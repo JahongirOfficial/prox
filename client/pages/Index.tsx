@@ -896,39 +896,39 @@ function CoursesList({
               Kurslar tuzilishi
             </h3>
             <div className="space-y-3">
-              <div className="flex items-center justify-between text-2xl font-jetbrains">
-                <span className="text-muted-foreground font-black font-jetbrains">
+              <div className="flex items-center justify-between text-sm font-jetbrains">
+                <span className="text-muted-foreground font-medium font-jetbrains">
                   Nazariya darslari
                 </span>
-                <span className="font-black text-6xl font-jetbrains">30%</span>
+                <span className="font-medium text-lg font-jetbrains">30%</span>
               </div>
-              <div className="w-full bg-muted rounded-full h-4">
+              <div className="w-full bg-muted rounded-full h-1.5">
                 <div
-                  className="bg-primary h-4 rounded-full"
+                  className="bg-primary h-1.5 rounded-full"
                   style={{ width: "30%" }}
                 ></div>
               </div>
-              <div className="flex items-center justify-between text-2xl font-jetbrains">
-                <span className="text-muted-foreground font-black font-jetbrains">
+              <div className="flex items-center justify-between text-sm font-jetbrains">
+                <span className="text-muted-foreground font-medium font-jetbrains">
                   Praktik mashg'ulotlar
                 </span>
-                <span className="font-black text-6xl font-jetbrains">50%</span>
+                <span className="font-medium text-lg font-jetbrains">50%</span>
               </div>
-              <div className="w-full bg-muted rounded-full h-4">
+              <div className="w-full bg-muted rounded-full h-1.5">
                 <div
-                  className="bg-primary h-4 rounded-full"
+                  className="bg-primary h-1.5 rounded-full"
                   style={{ width: "50%" }}
                 ></div>
               </div>
-              <div className="flex items-center justify-between text-2xl font-jetbrains">
-                <span className="text-muted-foreground font-black font-jetbrains">
+              <div className="flex items-center justify-between text-sm font-jetbrains">
+                <span className="text-muted-foreground font-medium font-jetbrains">
                   Loyihalar
                 </span>
-                <span className="font-black text-6xl font-jetbrains">20%</span>
+                <span className="font-medium text-lg font-jetbrains">20%</span>
               </div>
-              <div className="w-full bg-muted rounded-full h-4">
+              <div className="w-full bg-muted rounded-full h-1.5">
                 <div
-                  className="bg-primary h-4 rounded-full"
+                  className="bg-primary h-1.5 rounded-full"
                   style={{ width: "20%" }}
                 ></div>
               </div>
@@ -1776,38 +1776,27 @@ function MyCoursesContent({ navigate }) {
                   </p>
 
                   <div className="space-y-2 mb-4">
-                    <span className="inline-flex items-center gap-2 text-sm text-white/90 drop-shadow-sm">
-                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-400 to-cyan-400"></div>
-                      Qadam: <span className="font-bold text-white drop-shadow-sm">{stats.step}</span>
-                    </span>
-                    <span className="inline-flex items-center gap-2 text-sm text-white/90 drop-shadow-sm">
-                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400"></div>
-                      Jami ball: <span className="font-bold text-white drop-shadow-sm">{totalScore}</span>
-                    </span>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Progress:</span>
+                      <span className="font-medium text-primary">{course.progress || 0}%</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div
+                        className="bg-primary h-2 rounded-full transition-all duration-500"
+                        style={{ width: `${course.progress || 0}%` }}
+                      ></div>
+                    </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">O'qituvchi:</span>
-                      <span className="font-medium">{course.instructor}</span>
+                      <span className="font-medium">{course.instructor || "ProX Academy"}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Narxi:</span>
-                      <span className="font-medium text-primary">
-                        <img
-                          src="/images/orange-dollar.png"
-                          alt="$"
-                          className="inline-block w-4 h-4 mr-1"
-                        />
-                        {new Intl.NumberFormat("uz-UZ", {
-                          style: "currency",
-                          currency: "UZS",
-                          minimumFractionDigits: 0,
-                        }).format(course.price || 0)}
-                      </span>
+                      <span className="text-muted-foreground">Darslar:</span>
+                      <span className="font-medium">{course.completedLessons || 0}/{course.totalLessons || 0}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        Davomiyligi:
-                      </span>
-                      <span className="font-medium">{course.duration}</span>
+                      <span className="text-muted-foreground">Davomiyligi:</span>
+                      <span className="font-medium">{course.duration || "4 hafta"}</span>
                     </div>
                   </div>
 
@@ -4297,11 +4286,7 @@ function ProxOffline() {
                       <div className="relative z-10">
                         <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 border-amber-500/80 bg-gradient-to-br from-amber-500/40 to-yellow-500/40 flex items-center justify-center shadow-xl">
                           {currentUserId && (warningsByUser[currentUserId]?.[0]) ? (
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-200 animate-bounce">
-                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                              <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-                              <path d="M12 14v2" />
-                            </svg>
+                            <span className="icon-warning text-3xl animate-bounce">⚠️</span>
                           ) : (
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-400">
                               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -4311,7 +4296,7 @@ function ProxOffline() {
                           )}
                         </div>
                         <div className="text-xl font-bold text-amber-100 mb-2 tracking-wide">
-                          {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "1-oogohlantirish berildi" : "1-Ogohlantirish"}
+                          {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "1-oogohlantirish berildi!" : "1-Ogohlantirish"}
                         </div>
                         <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
                           {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "" : ""}
@@ -4323,11 +4308,7 @@ function ProxOffline() {
                         <div className="relative z-10">
                           <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 border-amber-500/80 bg-gradient-to-br from-amber-500/40 to-yellow-500/40 flex items-center justify-center shadow-xl">
                             {currentUserId && (warningsByUser[currentUserId]?.[0]) ? (
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-300 animate-bounce">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                                <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-                                <path d="M12 14v2" />
-                              </svg>
+                              <span className="icon-warning text-3xl animate-bounce">⚠️</span>
                             ) : (
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-400">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -4367,11 +4348,7 @@ function ProxOffline() {
                       <div className="relative z-10">
                         <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center border-rose-500/80 from-rose-500/50 to-red-500/50 shadow-xl">
                           {currentUserId && (warningsByUser[currentUserId]?.[1]) ? (
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-rose-200 animate-bounce">
-                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                              <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-                              <path d="M12 14v2" />
-                            </svg>
+                            <span className="icon-warning text-3xl animate-bounce">⚠️</span>
                           ) : (
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-rose-300">
                               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -4393,11 +4370,7 @@ function ProxOffline() {
                         <div className="relative z-10">
                           <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center border-rose-500/80 from-rose-500/50 to-red-500/50 shadow-xl">
                             {currentUserId && (warningsByUser[currentUserId]?.[1]) ? (
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-rose-300 animate-bounce">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                                <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-                                <path d="M12 14v2" />
-                              </svg>
+                              <span className="icon-warning text-3xl animate-bounce">⚠️</span>
                             ) : (
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-rose-400">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -4440,11 +4413,7 @@ function ProxOffline() {
                           : "border-slate-400/70 bg-slate-600/30"}
                         `}>
                           {currentUserId && (warningsByUser[currentUserId]?.[2]) ? (
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-200 animate-bounce">
-                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                              <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-                              <path d="M12 14v2" />
-                            </svg>
+                            <span className="icon-warning text-3xl animate-bounce">⚠️</span>
                           ) : (
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-400' : 'text-slate-500'}`}>
                               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -4473,10 +4442,7 @@ function ProxOffline() {
                             : "border-slate-300/60 bg-slate-500/15 shadow-lg"}
                           `}>
                             {currentUserId && (warningsByUser[currentUserId]?.[2]) ? (
-                              <div className="text-center animate-pulse">
-                                <div className="text-slate-200 font-bold text-sm mb-1">3-Ogohlantirish</div>
-                                <div className="text-slate-100 font-semibold text-xs">olindi</div>
-                              </div>
+                              <span className="icon-warning text-2xl animate-bounce">⚠️</span>
                             ) : (
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-400' : 'text-slate-500'}`}>
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -5418,14 +5384,21 @@ export default function Index() {
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
               </div>
             )}
-            {!isLoading && activeTab === "Bosh sahifa" && (
+            {!isLoading && location.pathname === '/' && (
               <HomeContent
                 setActiveTab={setActiveTab}
                 onProxOfflineClick={handleProxOfflineClick}
                 setSkipScroll={setSkipScroll}
               />
             )}
-            {activeTab === "Kurslar" && (
+            {!isLoading && location.pathname === '/home' && (
+              <HomeContent
+                setActiveTab={setActiveTab}
+                onProxOfflineClick={handleProxOfflineClick}
+                setSkipScroll={setSkipScroll}
+              />
+            )}
+            {!isLoading && location.pathname === '/courses' && (
               <CoursesList
                 setActiveTab={setActiveTab}
                 setActiveProject={setActiveProject}
@@ -5433,7 +5406,11 @@ export default function Index() {
                 setSkipScroll={setSkipScroll}
               />
             )}
-            {activeTab === "Kurslarim" && (
+            {!isLoading && location.pathname === '/my-courses' && (
+              <MyCoursesContent navigate={navigate} />
+            )}
+            {!isLoading && location.pathname === '/offline' && <ProxOffline />}
+            {!isLoading && activeTab === "Kurslarim" && location.pathname !== '/my-courses' && (
               <MyCoursesContent navigate={navigate} />
             )}
             {activeTab === "O'quvchilar loyihalari" && !activeProject && (
