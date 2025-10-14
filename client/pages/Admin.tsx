@@ -494,7 +494,8 @@ function UsersContent() {
     fullName: "",
     phone: "",
     role: "student",
-    balance: 0,
+    balance: "",
+    step: "",
   });
   const [editError, setEditError] = useState("");
   const [editSuccess, setEditSuccess] = useState("");
@@ -603,7 +604,8 @@ function UsersContent() {
       fullName: user.fullName || "",
       phone: user.phone || "",
       role: user.role || "student",
-      balance: user.balance || 0,
+      balance: (user.balance ?? "") as any,
+      step: (user.step ?? "") as any,
     });
     setEditError("");
     setEditSuccess("");
@@ -617,7 +619,8 @@ function UsersContent() {
       fullName: user.fullName || "",
       phone: user.phone || "",
       role: user.role || "student",
-      balance: user.balance || 0,
+      balance: (user.balance ?? "") as any,
+      step: (user.step ?? "") as any,
     });
     setEditError("");
     setEditSuccess("");
@@ -643,13 +646,26 @@ function UsersContent() {
         .split(";")
         .find((row) => row.trim().startsWith("jwt="))
         ?.split("=")[1];
+      // Build payload: convert balance/step to numbers if provided
+      const payload: any = {
+        fullName: editForm.fullName,
+        phone: editForm.phone,
+        role: editForm.role,
+      };
+      if (editForm.balance !== "" && editForm.balance !== null) {
+        payload.balance = Number(editForm.balance);
+      }
+      if (editForm.step !== "" && editForm.step !== null) {
+        payload.step = Number(editForm.step);
+      }
+
       const response = await fetch(`/api/admin/users/${editingUser.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify(payload),
       });
       // Agar 204 yoki content-type JSON emas bo'lsa, xatolik chiqmasin
       const contentType = response.headers.get("content-type");
@@ -1151,9 +1167,22 @@ function UsersContent() {
                   <Input
                     name="balance"
                     type="number"
-                    value={editForm.balance}
+                    value={(editForm.balance as any) === "" ? "" : editForm.balance}
                     onChange={handleEditFormChange}
-                    placeholder="0"
+                    placeholder="Balans"
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Qadam
+                  </label>
+                  <Input
+                    name="step"
+                    type="number"
+                    value={(editForm.step as any) === "" ? "" : editForm.step}
+                    onChange={handleEditFormChange}
+                    placeholder="Qadam"
                     className="w-full"
                   />
                 </div>

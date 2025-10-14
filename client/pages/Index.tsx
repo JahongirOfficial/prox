@@ -1883,18 +1883,179 @@ function ProfileContent({
 
   // Cascading selects data
   const UZ_REGIONS: Record<string, string[]> = {
-    Andijon: ["Andijon shahri", "Asaka", "Marhamat"],
-    Buxoro: ["Buxoro shahri", "G'ijduvon", "Jondor"],
-    "Farg'ona": ["Farg'ona shahri", "Qo'qon", "Quva"],
-    Jizzax: ["Jizzax shahri", "Zomin", "Forish"],
-    Namangan: ["Namangan shahri", "Chortoq", "Chust"],
-    Navoiy: ["Navoiy shahri", "Qiziltepa", "Konimex"],
-    Qashqadaryo: ["Qarshi shahri", "Shahrisabz", "Koson"],
-    Samarqand: ["Samarqand shahri", "Kattaqo'rg'on", "Urgut"],
-    Surxondaryo: ["Termiz shahri", "Denov", "Sherobod"],
-    Sirdaryo: ["Guliston shahri", "Sirdaryo", "Boyovut"],
-    Toshkent: ["Nurafshon", "Qibray", "Bo'stonliq"],
-    Xorazm: ["Urganch shahri", "Xiva", "Xonqa"],
+    Andijon: [
+      "Andijon shahri",
+      "Asaka",
+      "Baliqchi",
+      "Bo'ston",
+      "Buloqboshi",
+      "Izboskan",
+      "Jalolquduq",
+      "Marhamat",
+      "Oltinko'l",
+      "Paxtaobod",
+      "Qo'rg'ontepa",
+      "Shahrixon",
+      "Ulug'nor",
+    ],
+    Buxoro: [
+      "Buxoro shahri",
+      "Buxoro",
+      "G'ijduvon",
+      "Jondor",
+      "Kogon",
+      "Kogon shahri",
+      "Olot",
+      "Peshku",
+      "Qorako'l",
+      "Qorovulbozor",
+      "Romitan",
+      "Shofirkon",
+      "Vobkent",
+    ],
+    "Farg'ona": [
+      "Farg'ona shahri",
+      "Qo'qon",
+      "Quva",
+      "Beshariq",
+      "Bog'dod",
+      "Dang'ara",
+      "Furqat",
+      "Oltiariq",
+      "Rishton",
+      "So'x",
+      "Toshloq",
+      "Uchko'prik",
+      "Yozyovon",
+    ],
+    Jizzax: [
+      "Jizzax shahri",
+      "Arnasoy",
+      "Baxmal",
+      "Do'stlik",
+      "Forish",
+      "G'allaorol",
+      "Mirzacho'l",
+      "Paxtakor",
+      "Yangiobod",
+      "Zafarobod",
+      "Zomin",
+    ],
+    Namangan: [
+      "Namangan shahri",
+      "Chortoq",
+      "Chust",
+      "Kosonsoy",
+      "Mingbuloq",
+      "Norin",
+      "Pop",
+      "To'raqo'rg'on",
+      "Uchqo'rg'on",
+      "Uychi",
+      "Yangiqo'rg'on",
+    ],
+    Navoiy: [
+      "Navoiy shahri",
+      "Karmana",
+      "Konimex",
+      "Qiziltepa",
+      "Nurota",
+      "Tomdi",
+      "Uchquduq",
+      "Xatirchi",
+    ],
+    Qashqadaryo: [
+      "Qarshi shahri",
+      "Chiroqchi",
+      "Dehqonobod",
+      "G'uzor",
+      "Kasbi",
+      "Kitob",
+      "Koson",
+      "Mirishkor",
+      "Muborak",
+      "Nishon",
+      "Qamashi",
+      "Shahrisabz",
+      "Yakkabog'",
+    ],
+    Samarqand: [
+      "Samarqand shahri",
+      "Bulung'ur",
+      "Ishtixon",
+      "Jomboy",
+      "Kattaqo'rg'on",
+      "Kattaqo'rg'on shahri",
+      "Narpay",
+      "Nurobod",
+      "Oqdaryo",
+      "Paxtachi",
+      "Payariq",
+      "Pastdarg'om",
+      "Qo'shrabot",
+      "Tayloq",
+      "Urgut",
+    ],
+    Surxondaryo: [
+      "Termiz shahri",
+      "Angor",
+      "Bandixon",
+      "Boysun",
+      "Denov",
+      "Jarqo'rg'on",
+      "Muzrabot",
+      "Oltinsoy",
+      "Qiziriq",
+      "Qumqo'rg'on",
+      "Sariosiyo",
+      "Sherobod",
+      "Sho'rchi",
+      "Termiz",
+      "Uzun",
+    ],
+    Sirdaryo: [
+      "Guliston shahri",
+      "Boyovut",
+      "Guliston",
+      "Mirzaobod",
+      "Oqoltin",
+      "Sardoba",
+      "Sayxunobod",
+      "Sirdaryo",
+      "Xovos",
+    ],
+    Toshkent: [
+      "Toshkent shahri",
+      "Nurafshon",
+      "Bekobod",
+      "Bekobod shahri",
+      "Bo'stonliq",
+      "Bo'ka",
+      "Chinoz",
+      "Oqqo'rg'on",
+      "Ohangaron",
+      "Ohangaron shahri",
+      "Parkent",
+      "Piskent",
+      "Qibray",
+      "Quyi Chirchiq",
+      "Yangiyo'l",
+      "Zangiota",
+      "Yuqori Chirchiq",
+    ],
+    Xorazm: [
+      "Urganch shahri",
+      "Bog'ot",
+      "Gurlan",
+      "Hazorasp",
+      "Qo'shko'pir",
+      "Shovot",
+      "Urganch",
+      "Xiva",
+      "Xonqa",
+      "Yangiariq",
+      "Yangibozor",
+    ],
   };
 
   const SCHOOL_OPTIONS = Array.from(
@@ -2499,23 +2660,6 @@ function ProfileContent({
                     </div>
 
                     <div className="relative bg-background rounded-md p-8">
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                        <span className="text-muted-foreground font-black mb-4">Progress:</span>
-                        <span
-                          className="font-black leading-none"
-                          style={{ fontSize: '300px', lineHeight: '1' }}
-                        >
-                          {course.progress || 0}%
-                        </span>
-                      </div>
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <div className="w-full bg-muted rounded-full h-4">
-                          <div
-                            className="bg-primary h-4 rounded-full transition-all duration-300"
-                            style={{ width: `${course.progress || 0}%` }}
-                          ></div>
-                        </div>
-                      </div>
                     </div>
 
                     <div className="p-3 pt-2">
@@ -5379,7 +5523,7 @@ export default function Index() {
 
         <SidebarInset id="main-scroll" className="flex-1 overflow-y-auto">
           <div className="p-4 sm:p-6 lg:p-8 md:pt-4 pt-20 pb-16">
-            {isLoading && (
+            {isLoading && location.pathname !== '/offline' && (
               <div className="flex items-center justify-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
               </div>
@@ -5409,7 +5553,7 @@ export default function Index() {
             {!isLoading && location.pathname === '/my-courses' && (
               <MyCoursesContent navigate={navigate} />
             )}
-            {!isLoading && location.pathname === '/offline' && <ProxOffline />}
+            {/* ProxOffline handled in single routing block below to prevent duplicate loader */}
             {!isLoading && activeTab === "Kurslarim" && location.pathname !== '/my-courses' && (
               <MyCoursesContent navigate={navigate} />
             )}
