@@ -2,72 +2,72 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select"
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarHeader,
-    SidebarInset,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarProvider,
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
 } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CourseModule, Lesson } from "@shared/api"
 import {
-    AlertTriangle,
-    BarChart2,
-    BarChart3,
-    BookOpen,
-    ChartBar,
-    Check,
-    CreditCard,
-    Database,
-    Download,
-    Edit,
-    Eye,
-    Filter,
-    LogOut,
-    Menu,
-    Pencil,
-    Phone,
-    RefreshCw,
-    Search,
-    Settings,
-    Trash2,
-    TrendingDown,
-    User,
-    Users,
-    Wifi,
-    X
+  AlertTriangle,
+  BarChart2,
+  BarChart3,
+  BookOpen,
+  ChartBar,
+  Check,
+  CreditCard,
+  Database,
+  Download,
+  Edit,
+  Eye,
+  Filter,
+  LogOut,
+  Menu,
+  Pencil,
+  Phone,
+  RefreshCw,
+  Search,
+  Settings,
+  Trash2,
+  TrendingDown,
+  User,
+  Users,
+  Wifi,
+  X
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import {
-    Navigate,
-    Route,
-    Routes,
-    useLocation,
-    useNavigate,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
 } from "react-router-dom"
 import CourseDetailsModal from "./CourseDetailsModal"
 import DatabaseContent from "./DatabaseContent"
@@ -2944,7 +2944,7 @@ function PaymentsContent() {
                             payment.status === "pending"
                               ? "secondary"
                               : payment.status === "completed" ||
-                                  payment.status === "success"
+                                payment.status === "success"
                                 ? "outline"
                                 : payment.status === "rejected"
                                   ? "destructive"
@@ -2954,7 +2954,7 @@ function PaymentsContent() {
                           {payment.status === "pending"
                             ? "Kutilmoqda"
                             : payment.status === "completed" ||
-                                payment.status === "success"
+                              payment.status === "success"
                               ? "Tasdiqlangan"
                               : payment.status === "rejected"
                                 ? "Rad etilgan"
@@ -3393,11 +3393,27 @@ function AdminProxOffline() {
     todayScore: 0,
     attendanceDays: [] as string[],
     arrivalDate: "",
+    totalScore: 0,
+    role: "student_offline",
   });
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState("");
   const [editSuccess, setEditSuccess] = useState("");
   const [singleScore, setSingleScore] = useState({ score: "", note: "" });
+
+  // Bugungi ball o'zgarishini kuzatib, jami ballni yangilash
+  useEffect(() => {
+    if (editingUser && singleScore.score !== "") {
+      const currentTotal = getTotalScore(editingUser);
+      const newScore = Number(singleScore.score) || 0;
+      const newTotal = currentTotal + newScore;
+
+      setEditForm(prev => ({
+        ...prev,
+        totalScore: newTotal
+      }));
+    }
+  }, [singleScore.score, editingUser]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -3565,32 +3581,14 @@ function AdminProxOffline() {
       todayScore: todayScoreObj ? todayScoreObj.score : 0,
       attendanceDays: existingDays.length > 0 ? existingDays : defaultAll,
       arrivalDate: (user as any).arrivalDate || "",
+      totalScore: getTotalScore(user),
+      role: user.role || "student_offline",
     });
     setEditError("");
     setEditSuccess("");
-    
-    // Set single score and note for today
-    if (todayScoreObj) {
-      setSingleScore({
-        score: todayScoreObj.score || "",
-        note: todayScoreObj.note || ""
-      });
-    } else {
-      // Agar bugun uchun ball mavjud bo'lmasa, oxirgi ballni ko'rsatamiz
-      if (user.todayScores && user.todayScores.length > 0) {
-        const lastScore = user.todayScores[user.todayScores.length - 1];
-        if (lastScore.date && lastScore.date !== "") {
-          setSingleScore({
-            score: lastScore.score || "",
-            note: lastScore.note || ""
-          });
-        } else {
-          setSingleScore({ score: "", note: "" });
-        }
-      } else {
-        setSingleScore({ score: "", note: "" });
-      }
-    }
+
+    // Har safar tahrirlash bosilganda bugungi ball 0 bo'lib turishi uchun
+    setSingleScore({ score: "", note: "" });
   };
 
   // Edit form change handler
@@ -3615,7 +3613,7 @@ function AdminProxOffline() {
       const token = document.cookie
         .split(";")
         .find((row) => row.trim().startsWith("jwt="));
-      
+
       // Prepare today's score as an array with one object
       const todayScoresArr = [];
       if (singleScore.score !== "" && !isNaN(Number(singleScore.score))) {
@@ -3627,14 +3625,14 @@ function AdminProxOffline() {
         const day = today.getDate();
         const month = months[today.getMonth()];
         const uzDate = `${day}-${month}`;
-        
+
         todayScoresArr.push({
           date: uzDate,
           score: Number(singleScore.score),
           note: singleScore.note || ""
         });
       }
-      
+
       const body = {
         fullName: editForm.fullName,
         phone: editForm.phone,
@@ -3643,8 +3641,10 @@ function AdminProxOffline() {
         attendanceDays: editForm.attendanceDays,
         arrivalDate: editForm.arrivalDate,
         weekScores: todayScoresArr, // Send as array with one object
+        role: editForm.role, // Rol maydonini yuborish
+        // totalScore avtomatik hisoblanadi, yuborilmaydi
       };
-      
+
       const res = await fetch(`/api/admin/users/${editingUser.id}`, {
         method: "PUT",
         headers: {
@@ -3661,13 +3661,17 @@ function AdminProxOffline() {
         prev.map((u) =>
           u.id === editingUser.id
             ? {
-                ...u,
-                ...editForm,
-                todayScores: data.user?.todayScores ?? u.todayScores,
-              }
+              ...u,
+              ...editForm,
+              todayScores: data.user?.todayScores ?? u.todayScores,
+            }
             : u,
         ),
       );
+
+      // Bugungi ballni 0 ga o'rnatish (keyingi tahrirlash uchun)
+      setSingleScore({ score: "", note: "" });
+
       // Close the modal after a short delay
       setTimeout(() => {
         setEditingUser(null);
@@ -3758,7 +3762,7 @@ function AdminProxOffline() {
                     O'quvchini tahrirlash
                   </h3>
                   <div className="text-sm text-muted-foreground">
-                    Jami ball: <span className="font-semibold text-foreground">{editingUser ? getTotalScore(editingUser) : 0}</span>
+                    Jami ball: <span className="font-semibold text-foreground">{editForm.totalScore || (editingUser ? getTotalScore(editingUser) : 0)}</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-end gap-2 pt-2">
@@ -3796,6 +3800,21 @@ function AdminProxOffline() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">
+                      Rol
+                    </label>
+                    <select
+                      name="role"
+                      value={editForm.role}
+                      onChange={handleEditFormChange}
+                      className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground"
+                    >
+                      <option value="student">Student</option>
+                      <option value="student_offline">Student Offline</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
                       Balans
                     </label>
                     <Input
@@ -3819,6 +3838,22 @@ function AdminProxOffline() {
                       ).toString()}
                       className="w-full"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Jami ball
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div className="w-full px-3 py-2 border border-input rounded-md bg-muted/50 text-foreground font-semibold text-lg">
+                        {editForm.totalScore || getTotalScore(editingUser)}
+                      </div>
+                      <div className="text-sm text-muted-foreground whitespace-nowrap">
+                        Joriy: {getTotalScore(editingUser)}
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Bugungi ball kiritilganda avtomatik yangilanadi
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">
@@ -3925,7 +3960,9 @@ function AdminProxOffline() {
                           type="number"
                           min="0"
                           value={singleScore.score}
-                          onChange={(e) => setSingleScore({...singleScore, score: e.target.value})}
+                          onChange={(e) => setSingleScore({ ...singleScore, score: e.target.value })}
+                          onWheel={(e) => (e.currentTarget as HTMLInputElement).blur()}
+                          onFocus={(e) => e.currentTarget.select()}
                           placeholder="Ball kiriting"
                           className="w-full"
                         />
@@ -3937,14 +3974,14 @@ function AdminProxOffline() {
                         <textarea
                           rows={3}
                           value={singleScore.note}
-                          onChange={(e) => setSingleScore({...singleScore, note: e.target.value})}
+                          onChange={(e) => setSingleScore({ ...singleScore, note: e.target.value })}
                           placeholder="Sabab/izoh..."
                           className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground"
                         />
                       </div>
                     </div>
                   </div>
-                  
+
                   {editError && (
                     <div className="flex items-center gap-2 p-2 bg-red-50 text-red-700 rounded text-sm">
                       <X className="w-4 h-4" /> {editError}
@@ -4208,7 +4245,7 @@ function AdminPanel() {
           setUserData(data.user);
         }
       }
-    } catch {}
+    } catch { }
   };
 
   // When switching to settings tab, reload user data
@@ -4289,10 +4326,10 @@ function AdminPanel() {
                 {adminMenuItems.map((item) => (
                   <Button
                     key={item.title}
-                    variant={activeTab === item.path ? "secondary" : "ghost"}
+                    variant={location.pathname.includes(item.path) ? "secondary" : "ghost"}
                     className="w-full justify-start"
                     onClick={() => {
-                      setActiveTab(item.path);
+                      navigate(item.path);
                       setMobileMenuOpen(false);
                     }}
                   >
@@ -4327,7 +4364,7 @@ function AdminPanel() {
                 {adminMenuItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
-                      isActive={activeTab === item.path}
+                      isActive={location.pathname.includes(item.path)}
                       className="w-full justify-start"
                       onClick={() => handleSidebarMenuClick(item.path)}
                     >

@@ -998,6 +998,7 @@ export function createServer() {
         attendanceDays,
         arrivalDate,
         weekScores,
+        totalScore,
         warnings,
         certificates,
       } = req.body;
@@ -1068,6 +1069,47 @@ export function createServer() {
           }
         }
         (user as any).todayScores = existing;
+      }
+
+      // If totalScore is provided, adjust todayScores so that the sum equals totalScore
+      if (typeof totalScore === "number" && !isNaN(totalScore)) {
+        const existing = Array.isArray((user as any).todayScores)
+          ? ((user as any).todayScores as any[])
+          : [];
+        const currentTotal = existing.reduce(
+          (sum: number, x: any) => sum + Number(x?.score || 0),
+          0,
+        );
+        const delta = Number(totalScore) - currentTotal;
+        if (delta !== 0) {
+          // Build Uzbek date string for today, consistent with client logic
+          const today = new Date();
+          const months = [
+            "yanvar",
+            "fevral",
+            "mart",
+            "aprel",
+            "may",
+            "iyun",
+            "iyul",
+            "avgust",
+            "sentabr",
+            "oktabr",
+            "noyabr",
+            "dekabr",
+          ];
+          const day = today.getDate();
+          const month = months[today.getMonth()];
+          const uzDate = `${day}-${month}`;
+
+          const idx = existing.findIndex((x) => x && x.date === uzDate);
+          if (idx >= 0) {
+            existing[idx].score = Number(existing[idx].score || 0) + delta;
+          } else {
+            existing.push({ date: uzDate, score: delta, note: "" });
+          }
+          (user as any).todayScores = existing;
+        }
       }
 
       await user.save();
@@ -3271,6 +3313,7 @@ export function createServer() {
         attendanceDays,
         arrivalDate,
         weekScores, // Yangi qo'shilgan
+        totalScore, // Jami ball
         warnings,
         certificates,
       } = req.body;
@@ -3301,18 +3344,61 @@ export function createServer() {
         if (user.todayScores === undefined)
           user.todayScores = [{ date: "", score: 0 }];
         
+        // Jami ballni o'zgartirish
+        if (totalScore !== undefined && typeof totalScore === 'number') {
+          // Hozirgi jami ballni hisoblash
+          const currentTotal = user.todayScores.reduce((sum, s) => sum + (s.score || 0), 0);
+          
+          // Agar yangi jami ball kiritilgan bo'lsa va u hozirgi jami balldan farq qilsa
+          if (totalScore !== currentTotal) {
+            // Barcha ballarni yangi jami ballga moslash
+            // Eng oddiy usul: birinchi yozuvga yangi jami ballni berish, qolganlarini 0 qilish
+            if (user.todayScores.length > 0) {
+              user.todayScores[0].score = totalScore;
+              // Qolgan yozuvlarni 0 qilish (agar kerak bo'lsa)
+              for (let i = 1; i < user.todayScores.length; i++) {
+                user.todayScores[i].score = 0;
+              }
+            } else {
+              // Agar hech qanday yozuv bo'lmasa, yangi yozuv yaratish
+              const months = [
+                "yanvar", "fevral", "mart", "aprel", "may", "iyun",
+                "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr",
+              ];
+              const d = new Date();
+              const day = d.getDate();
+              const month = months[d.getMonth()];
+              const uzDate = `${day}-${month}`;
+              user.todayScores.push({
+                date: uzDate,
+                score: totalScore,
+                note: "Jami ball o'zgartirildi"
+              });
+            }
+          }
+        }
+
         // Yangi o'zgarish: weekScores obyekt sifatida kelganda ham ishlash
-        if (Array.isArray(weekScores)) {
+        if (Array.isArray(weekScores) && weekScores.length > 0) {
           for (const ws of weekScores) {
-            // Remove any existing entry for this date
-            user.todayScores = user.todayScores.filter(
-              (s) => s.date !== ws.date,
-            );
-            user.todayScores.push({
-              date: ws.date,
-              score: ws.score,
-              note: ws.note || "",
-            });
+            // Faqat ball kiritilgan bo'lsa qo'shish
+            if (ws.score && ws.score > 0) {
+              // Shu sana uchun mavjud yozuvni topish
+              const existingIndex = user.todayScores.findIndex(s => s.date === ws.date);
+              
+              if (existingIndex >= 0) {
+                // Mavjud yozuvni yangilash
+                user.todayScores[existingIndex].score = ws.score;
+                user.todayScores[existingIndex].note = ws.note || "";
+              } else {
+                // Yangi yozuv qo'shish
+                user.todayScores.push({
+                  date: ws.date,
+                  score: ws.score,
+                  note: ws.note || "",
+                });
+              }
+            }
           }
         }
         
@@ -3532,6 +3618,7 @@ export function createServer() {
 
   // Only serve static files in production mode
   if (process.env.NODE_ENV === "production") {
+    const __dirname = path.dirname(new URL(import.meta.url).pathname);
     app.use(express.static(path.join(__dirname, "client/build")));
 
     app.get("*", (req, res) => {

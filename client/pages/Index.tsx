@@ -36,7 +36,7 @@ import {
 export const menuItems = [
   { title: "Bosh sahifa", icon: Home },
   { title: "Kurslar", icon: BookOpen },
-  { title: "O'quvchilar loyihalari", icon: FolderOpen },
+  { title: "Loyihalarimiz", icon: FolderOpen },
 ];
 
 export const userMenuItems = [{ title: "Kurslarim", icon: BookOpen }];
@@ -213,7 +213,7 @@ function CoursesList({
     setShowPaymentForm(false);
   };
 
-  
+
 
   // Helper: progress based on arrival date vs current step
   const getDaysSinceArrival = (arrival?: string) => {
@@ -327,7 +327,7 @@ function CoursesList({
         const data = await response.json();
         setEnrolledCourses(data.courses || []);
       }
-    } catch {}
+    } catch { }
   };
 
   const formatCurrency = (amount) => {
@@ -526,8 +526,7 @@ function CoursesList({
             return (
               <Card
                 key={course.id}
-                className={`relative overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer group hover:shadow-lg hover:shadow-primary/10 ${
-                  (highlightTarget === "html" && isHTMLCourse(course)) ||
+                className={`relative overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer group hover:shadow-lg hover:shadow-primary/10 ${(highlightTarget === "html" && isHTMLCourse(course)) ||
                   (highlightTarget === "css" &&
                     (isCSSCourse(course) || isBootstrapCourse(course))) ||
                   (highlightTarget === "bootstrap" &&
@@ -537,9 +536,9 @@ function CoursesList({
                   (highlightTarget === "nodejs" && isNodejsCourse(course)) ||
                   (highlightTarget === "express" && isExpressCourse(course)) ||
                   (highlightTarget === "mongo" && isMongoCourse(course))
-                    ? "ring-2 ring-cyan-500"
-                    : ""
-                }`}
+                  ? "ring-2 ring-cyan-500"
+                  : ""
+                  }`}
                 onClick={() => openCourseDetails(course.id)}
               >
                 <CardContent className="p-0">
@@ -555,9 +554,9 @@ function CoursesList({
                     </div>
                   )}
 
-                
 
-                
+
+
                   <div className="p-8">
                     <h3 className="text-xl font-semibold font-jetbrains text-card-foreground mb-2 flex items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
                       <span className="truncate">{course.title}</span>
@@ -632,7 +631,7 @@ function CoursesList({
                             const token = getJwtToken();
                             if (!token) {
                               // No JWT token found, redirect to login page
-                              setActiveTab("O'quvchilar loyihalari");
+                              setActiveTab("Loyihalarimiz");
                               setActiveProject("Blogs");
                               return;
                             }
@@ -1265,7 +1264,7 @@ function ProjectsList() {
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-foreground">
-            O'quvchilar loyihalari
+            Loyihalarimiz
           </h2>
         </div>
       </div>
@@ -1344,9 +1343,9 @@ function ProjectsList() {
                 <Badge variant="secondary" className="text-xs">
                   {project.badge}
                 </Badge>
-                      <span className="text-lg font-bold text-primary">
-                        {project.price}
-                      </span>
+                <span className="text-lg font-bold text-primary">
+                  {project.price}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -2266,17 +2265,17 @@ function ProfileContent({
       const body = isLoginMode
         ? { phone: formData.phone, password: formData.password }
         : {
-            fullName: formData.fullName.trim(),
-            phone: formData.phone,
-            password: formData.password,
-            role: "student",
-            meta: {
-              region: formData.region,
-              district: formData.district,
-              school: formData.school,
-              grade: formData.grade,
-            },
-          };
+          fullName: formData.fullName.trim(),
+          phone: formData.phone,
+          password: formData.password,
+          role: "student",
+          meta: {
+            region: formData.region,
+            district: formData.district,
+            school: formData.school,
+            grade: formData.grade,
+          },
+        };
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -2397,7 +2396,7 @@ function ProfileContent({
                       className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                     />
                   </div>
-                  
+
                   {/* Region / District / School / Grade */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
@@ -3465,11 +3464,10 @@ function PaymentsContent() {
                 <button
                   type="submit"
                   disabled={loading || !paymentForm.amount}
-                  className={`flex-1 px-6 py-3 font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl ${
-                    loading || !paymentForm.amount
-                      ? "bg-slate-600 text-slate-400 cursor-not-allowed"
-                      : "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white hover:scale-105"
-                  }`}
+                  className={`flex-1 px-6 py-3 font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl ${loading || !paymentForm.amount
+                    ? "bg-slate-600 text-slate-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white hover:scale-105"
+                    }`}
                 >
                   {loading ? "Jarayonda..." : "To'lovni tasdiqlash"}
                 </button>
@@ -3664,11 +3662,10 @@ export function MobileNavbar({
               {menuItems.map((item) => (
                 <button
                   key={item.title}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                    activeTab === item.title && !activeProject
-                      ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg"
-                      : "text-gray-300 hover:bg-slate-700/50 hover:text-white"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${activeTab === item.title && !activeProject
+                    ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg"
+                    : "text-gray-300 hover:bg-slate-700/50 hover:text-white"
+                    }`}
                   onClick={() => onMenuClick(item.title)}
                 >
                   <item.icon className="w-5 h-5" />
@@ -3781,7 +3778,9 @@ function ProxOffline() {
   const [certsByUser, setCertsByUser] = useState<Record<string, boolean[]>>({});
   const [certModalOpen, setCertModalOpen] = useState(false);
   const [certTarget, setCertTarget] = useState<number>(-1);
-  const [certAction, setCertAction] = useState<"unlock"|"lock">("unlock");
+  const [certAction, setCertAction] = useState<"unlock" | "lock">("unlock");
+
+
 
   // Local helpers for progress to avoid scope issues
   const daysSinceArrival = (arrival?: string) => {
@@ -3892,7 +3891,7 @@ function ProxOffline() {
           const d = await ref.json();
           setWarningsByUser((prev) => ({ ...prev, [userId]: d?.user?.warnings || nextWarnings }));
         }
-      } catch {}
+      } catch { }
       return true;
     } catch {
       return false;
@@ -3922,7 +3921,7 @@ function ProxOffline() {
           const arr = certificateTitles.map((t) => serverTitles.includes(t));
           setCertsByUser((prev) => ({ ...prev, [userId]: arr }));
         }
-      } catch {}
+      } catch { }
       return true;
     } catch {
       return false;
@@ -3942,7 +3941,7 @@ function ProxOffline() {
           const data = await res.json();
           setIsAdmin(data?.user?.role === "admin");
         }
-      } catch {}
+      } catch { }
     };
     check();
   }, []);
@@ -3981,11 +3980,30 @@ function ProxOffline() {
                   const titles = raw as string[];
                   arr = certificateTitles.map((t) => titles.includes(t));
                 }
+
+                // Avtomatik sertifikat ochish logikasi
+                const step = Number(u.step || 0);
+                const totalScore = (u.todayScores || []).reduce((sum: number, s: any) => sum + (s.score || 0), 0);
+
+                // HTML sertifikati - o'quvchining qadami 35 dan yuqori bo'lsa
+                if (step > 35 && !arr[0]) {
+                  console.log(`HTML sertifikati ochildi: ${u.fullName}, step: ${step}`);
+                  arr[0] = true; // HTML sertifikati
+                }
+
+                // CSS & Bootstrap sertifikati - o'quvchining qadami 80 dan yuqori bo'lsa
+                if (step > 80 && !arr[1]) {
+                  console.log(`CSS & Bootstrap sertifikati ochildi: ${u.fullName}, step: ${step}`);
+                  arr[1] = true; // CSS & Bootstrap sertifikati
+                }
+
                 cmap[uid] = arr;
               });
               setCertsByUser(cmap);
-            } catch {}
-          } catch {}
+
+
+            } catch { }
+          } catch { }
         } else {
           setError("Foydalanuvchilarni yuklashda xatolik");
         }
@@ -4330,7 +4348,7 @@ function ProxOffline() {
                     </div>
                   )}
 
-                
+
 
                 {/* Progress */}
                 <div className="mt-5 max-w-5xl mx-auto w-full">
@@ -4342,29 +4360,28 @@ function ProxOffline() {
                   <div className="flex items-center gap-2">
                     <div className="relative flex-1 h-8 sm:h-10 rounded-full bg-slate-900/30 border border-white/10 overflow-hidden shadow-inner">
                       <div
-                        className={`h-full rounded-full shadow-[0_0_12px_rgba(16,185,129,0.35)] transition-all duration-500 ${
-                          progressPercent(selectedUser) > 55
-                            ? 'bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-400'
-                            : 'bg-gradient-to-r from-red-400 via-red-500 to-red-400'
-                        }`}
+                        className={`h-full rounded-full shadow-[0_0_12px_rgba(16,185,129,0.35)] transition-all duration-500 ${progressPercent(selectedUser) > 55
+                          ? 'bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-400'
+                          : 'bg-gradient-to-r from-red-400 via-red-500 to-red-400'
+                          }`}
                         style={{ width: `${Math.min(100, progressPercent(selectedUser))}%` }}
                       />
                     </div>
-                    <div className={`backdrop-blur-sm rounded-md px-3 py-2 border ${
-                      progressPercent(selectedUser) > 55
-                        ? 'bg-emerald-500/20 border-emerald-400/30'
-                        : 'bg-red-500/20 border-red-400/30'
-                    }`}>
-                      <span className={`font-black tracking-wide text-2xl sm:text-3xl ${
-                        progressPercent(selectedUser) > 55 ? 'text-emerald-300' : 'text-red-300'
+                    <div className={`backdrop-blur-sm rounded-md px-3 py-2 border ${progressPercent(selectedUser) > 55
+                      ? 'bg-emerald-500/20 border-emerald-400/30'
+                      : 'bg-red-500/20 border-red-400/30'
                       }`}>
+                      <span className={`font-black tracking-wide text-2xl sm:text-3xl ${progressPercent(selectedUser) > 55 ? 'text-emerald-300' : 'text-red-300'
+                        }`}>
                         {Math.round(progressPercent(selectedUser))}%
                       </span>
                     </div>
                   </div>
-                  {(() => { const info = progressGainLoss(selectedUser); return info.text ? (
-                    <div className={`mt-3 text-center text-base ${info.classes}`}>{info.text}</div>
-                  ) : null })()}
+                  {(() => {
+                    const info = progressGainLoss(selectedUser); return info.text ? (
+                      <div className={`mt-3 text-center text-base ${info.classes}`}>{info.text}</div>
+                    ) : null
+                  })()}
                 </div>
 
                 {/* Info Cards: Arrival, Today, Total Days (reordered) */}
@@ -4418,35 +4435,35 @@ function ProxOffline() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {/* 1-Ogohlantirish */}
                     {isAdmin ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setWarningTarget(1);
-                        setWarningReason(currentUserId ? (warningsByUser[currentUserId]?.[0] || "") : "");
-                        setWarningModalOpen(true);
-                      }}
-                      className="relative rounded-3xl border-4 border-amber-500/80 bg-gradient-to-br from-amber-600/40 via-yellow-600/35 to-orange-600/40 p-6 text-center shadow-2xl"
-                    >
-                      <div className="relative z-10">
-                        <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 border-amber-500/80 bg-gradient-to-br from-amber-500/40 to-yellow-500/40 flex items-center justify-center shadow-xl">
-                          {currentUserId && (warningsByUser[currentUserId]?.[0]) ? (
-                            <span className="icon-warning text-3xl animate-bounce">⚠️</span>
-                          ) : (
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-400">
-                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                              <circle cx="12" cy="16" r="1" />
-                              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                            </svg>
-                          )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWarningTarget(1);
+                          setWarningReason(currentUserId ? (warningsByUser[currentUserId]?.[0] || "") : "");
+                          setWarningModalOpen(true);
+                        }}
+                        className="relative rounded-3xl border-4 border-amber-500/80 bg-gradient-to-br from-amber-600/40 via-yellow-600/35 to-orange-600/40 p-6 text-center shadow-2xl"
+                      >
+                        <div className="relative z-10">
+                          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 border-amber-500/80 bg-gradient-to-br from-amber-500/40 to-yellow-500/40 flex items-center justify-center shadow-xl">
+                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? (
+                              <span className="icon-warning text-3xl animate-bounce">⚠️</span>
+                            ) : (
+                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-400">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <circle cx="12" cy="16" r="1" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="text-xl font-bold text-amber-100 mb-2 tracking-wide">
+                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "1-oogohlantirish berildi!" : "1-Ogohlantirish"}
+                          </div>
+                          <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
+                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "" : ""}
+                          </div>
                         </div>
-                        <div className="text-xl font-bold text-amber-100 mb-2 tracking-wide">
-                          {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "1-oogohlantirish berildi!" : "1-Ogohlantirish"}
-                        </div>
-                        <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
-                          {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "" : ""}
-                        </div>
-                      </div>
-                    </button>
+                      </button>
                     ) : (
                       <div className="relative rounded-3xl border-4 border-amber-500/80 bg-gradient-to-br from-amber-600/40 via-yellow-600/35 to-orange-600/40 p-6 text-center opacity-85 cursor-not-allowed shadow-2xl">
                         <div className="relative z-10">
@@ -4472,43 +4489,43 @@ function ProxOffline() {
                     )}
                     {/* 2-Ogohlantirish */}
                     {isAdmin ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!currentUserId || !(warningsByUser[currentUserId]?.[0])) {
-                          alert("Avval 1-ogohlantirishni bering.");
-                          return;
-                        }
-                        setWarningTarget(2);
-                        setWarningReason(currentUserId ? (warningsByUser[currentUserId]?.[1] || "") : "");
-                        setWarningModalOpen(true);
-                      }}
-                      disabled={!currentUserId || !(warningsByUser[currentUserId]?.[0])}
-                      className={`relative rounded-3xl border-4 border-rose-500/80 p-6 text-center shadow-2xl ${currentUserId && warningsByUser[currentUserId]?.[0]
-                        ? "bg-gradient-to-br from-rose-600/50 via-red-600/45 to-pink-600/50"
-                        : "opacity-75 cursor-not-allowed bg-rose-700/40 border-rose-400/70"}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!currentUserId || !(warningsByUser[currentUserId]?.[0])) {
+                            alert("Avval 1-ogohlantirishni bering.");
+                            return;
+                          }
+                          setWarningTarget(2);
+                          setWarningReason(currentUserId ? (warningsByUser[currentUserId]?.[1] || "") : "");
+                          setWarningModalOpen(true);
+                        }}
+                        disabled={!currentUserId || !(warningsByUser[currentUserId]?.[0])}
+                        className={`relative rounded-3xl border-4 border-rose-500/80 p-6 text-center shadow-2xl ${currentUserId && warningsByUser[currentUserId]?.[0]
+                          ? "bg-gradient-to-br from-rose-600/50 via-red-600/45 to-pink-600/50"
+                          : "opacity-75 cursor-not-allowed bg-rose-700/40 border-rose-400/70"}
                       `}
-                    >
-                      <div className="relative z-10">
-                        <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center border-rose-500/80 from-rose-500/50 to-red-500/50 shadow-xl">
-                          {currentUserId && (warningsByUser[currentUserId]?.[1]) ? (
-                            <span className="icon-warning text-3xl animate-bounce">⚠️</span>
-                          ) : (
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-rose-300">
-                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                              <circle cx="12" cy="16" r="1" />
-                              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                            </svg>
-                          )}
+                      >
+                        <div className="relative z-10">
+                          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center border-rose-500/80 from-rose-500/50 to-red-500/50 shadow-xl">
+                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? (
+                              <span className="icon-warning text-3xl animate-bounce">⚠️</span>
+                            ) : (
+                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-rose-300">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <circle cx="12" cy="16" r="1" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="text-xl font-bold mb-2 tracking-wide text-rose-200">
+                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "2-oogohlantirish berildi" : "2-Ogohlantirish"}
+                          </div>
+                          <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
+                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "" : ""}
+                          </div>
                         </div>
-                        <div className="text-xl font-bold mb-2 tracking-wide text-rose-200">
-                          {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "2-oogohlantirish berildi" : "2-Ogohlantirish"}
-                        </div>
-                        <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
-                          {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "" : ""}
-                        </div>
-                      </div>
-                    </button>
+                      </button>
                     ) : (
                       <div className="relative rounded-3xl border-4 border-rose-500/80 bg-gradient-to-br from-rose-600/50 via-red-600/45 to-pink-600/50 p-6 text-center opacity-85 cursor-not-allowed shadow-2xl">
                         <div className="relative z-10">
@@ -4534,46 +4551,46 @@ function ProxOffline() {
                     )}
                     {/* 3-Ogohlantirish */}
                     {isAdmin ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!currentUserId || !(warningsByUser[currentUserId]?.[1])) {
-                          alert("Avval 2-ogohlantirishni bering.");
-                          return;
-                        }
-                        setWarningTarget(3);
-                        setWarningReason(currentUserId ? (warningsByUser[currentUserId]?.[2] || "") : "");
-                        setWarningModalOpen(true);
-                      }}
-                      disabled={!currentUserId || !(warningsByUser[currentUserId]?.[1])}
-                      className={`relative rounded-3xl border-4 border-slate-600/80 p-6 text-center ${currentUserId && warningsByUser[currentUserId]?.[1]
-                        ? "bg-gradient-to-br from-slate-900/80 via-gray-900/70 to-black/60 shadow-2xl"
-                        : "opacity-75 cursor-not-allowed bg-slate-800/40 border-slate-500/60"}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!currentUserId || !(warningsByUser[currentUserId]?.[1])) {
+                            alert("Avval 2-ogohlantirishni bering.");
+                            return;
+                          }
+                          setWarningTarget(3);
+                          setWarningReason(currentUserId ? (warningsByUser[currentUserId]?.[2] || "") : "");
+                          setWarningModalOpen(true);
+                        }}
+                        disabled={!currentUserId || !(warningsByUser[currentUserId]?.[1])}
+                        className={`relative rounded-3xl border-4 border-slate-600/80 p-6 text-center ${currentUserId && warningsByUser[currentUserId]?.[1]
+                          ? "bg-gradient-to-br from-slate-900/80 via-gray-900/70 to-black/60 shadow-2xl"
+                          : "opacity-75 cursor-not-allowed bg-slate-800/40 border-slate-500/60"}
                       `}
-                    >
-                      <div className="relative z-10">
-                        <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center ${currentUserId && warningsByUser[currentUserId]?.[1]
-                          ? "border-slate-500/80 from-slate-700/40 to-gray-700/40 shadow-xl"
-                          : "border-slate-400/70 bg-slate-600/30"}
+                      >
+                        <div className="relative z-10">
+                          <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center ${currentUserId && warningsByUser[currentUserId]?.[1]
+                            ? "border-slate-500/80 from-slate-700/40 to-gray-700/40 shadow-xl"
+                            : "border-slate-400/70 bg-slate-600/30"}
                         `}>
-                          {currentUserId && (warningsByUser[currentUserId]?.[2]) ? (
-                            <span className="icon-warning text-3xl animate-bounce">⚠️</span>
-                          ) : (
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-400' : 'text-slate-500'}`}>
-                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                              <circle cx="12" cy="16" r="1" />
-                              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                            </svg>
-                          )}
+                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? (
+                              <span className="icon-warning text-3xl animate-bounce">⚠️</span>
+                            ) : (
+                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-400' : 'text-slate-500'}`}>
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <circle cx="12" cy="16" r="1" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className={`text-xl font-bold mb-2 ${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-100' : 'text-slate-400'}`}>
+                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-oogohlantirish berildi" : "3-Ogohlantirish"}
+                          </div>
+                          <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
+                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-Ogohlantirish olindi" : ""}
+                          </div>
                         </div>
-                        <div className={`text-xl font-bold mb-2 ${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-100' : 'text-slate-400'}`}>
-                          {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-oogohlantirish berildi" : "3-Ogohlantirish"}
-                        </div>
-                        <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
-                          {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-Ogohlantirish olindi" : ""}
-                        </div>
-                      </div>
-                    </button>
+                      </button>
                     ) : (
                       <div className="relative rounded-3xl border-4 border-slate-600/80 bg-gradient-to-br from-slate-900/80 via-gray-900/70 to-black/60 p-6 text-center backdrop-blur-sm opacity-85 cursor-not-allowed shadow-2xl">
                         <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-35 ${currentUserId && warningsByUser[currentUserId]?.[1]
@@ -4677,11 +4694,10 @@ function ProxOffline() {
                     {/* Keys Section - Kalitlar */}
                     <div className="mb-3 flex items-center justify-center gap-3">
                       {certificateTitles.map((_, idx) => (
-                        <div key={idx} className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
-                          currentUserId && certsByUser[currentUserId]?.[idx]
-                            ? 'bg-emerald-500 border-emerald-400 shadow-lg shadow-emerald-400/50'
-                            : 'bg-slate-600 border-slate-500'
-                        }`}>
+                        <div key={idx} className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${currentUserId && certsByUser[currentUserId]?.[idx]
+                          ? 'bg-emerald-500 border-emerald-400 shadow-lg shadow-emerald-400/50'
+                          : 'bg-slate-600 border-slate-500'
+                          }`}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-white">
                             <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
                           </svg>
@@ -4704,7 +4720,7 @@ function ProxOffline() {
                               className={`relative z-10 flex items-center gap-4 rounded-3xl p-4 sm:p-5 min-h-[160px] sm:min-h-[180px] shadow-sm hover:shadow-md ${unlocked
                                 ? "border border-emerald-300/20"
                                 : "border border-white/10"
-                              }`}
+                                }`}
                               style={{ backgroundImage: `url('${getTechnologyIcon(title)}')`, backgroundRepeat: 'no-repeat', backgroundSize: '60%', backgroundPosition: 'center' }}
                             >
                               {/* Bottom gradient overlay for text readability */}
@@ -5174,11 +5190,10 @@ function CoursesPreview({ onShowAll, setActiveTab, navigate, setSkipScroll }) {
             onClick={() => navigate(`/courses/${course.id}`)}
           >
             <div
-              className={`rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 border-2 border-gray-600 ${
-                course.imageUrl
-                  ? "bg-gradient-to-br from-slate-700 to-slate-900"
-                  : "bg-slate-800"
-              }`}
+              className={`rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 border-2 border-gray-600 ${course.imageUrl
+                ? "bg-gradient-to-br from-slate-700 to-slate-900"
+                : "bg-slate-800"
+                }`}
             >
               {course.imageUrl ? (
                 <img
@@ -5238,7 +5253,7 @@ export default function Index() {
     // Handle URL hash or path for profile/login redirect
     const handleHashOrPathChange = () => {
       if (window.location.hash === "#profile") {
-        setActiveTab("O'quvchilar loyihalari");
+        setActiveTab("Loyihalarimiz");
         setActiveProject("Blogs");
         // Clear the hash
         window.history.replaceState(null, "", window.location.pathname);
@@ -5250,7 +5265,7 @@ export default function Index() {
         window.location.hash === "#login" ||
         window.location.pathname.endsWith("/login")
       ) {
-        setActiveTab("O'quvchilar loyihalari");
+        setActiveTab("Loyihalarimiz");
         setActiveProject("Blogs");
         // Clear the hash or path if needed
         if (window.location.hash === "#login") {
@@ -5304,7 +5319,7 @@ export default function Index() {
         setActiveProject("");
         break;
       case "projects":
-        setActiveTab("O'quvchilar loyihalari");
+        setActiveTab("Loyihalarimiz");
         if (sub === "blogs") setActiveProject("Blogs");
         else if (sub === "resume") setActiveProject("Resume Builder");
         else if (sub === "payments") setActiveProject("Payments");
@@ -5323,7 +5338,7 @@ export default function Index() {
     try {
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
-    } catch {}
+    } catch { }
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   };
 
@@ -5335,11 +5350,11 @@ export default function Index() {
     if (title === "Bosh sahifa") navigate("/home");
     else if (title === "Kurslar") navigate("/courses");
     else if (title === "Kurslarim") navigate("/my-courses");
-    else if (title === "O'quvchilar loyihalari") navigate("/projects");
+    else if (title === "Loyihalarimiz") navigate("/projects");
   };
 
   const handleProjectMenuClick = (project) => {
-    setActiveTab("O'quvchilar loyihalari");
+    setActiveTab("Loyihalarimiz");
     setActiveProject(project);
     scrollToTop();
     // Navigate to project route
@@ -5389,11 +5404,10 @@ export default function Index() {
                   {menuItems.map((item) => (
                     <button
                       key={item.title}
-                      className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
-                        activeTab === item.title && !activeProject
-                          ? "bg-gradient-to-r from-slate-800 to-cyan-900 text-white"
-                          : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                      }`}
+                      className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${activeTab === item.title && !activeProject
+                        ? "bg-gradient-to-r from-slate-800 to-cyan-900 text-white"
+                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                        }`}
                       onClick={() => handleSidebarMenuClick(item.title)}
                     >
                       <item.icon className="w-4 h-4" />
@@ -5421,11 +5435,10 @@ export default function Index() {
                     {userMenuItems.map((item) => (
                       <button
                         key={item.title}
-                        className={`w-full flex items-start gap-2 px-3 py-2 rounded-lg transition-all duration-200 justify-start ${
-                          activeTab === item.title && !activeProject
-                            ? "bg-gradient-to-r from-slate-800 to-cyan-900 text-white"
-                            : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                        }`}
+                        className={`w-full flex items-start gap-2 px-3 py-2 rounded-lg transition-all duration-200 justify-start ${activeTab === item.title && !activeProject
+                          ? "bg-gradient-to-r from-slate-800 to-cyan-900 text-white"
+                          : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                          }`}
                         onClick={() => handleSidebarMenuClick(item.title)}
                       >
                         <item.icon className="w-4 h-4" />
@@ -5448,11 +5461,10 @@ export default function Index() {
                 </div>
                 <div className="space-y-1">
                   <button
-                    className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
-                      activeProject === "Blogs"
-                        ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
-                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                    }`}
+                    className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${activeProject === "Blogs"
+                      ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
+                      : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                      }`}
                     onClick={() => handleProjectMenuClick("Blogs")}
                   >
                     <User className="w-4 h-4" />
@@ -5461,11 +5473,10 @@ export default function Index() {
                     </span>
                   </button>
                   <button
-                    className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
-                      activeProject === "Resume Builder"
-                        ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
-                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                    }`}
+                    className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${activeProject === "Resume Builder"
+                      ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
+                      : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                      }`}
                     onClick={() => handleProjectMenuClick("Resume Builder")}
                   >
                     <Settings className="w-4 h-4" />
@@ -5475,11 +5486,10 @@ export default function Index() {
                   </button>
                   {isLoggedIn && (
                     <button
-                      className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
-                        activeProject === "Payments"
-                          ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
-                          : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                      }`}
+                      className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${activeProject === "Payments"
+                        ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
+                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                        }`}
                       onClick={() => handleProjectMenuClick("Payments")}
                     >
                       <CreditCard className="w-4 h-4" />
@@ -5557,10 +5567,10 @@ export default function Index() {
             {!isLoading && activeTab === "Kurslarim" && location.pathname !== '/my-courses' && (
               <MyCoursesContent navigate={navigate} />
             )}
-            {activeTab === "O'quvchilar loyihalari" && !activeProject && (
+            {activeTab === "Loyihalarimiz" && !activeProject && (
               <ProjectsList />
             )}
-            {activeTab === "O'quvchilar loyihalari" &&
+            {activeTab === "Loyihalarimiz" &&
               activeProject === "Blogs" && (
                 <ProfileContent
                   setIsLoggedIn={setIsLoggedIn}
@@ -5569,9 +5579,9 @@ export default function Index() {
                   navigate={navigate}
                 />
               )}
-            {activeTab === "O'quvchilar loyihalari" &&
+            {activeTab === "Loyihalarimiz" &&
               activeProject === "Resume Builder" && <SecurityContent />}
-            {activeTab === "O'quvchilar loyihalari" &&
+            {activeTab === "Loyihalarimiz" &&
               activeProject === "Payments" && <PaymentsContent />}
             {!isLoading && activeTab === "proX offline" && <ProxOffline />}
           </div>
@@ -5596,7 +5606,7 @@ function AdminContactCard() {
       const sessionDismissed =
         sessionStorage.getItem("adminContactDismissedSession") === "1";
       if (sessionDismissed) setDismissed(true);
-    } catch {}
+    } catch { }
   }, []);
 
   useEffect(() => {
@@ -5628,7 +5638,7 @@ function AdminContactCard() {
     setDismissed(true);
     try {
       sessionStorage.setItem("adminContactDismissedSession", "1");
-    } catch {}
+    } catch { }
   };
 
   // When hidden or dismissed, do not render at all to avoid invisible clickable area
@@ -5638,16 +5648,14 @@ function AdminContactCard() {
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-50 transition-all duration-700 ease-out ${
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
-      }`}
+      className={`fixed bottom-6 right-6 z-50 transition-all duration-700 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+        }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl shadow-2xl p-3 cursor-pointer transform transition-all duration-300 relative ${
-          isHovered ? "scale-105 shadow-3xl" : "scale-100"
-        }`}
+        className={`bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl shadow-2xl p-3 cursor-pointer transform transition-all duration-300 relative ${isHovered ? "scale-105 shadow-3xl" : "scale-100"
+          }`}
         onClick={handleContact}
       >
         {/* Close button */}
