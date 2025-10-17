@@ -4125,6 +4125,12 @@ function ProxOffline() {
                     className="w-full pl-14 pr-6 py-4 text-lg sm:py-5 sm:text-xl bg-white/10 border-white/20 text-white placeholder:text-white/60 rounded-2xl backdrop-blur-sm focus:bg-white/20 focus:border-cyan-400 transition-all duration-300"
                   />
                 </div>
+                {/* Total Students Count */}
+                <div className="w-full max-w-6xl mx-auto mt-3">
+                  <div className="text-right text-white/80">
+                    Jami o'quvchilar: <span className="font-semibold text-white">{users.length}</span>
+                  </div>
+                </div>
                 {hasQuery && filteredUsers.length === 0 && (
                   <div className="text-center text-white/80 bg-white/10 p-4 rounded-xl backdrop-blur-sm mt-3">
                     O'quvchi topilmadi
@@ -4143,7 +4149,6 @@ function ProxOffline() {
                       <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
                         {user.fullName}
                       </h3>
-                      <p className="text-sm text-muted-foreground">Dasturchi</p>
                     </div>
 
                     <div className="flex items-center justify-between">

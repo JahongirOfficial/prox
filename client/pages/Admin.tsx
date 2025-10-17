@@ -3663,6 +3663,11 @@ function AdminProxOffline() {
               className="w-full pl-10"
             />
           </div>
+          <div className="w-full max-w-4xl mx-auto -mt-3 mb-4">
+            <div className="text-right text-muted-foreground">
+              Jami o'quvchilar: <span className="font-semibold text-foreground">{users.length}</span>
+            </div>
+          </div>
           {loading ? (
             <div className="flex items-center justify-center min-h-[120px]">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
