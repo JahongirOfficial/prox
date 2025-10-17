@@ -35,7 +35,6 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { CourseModule, Lesson } from "@shared/api"
 import {
-  AlertTriangle,
   BarChart2,
   BarChart3,
   BookOpen,
@@ -3542,7 +3541,7 @@ function AdminProxOffline() {
     setEditForm((prev) => ({
       ...prev,
       [name]:
-        name === "balance" || name === "step" || name === "todayScore"
+        name === "balance" || name === "step" || name === "todayScore" || name === "totalScore"
           ? Number(value)
           : value,
     }));
@@ -3587,7 +3586,7 @@ function AdminProxOffline() {
         arrivalDate: editForm.arrivalDate,
         weekScores: todayScoresArr, // Send as array with one object
         role: editForm.role, // Rol maydonini yuborish
-        // totalScore avtomatik hisoblanadi, yuborilmaydi
+        totalScore: typeof editForm.totalScore === 'number' ? editForm.totalScore : Number(editForm.totalScore) || 0,
       };
 
       const res = await fetch(`/api/admin/users/${editingUser.id}`, {
@@ -3609,6 +3608,9 @@ function AdminProxOffline() {
               ...u,
               ...editForm,
               todayScores: data.user?.todayScores ?? u.todayScores,
+              attendanceDays: Array.isArray(data.user?.attendanceDays)
+                ? data.user.attendanceDays
+                : u.attendanceDays,
             }
             : u,
         ),
@@ -3683,7 +3685,6 @@ function AdminProxOffline() {
                   </div>
                   <div className="flex-1">
                     <p className="font-medium">{user.fullName}</p>
-                    <p className="text-sm text-muted-foreground">Dasturchi</p>
                     <p className="text-xs mt-1"><span className="text-muted-foreground">Jami ball:</span> <span className="font-semibold">{getTotalScore(user)}</span></p>
                   </div>
                   <button
@@ -3788,16 +3789,20 @@ function AdminProxOffline() {
                     <label className="block text-sm font-medium mb-1">
                       Jami ball
                     </label>
-                    <div className="flex items-center gap-2">
-                      <div className="w-full px-3 py-2 border border-input rounded-md bg-muted/50 text-foreground font-semibold text-lg">
-                        {editForm.totalScore || getTotalScore(editingUser)}
-                      </div>
-                      <div className="text-sm text-muted-foreground whitespace-nowrap">
-                        Joriy: {getTotalScore(editingUser)}
-                      </div>
-                    </div>
+                    <Input
+                      name="totalScore"
+                      type="number"
+                      min={0}
+                      value={typeof editForm.totalScore === "number" ? editForm.totalScore : Number(editForm.totalScore) || 0}
+                      onChange={handleEditFormChange}
+                      onWheel={(e) => (e.currentTarget as HTMLInputElement).blur()}
+                      onFocus={(e) => e.currentTarget.select()}
+                      inputMode="numeric"
+                      placeholder={String(getTotalScore(editingUser))}
+                      className="w-full"
+                    />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Bugungi ball kiritilganda avtomatik yangilanadi
+                      Jami ballni qo'lda tahrirlash mumkin. Saqlangandan so'ng MongoDB'da yoziladi.
                     </p>
                   </div>
                   <div>
@@ -3840,57 +3845,34 @@ function AdminProxOffline() {
                     <label className="block text-sm font-medium mb-1">
                       Kunlar (Day)
                     </label>
-                    <select
-                      value={(function () {
-                        const arrSorted = (editForm.attendanceDays || [])
-                          .slice()
-                          .sort()
-                          .join(",");
-                        if (
-                          arrSorted ===
-                          ["Du", "Se", "Ch", "Pa", "Ju", "Sh", "Ya"]
-                            .sort()
-                            .join(",")
-                        )
-                          return "all";
-                        if (arrSorted === ["Du", "Ch", "Ju"].sort().join(","))
-                          return "mon-wed-fri";
-                        if (arrSorted === ["Se", "Pa", "Sh"].sort().join(","))
-                          return "tue-thu-sat";
-                        return "all";
-                      })()}
-                      onChange={(e) => {
-                        const preset = dayPresets.find(
-                          (p) => p.value === e.target.value,
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {dayCodes.map((code) => {
+                        const active = Array.isArray(editForm.attendanceDays) && editForm.attendanceDays.includes(code);
+                        return (
+                          <button
+                            type="button"
+                            key={code}
+                            onClick={() =>
+                              setEditForm((f) => {
+                                const curr = Array.isArray(f.attendanceDays) ? f.attendanceDays : [];
+                                const next = curr.includes(code)
+                                  ? curr.filter((d) => d !== code)
+                                  : [...curr, code];
+                                return { ...f, attendanceDays: next };
+                              })
+                            }
+                            className={`px-3 py-1 text-sm rounded-md border transition-colors ${
+                              active
+                                ? "bg-primary text-primary-foreground border-primary"
+                                : "bg-muted/30 text-muted-foreground border-border hover:bg-muted"
+                            }`}
+                          >
+                            {code}
+                          </button>
                         );
-                        setEditForm((f) => ({
-                          ...f,
-                          attendanceDays: preset
-                            ? preset.days
-                            : dayPresets[0].days,
-                        }));
-                      }}
-                      className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground"
-                    >
-                      {dayPresets.map((p) => (
-                        <option key={p.value} value={p.value}>
-                          {p.label}
-                        </option>
-                      ))}
-                    </select>
-                    {editForm.attendanceDays &&
-                      editForm.attendanceDays.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {dayCodes.map((code) => (
-                            <span
-                              key={code}
-                              className={`text-xs px-2 py-0.5 rounded border transition-all duration-200 ${editForm.attendanceDays.includes(code) ? "bg-primary/10 border-primary text-primary font-medium" : "bg-muted/30 text-muted-foreground/60 border-muted-foreground/20"}`}
-                            >
-                              {code}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      })}
+                    </div>
+                    {/* Removed duplicate badges under buttons */}
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">
@@ -3986,7 +3968,6 @@ function AdminProxOffline() {
                 <div className="text-foreground text-xl md:text-2xl font-bold text-center md:text-left">
                   {selectedUser.fullName}
                 </div>
-                <div className="text-muted-foreground text-base">Dasturchi</div>
               </div>
               <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 mt-6 md:mt-0 w-full">
                 <div className="bg-white/10 rounded-xl p-3 md:p-4 flex flex-col items-center shadow">
