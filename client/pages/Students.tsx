@@ -1,5 +1,4 @@
-import { BarChart2, BarChart3, ChartBar, TrendingDown } from "lucide-react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Students() {
   const location = useLocation();

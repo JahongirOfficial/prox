@@ -224,7 +224,7 @@ function CoursesList({
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const diffMs = today.getTime() - start.getTime();
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1; // include first day
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     return Math.max(0, days);
   };
 
@@ -3791,7 +3791,7 @@ function ProxOffline() {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const diffMs = today.getTime() - start.getTime();
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     return Math.max(0, days);
   };
 
@@ -4016,9 +4016,12 @@ function ProxOffline() {
     fetchUsers();
   }, []);
 
+  // Live, normalized search for /offline list
+  const normalizedSearch = (search || "").trim().toLowerCase();
   const filteredUsers = users.filter((user) =>
     user.fullName.toLowerCase().includes(search.toLowerCase()),
   );
+  const hasQuery = (search || "").trim().length > 0;
 
   // Helper to get current week dates (Monday to Saturday ONLY)
   function getCurrentWeekDates() {
@@ -4084,69 +4087,76 @@ function ProxOffline() {
       {!selectedUser ? (
         <div>
           {/* Students List Section - Compact */}
-          {!loading && !error && filteredUsers.length > 0 && (
-            <div className="container mx-auto px-6 pb-8">
-              <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-6">
-                  <h2 className="text-3xl font-bold text-foreground mb-4">
-                    Offline O'quvchilar
-                  </h2>
-                  <p className="text-muted-foreground mb-6">
-                    Bizning dasturlash akademiyasimizda o'qiyotgan talabalar
-                    ro'yxati
-                  </p>
+          <div className="container mx-auto px-6 pb-8">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-6">
+                {!hasQuery && (
+                  <>
+                    <h2 className="text-3xl font-bold text-foreground mb-4">
+                      Offline O'quvchilar
+                    </h2>
+                    <p className="text-muted-foreground mb-6">
+                      Bizning dasturlash akademiyasimizda o'qiyotgan talabalar
+                      ro'yxati
+                    </p>
+                  </>
+                )}
 
-                  {/* Search Input */}
-                  <div className="relative w-full max-w-md mx-auto">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60">
-                      <svg
-                        width="20"
-                        height="20"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="w-5 h-5"
-                      >
-                        <circle cx="11" cy="11" r="7" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                      </svg>
-                    </span>
-                    <Input
-                      placeholder="O'quvchini qidirish..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      className="w-full pl-14 pr-6 py-4 text-lg sm:py-5 sm:text-xl bg-white/10 border-white/20 text-white placeholder:text-white/60 rounded-2xl backdrop-blur-sm focus:bg-white/20 focus:border-cyan-400 transition-all duration-300"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredUsers.map((user) => (
-                    <div
-                      key={user.id}
-                      className="group bg-card border border-border rounded-2xl p-6 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary/10 hover:border-primary/50 hover:-translate-y-1"
-                      onClick={() => setSelectedUser(user)}
+                {/* Search Input */}
+                <div className="relative w-full max-w-md mx-auto">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60">
+                    <svg
+                      width="20"
+                      height="20"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="w-5 h-5"
                     >
-                      <div className="mb-4">
-                        <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
-                          {user.fullName}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">Dasturchi</p>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
-                          Offline Student
-                        </span>
-                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                      </div>
-                    </div>
-                  ))}
+                      <circle cx="11" cy="11" r="7" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                  </span>
+                  <Input
+                    placeholder="O'quvchini qidirish..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-14 pr-6 py-4 text-lg sm:py-5 sm:text-xl bg-white/10 border-white/20 text-white placeholder:text-white/60 rounded-2xl backdrop-blur-sm focus:bg-white/20 focus:border-cyan-400 transition-all duration-300"
+                  />
                 </div>
+                {hasQuery && filteredUsers.length === 0 && (
+                  <div className="text-center text-white/80 bg-white/10 p-4 rounded-xl backdrop-blur-sm mt-3">
+                    O'quvchi topilmadi
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredUsers.length > 0 && filteredUsers.map((user) => (
+                  <div
+                    key={user.id}
+                    className="group bg-card border border-border rounded-2xl p-6 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary/10 hover:border-primary/50 hover:-translate-y-1"
+                    onClick={() => setSelectedUser(user)}
+                  >
+                    <div className="mb-4">
+                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
+                        {user.fullName}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">Dasturchi</p>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
+                        Offline Student
+                      </span>
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          )}
+          </div>
 
           {loading ? (
             <div className="flex items-center justify-center py-2">
@@ -4156,7 +4166,7 @@ function ProxOffline() {
             <div className="text-center text-red-500 bg-red-50 p-3 rounded-xl border border-red-200 mt-1">
               {error}
             </div>
-          ) : filteredUsers.length === 0 ? (
+          ) : (!hasQuery && filteredUsers.length === 0) ? (
             <div className="text-center text-white/80 bg-white/10 p-4 rounded-xl backdrop-blur-sm mt-1">
               Offline o'quvchilar topilmadi
             </div>
@@ -4273,13 +4283,15 @@ function ProxOffline() {
                     </div>
 
                     {/* Step value with gradient text */}
-                    <div className="text-5xl font-black mb-2 bg-gradient-to-r from-emerald-200 via-green-200 to-teal-200 bg-clip-text text-transparent drop-shadow-[0_4px_8px_rgba(16,185,129,0.3)]">
+                    <div className="hidden sm:block text-5xl font-black mb-2 bg-gradient-to-r from-emerald-200 via-green-200 to-teal-200 bg-clip-text text-transparent drop-shadow-[0_4px_8px_rgba(16,185,129,0.3)]">
                       {selectedUser.step ?? 1}
                     </div>
-
-                    {/* Label with modern styling */}
-                    <div className="text-sm font-semibold text-emerald-200/90 uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(16,185,129,0.2)]">
+                    <div className="hidden sm:block text-sm font-semibold text-emerald-200/90 uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(16,185,129,0.2)]">
                       Qadam
+                    </div>
+
+                    <div className="sm:hidden text-3xl font-extrabold text-emerald-200/95">
+                      {(selectedUser.step ?? 1)}-qadam
                     </div>
                   </div>
 

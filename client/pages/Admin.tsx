@@ -1080,29 +1080,7 @@ function UsersContent() {
                     {formatDate(viewingUser.createdAt)}
                   </span>
                 </div>
-                {/* Warnings Section */}
-                <div className="border-b pb-2">
-                  <span className="text-sm text-muted-foreground block mb-2">Ogohlantirishlar</span>
-                  <div className="space-y-2">
-                    {Array.isArray(viewingUser.warnings) && viewingUser.warnings.length > 0 ? (
-                      viewingUser.warnings.map((warning, index) => (
-                        <div key={index} className="flex items-center gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
-                          <AlertTriangle className="w-4 h-4 text-yellow-600 flex-shrink-0" />
-                          <span className="text-sm text-yellow-800 flex-1">
-                            {warning || `Ogohlantirish #${index + 1}`}
-                          </span>
-                          <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded">
-                            #{index + 1}
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-sm text-muted-foreground italic">
-                        Ogohlantirishlar yo'q
-                      </div>
-                    )}
-                  </div>
-                </div>
+                
               </div>
             ) : (
               <div className="space-y-4">
@@ -1175,44 +1153,11 @@ function UsersContent() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Qadam
+                    
                   </label>
-                  <Input
-                    name="step"
-                    type="number"
-                    value={(editForm.step as any) === "" ? "" : editForm.step}
-                    onChange={handleEditFormChange}
-                    placeholder="Qadam"
-                    className="w-full"
-                  />
+                  
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Ogohlantirishlar
-                  </label>
-                  <div className="space-y-2">
-                    {Array.isArray((editingUser || viewingUser)?.warnings) && (editingUser || viewingUser)?.warnings.length > 0 ? (
-                      (editingUser || viewingUser)?.warnings.map((warning, index) => (
-                        <div key={index} className="flex items-center gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
-                          <AlertTriangle className="w-4 h-4 text-yellow-600 flex-shrink-0" />
-                          <span className="text-sm text-yellow-800 flex-1">
-                            {warning || `Ogohlantirish #${index + 1}`}
-                          </span>
-                          <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded">
-                            #{index + 1}
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-sm text-muted-foreground italic">
-                        Ogohlantirishlar yo'q
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Ogohlantirishlar serverda saqlanadi va admin panel orqali boshqariladi
-                  </p>
-                </div>
+                
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Ro'yxatdan o'tgan sana
