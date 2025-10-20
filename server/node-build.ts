@@ -1,7 +1,6 @@
-import path from "path";
-import { createServer } from "./index";
-import express from "express";
-import { fileURLToPath } from "url";
+import path from "path"
+import { fileURLToPath } from "url"
+import { createServer } from "./index"
 
 const server = createServer();
 const port = 3000; // Explicitly set port to 3000

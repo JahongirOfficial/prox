@@ -206,7 +206,7 @@ function CoursesList({
     | "mongo"
   >(null);
 
-  const handlePaymentSubmit = async (e) => {
+  const handlePaymentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Payment form submission logic can be added here
     console.log("Payment form submitted:", paymentForm);
@@ -249,7 +249,7 @@ function CoursesList({
     }
   }, []);
 
-  const handleCourseClick = () => {
+  const handleCourseClick = (): void => {
     setActiveTab("Kurslar");
     navigate("/courses");
     // Ensure the main scroll container starts from the very top
@@ -5649,13 +5649,15 @@ function AdminContactCard() {
     window.open(tgDeepLink, "_blank");
   };
 
-  const handleClose = (e) => {
+  const handleClose = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setIsVisible(false);
     setDismissed(true);
     try {
       sessionStorage.setItem("adminContactDismissedSession", "1");
-    } catch { }
+    } catch (error) {
+      // Handle sessionStorage error silently
+    }
   };
 
   // When hidden or dismissed, do not render at all to avoid invisible clickable area
@@ -5665,14 +5667,16 @@ function AdminContactCard() {
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-50 transition-all duration-700 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
-        }`}
+      className={`fixed bottom-6 right-6 z-50 transition-all duration-700 ease-out ${
+        isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+      }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl shadow-2xl p-3 cursor-pointer transform transition-all duration-300 relative ${isHovered ? "scale-105 shadow-3xl" : "scale-100"
-          }`}
+        className={`bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl shadow-2xl p-3 cursor-pointer transform transition-all duration-300 relative ${
+          isHovered ? "scale-105 shadow-3xl" : "scale-100"
+        }`}
         onClick={handleContact}
       >
         {/* Close button */}
