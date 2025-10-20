@@ -34,7 +34,7 @@ export default function Students() {
     return arr.reduce((sum: number, s: any) => sum + Number(s?.score || 0), 0);
   }
 
-  // Format arrival date for display - iOS optimized
+  // Format arrival date for display - Universal compatibility
   function formatArrivalDate(dateString: string) {
     if (!dateString) return "Belgilanmagan";
 
@@ -42,12 +42,12 @@ export default function Students() {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return "Belgilanmagan";
 
-      // iOS Safari compatible date formatting
-      const day = date.getDate().toString().padStart(2, '0');
+      // Universal date formatting for all devices (PC, Android, iOS)
+      const day = date.getDate();
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
 
-      // Uzbek month names for iOS compatibility
+      // Uzbek month names for consistency across all platforms
       const uzbekMonths = [
         'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun',
         'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'
@@ -55,7 +55,7 @@ export default function Students() {
 
       const monthName = uzbekMonths[month - 1];
 
-      // Format: "15 Yanvar 2024" - iOS friendly
+      // Format: "15 Yanvar 2024" - Works on all platforms
       return `${day} ${monthName} ${year}`;
     } catch (error) {
       return "Belgilanmagan";
