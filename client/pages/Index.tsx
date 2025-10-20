@@ -218,11 +218,24 @@ function CoursesList({
   // Helper: progress based on arrival date vs current step
   const getDaysSinceArrival = (arrival?: string) => {
     if (!arrival) return 0;
-    const a = new Date(arrival);
+    let a: Date;
+    
+    // Parse date string
+    if (arrival.includes('T')) {
+      a = new Date(arrival);
+    } else if (arrival.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const parts = arrival.split('-');
+      a = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+    } else {
+      a = new Date(arrival);
+    }
+    
     if (isNaN(a.getTime())) return 0;
-    const start = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+    
+    // Use UTC to avoid timezone issues
+    const start = new Date(Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate()));
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     const diffMs = today.getTime() - start.getTime();
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     return Math.max(0, days);
@@ -3785,11 +3798,24 @@ function ProxOffline() {
   // Local helpers for progress to avoid scope issues
   const daysSinceArrival = (arrival?: string) => {
     if (!arrival) return 0;
-    const a = new Date(arrival);
+    let a: Date;
+    
+    // Parse date string
+    if (arrival.includes('T')) {
+      a = new Date(arrival);
+    } else if (arrival.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const parts = arrival.split('-');
+      a = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+    } else {
+      a = new Date(arrival);
+    }
+    
     if (isNaN(a.getTime())) return 0;
-    const start = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+    
+    // Use UTC to avoid timezone issues
+    const start = new Date(Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate()));
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     const diffMs = today.getTime() - start.getTime();
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     return Math.max(0, days);
@@ -3824,8 +3850,9 @@ function ProxOffline() {
         // Full ISO format - parse directly
         date = new Date(dateString);
       } else if (typeof dateString === 'string' && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        // Date-only format (YYYY-MM-DD) - add time to avoid timezone issues
-        date = new Date(dateString + 'T00:00:00Z');
+        // Date-only format (YYYY-MM-DD) - parse as UTC to avoid timezone issues
+        const parts = dateString.split('-');
+        date = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
       } else {
         // Try parsing as-is
         date = new Date(dateString);
@@ -3833,9 +3860,10 @@ function ProxOffline() {
       
       if (isNaN(date.getTime())) return "—";
 
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const year = String(date.getFullYear()).slice(-2);
+      // Use UTC methods to avoid timezone offset issues on iOS
+      const day = String(date.getUTCDate()).padStart(2, '0');
+      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+      const year = String(date.getUTCFullYear()).slice(-2);
 
       return `${day}/${month}/${year}`;
     } catch {
