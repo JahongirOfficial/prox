@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react'
 import { calculateProgress, getStudentData, saveStudentData } from '../utils/studentUtils'
 
+interface StudentData {
+  id: string;
+  joinDate: string;
+  name: string;
+}
+
 function ProxOffline() {
-  const [studentData, setStudentData] = useState(null);
+  const [studentData, setStudentData] = useState<StudentData | null>(null);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -35,6 +41,14 @@ function ProxOffline() {
     setProgress(calculateProgress(newStudentData));
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Oy 0 dan boshlanadi
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-8">
       <h1 className="text-3xl font-bold text-white mb-8">ProX Offline</h1>
@@ -44,11 +58,7 @@ function ProxOffline() {
           <h2 className="text-xl font-semibold text-white mb-4">O'quvchi Ma'lumotlari</h2>
           <div className="space-y-2 text-white">
             <p><strong>ID:</strong> {studentData.id}</p>
-            <p><strong>Kelgan kuni:</strong> {new Date(studentData.joinDate).toLocaleDateString('en-GB', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric'
-            }).replace(/\//g, '.')}</p>
+            <p><strong>Kelgan kuni:</strong> {formatDate(studentData.joinDate)}</p>
             <p><strong>Ism:</strong> {studentData.name}</p>
           </div>
         </div>
