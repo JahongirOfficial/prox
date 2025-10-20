@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { saveStudentData, getStudentData, calculateProgress } from '../utils/studentUtils';
+import { useEffect, useState } from 'react'
+import { calculateProgress, getStudentData, saveStudentData } from '../utils/studentUtils'
 
 function ProxOffline() {
   const [studentData, setStudentData] = useState(null);
@@ -44,7 +44,11 @@ function ProxOffline() {
           <h2 className="text-xl font-semibold text-white mb-4">O'quvchi Ma'lumotlari</h2>
           <div className="space-y-2 text-white">
             <p><strong>ID:</strong> {studentData.id}</p>
-            <p><strong>Kelgan kuni:</strong> {new Date(studentData.joinDate).toLocaleDateString()}</p>
+            <p><strong>Kelgan kuni:</strong> {new Date(studentData.joinDate).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            }).replace(/\//g, '.')}</p>
             <p><strong>Ism:</strong> {studentData.name}</p>
           </div>
         </div>
