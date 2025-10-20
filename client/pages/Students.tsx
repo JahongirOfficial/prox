@@ -93,9 +93,14 @@ export default function Students() {
   const totalScore = getTotalScore(user);
 
   return (
-    <div 
-      className="min-h-screen w-full flex flex-col items-center justify-center"
+    <div
       style={{
+        minHeight: '100vh',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
         padding: '16px',
         paddingTop: 'max(16px, env(safe-area-inset-top, 16px))',
         paddingBottom: 'max(16px, env(safe-area-inset-bottom, 16px))',
@@ -103,13 +108,27 @@ export default function Students() {
       }}
     >
       <button
-        className="mb-6 self-start flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
-        onClick={() => navigate("/prox-offline")}
         style={{
+          marginBottom: '24px',
+          alignSelf: 'flex-start',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          fontSize: '14px',
+          color: 'rgba(255, 255, 255, 0.8)',
           padding: '8px 16px',
           border: '1px solid rgba(255,255,255,0.2)',
           borderRadius: '8px',
-          background: 'rgba(255,255,255,0.05)'
+          background: 'rgba(255,255,255,0.05)',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease'
+        }}
+        onClick={() => navigate("/prox-offline")}
+        onMouseOver={(e) => {
+          e.target.style.color = 'white';
+        }}
+        onMouseOut={(e) => {
+          e.target.style.color = 'rgba(255, 255, 255, 0.8)';
         }}
       >
         <svg
@@ -119,16 +138,18 @@ export default function Students() {
           viewBox="0 0 24 24"
           stroke="currentColor"
           strokeWidth="2"
-          className="w-5 h-5"
+          style={{ width: '20px', height: '20px' }}
         >
           <path d="M15 19l-7-7 7-7" />
         </svg>
         Orqaga
       </button>
       <div
-        className="relative w-full overflow-hidden"
         style={{
+          position: 'relative',
+          width: '100%',
           maxWidth: '400px',
+          overflow: 'hidden',
           background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           borderRadius: '16px',
@@ -138,8 +159,11 @@ export default function Students() {
       >
         {/* Animated background patterns */}
         <div
-          className="absolute inset-0 opacity-20 animate-pulse"
           style={{
+            position: 'absolute',
+            inset: 0,
+            opacity: 0.2,
+            animation: 'pulse 3s ease-in-out infinite',
             backgroundImage: `radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
                              radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 50%),
                              radial-gradient(circle at 40% 80%, rgba(120, 198, 255, 0.2) 0%, transparent 50%)`,
@@ -148,14 +172,23 @@ export default function Students() {
         />
 
         {/* Animated border glow */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/20 via-cyan-500/20 to-emerald-500/20 animate-pulse opacity-30" />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '16px',
+            background: 'linear-gradient(45deg, rgba(147, 51, 234, 0.2), rgba(6, 182, 212, 0.2), rgba(16, 185, 129, 0.2))',
+            opacity: 0.3,
+            animation: 'pulse 3s ease-in-out infinite'
+          }}
+        />
 
         <div style={{ position: 'relative', zIndex: 10 }}>
           {/* User info section - iPhone optimized */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '24px' }}>
             {/* User profile */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div 
+              <div
                 style={{
                   width: '60px',
                   height: '60px',
@@ -171,11 +204,11 @@ export default function Students() {
                 <span style={{ fontSize: '28px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>👨‍💻</span>
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div 
-                  style={{ 
-                    fontWeight: 'bold', 
-                    fontSize: '20px', 
-                    color: 'white', 
+                <div
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: '20px',
+                    color: 'white',
                     filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -184,18 +217,18 @@ export default function Students() {
                 >
                   {user.fullName}
                 </div>
-                <div 
-                  style={{ 
-                    fontSize: '14px', 
-                    color: 'rgba(255, 255, 255, 0.7)', 
-                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' 
+                <div
+                  style={{
+                    fontSize: '14px',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
                   }}
                 >
                   Dasturchi
                 </div>
               </div>
             </div>
-            
+
             {/* Stats section - iPhone optimized with inline styles */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* Qadam */}
@@ -222,7 +255,7 @@ export default function Students() {
                 </span>
                 <span style={{ fontWeight: 'bold', fontSize: '16px', color: 'white' }}>{stats.step}</span>
               </div>
-              
+
               {/* Jami ball */}
               <div style={{
                 display: 'flex',
@@ -247,7 +280,7 @@ export default function Students() {
                 </span>
                 <span style={{ fontWeight: 'bold', fontSize: '16px', color: 'white' }}>{totalScore}</span>
               </div>
-              
+
               {/* Shu oy ball */}
               <div style={{
                 display: 'flex',
@@ -272,7 +305,7 @@ export default function Students() {
                 </span>
                 <span style={{ fontWeight: 'bold', fontSize: '16px', color: 'white' }}>{stats.monthPoints.reduce((a, b) => a + b, 0)}</span>
               </div>
-              
+
               {/* O'rtacha ball */}
               <div style={{
                 display: 'flex',
@@ -297,7 +330,7 @@ export default function Students() {
                 </span>
                 <span style={{ fontWeight: 'bold', fontSize: '16px', color: 'white' }}>{stats.avg}</span>
               </div>
-              
+
               {/* Eng yomon kun */}
               <div style={{
                 display: 'flex',
@@ -322,7 +355,7 @@ export default function Students() {
                 </span>
                 <span style={{ fontWeight: 'bold', fontSize: '16px', color: 'white' }}>{stats.worstDay} ({stats.worstDayValue})</span>
               </div>
-              
+
               {/* Kelgan sana - iPhone optimized */}
               <div style={{
                 display: 'flex',
@@ -345,9 +378,9 @@ export default function Students() {
                   }}></div>
                   Kelgan sana:
                 </span>
-                <span style={{ 
-                  fontWeight: 'bold', 
-                  fontSize: '16px', 
+                <span style={{
+                  fontWeight: 'bold',
+                  fontSize: '16px',
                   color: 'white',
                   textAlign: 'right',
                   maxWidth: '150px',
