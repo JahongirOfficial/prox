@@ -34,6 +34,34 @@ export default function Students() {
     return arr.reduce((sum: number, s: any) => sum + Number(s?.score || 0), 0);
   }
 
+  // Format arrival date for display - iOS optimized
+  function formatArrivalDate(dateString: string) {
+    if (!dateString) return "Belgilanmagan";
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "Belgilanmagan";
+      
+      // iOS Safari compatible date formatting
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      
+      // Uzbek month names for iOS compatibility
+      const uzbekMonths = [
+        'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun',
+        'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'
+      ];
+      
+      const monthName = uzbekMonths[month - 1];
+      
+      // Format: "15 Yanvar 2024" - iOS friendly
+      return `${day} ${monthName} ${year}`;
+    } catch (error) {
+      return "Belgilanmagan";
+    }
+  }
+
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
@@ -159,6 +187,17 @@ export default function Students() {
                   Eng yomon kun:
                 </span>
                 <span className="font-bold text-sm sm:text-base text-white drop-shadow-sm">{stats.worstDay} ({stats.worstDayValue})</span>
+              </div>
+              
+              {/* Kelgan sana - iOS optimized */}
+              <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <span className="inline-flex items-center gap-2 text-xs sm:text-sm text-white/90 drop-shadow-sm">
+                  <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-gradient-to-r from-green-400 to-teal-400 animate-pulse"></div>
+                  Kelgan sana:
+                </span>
+                <span className="font-bold text-sm sm:text-base text-white drop-shadow-sm text-right">
+                  {formatArrivalDate(user.arrivalDate)}
+                </span>
               </div>
             </div>
           </div>

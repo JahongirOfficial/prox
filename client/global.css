@@ -279,6 +279,20 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  
+  /* Fix date display on iOS */
+  .text-right {
+    text-align: right !important;
+    direction: ltr;
+  }
+  
+  /* Better text wrapping for dates on small screens */
+  .font-bold {
+    word-break: keep-all;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 /* iPhone specific fixes */
