@@ -5,7 +5,7 @@ export default function Students() {
   const navigate = useNavigate();
   const user = location.state?.user;
 
-  // Dummy stats generator
+  // 📊 Tasodifiy statistikalar (faqat demo uchun)
   function getUserStats(u: any) {
     const weekPoints = Array.from({ length: 7 }, () =>
       Math.floor(Math.random() * 100)
@@ -14,8 +14,7 @@ export default function Students() {
       Math.floor(Math.random() * 300)
     );
     const avg = Math.round(
-      weekPoints.reduce((a: number, b: number) => a + b, 0) /
-        weekPoints.length
+      weekPoints.reduce((a: number, b: number) => a + b, 0) / weekPoints.length
     );
     const worstDayIdx = weekPoints.indexOf(Math.min(...weekPoints));
     const days = ["Du", "Se", "Ch", "Pa", "Ju", "Sh", "Ya"];
@@ -29,29 +28,32 @@ export default function Students() {
     };
   }
 
-  // Real total score from Mongo (sum of all todayScores)
+  // 🧮 Umumiy ballni hisoblash
   function getTotalScore(u: any) {
     const arr = Array.isArray(u?.todayScores) ? u.todayScores : [];
     return arr.reduce((sum: number, s: any) => sum + Number(s?.score || 0), 0);
   }
 
-  // ✅ Sana formatlash (iOS bilan to‘liq mos)
+  // ✅ iOS bilan 100% mos sana formatlash funksiyasi
   function formatArrivalDate(dateString: string) {
     if (!dateString) return "Belgilanmagan";
 
     try {
-      let date: Date;
+      // 1️⃣ iOS uchun xavfsiz formatga o‘tkazish
+      let safeString = dateString
+        .trim()
+        .replace("T", " ")
+        .replace(/-/g, "/"); // Safari uchun kerak
 
-      // iOS uchun "YYYY-MM-DD" ni "YYYY/MM/DD" formatga o‘zgartirish
-      if (dateString.includes("-")) {
-        date = new Date(dateString.replace(/-/g, "/"));
-      } else {
-        date = new Date(dateString);
+      // 2️⃣ Faqat sana bo‘lsa (vaqt yo‘q bo‘lsa), vaqt qo‘shamiz
+      if (/^\d{4}\/\d{2}\/\d{2}$/.test(safeString)) {
+        safeString += " 00:00:00";
       }
 
-      // Agar hamon noto‘g‘ri bo‘lsa
+      const date = new Date(safeString);
       if (isNaN(date.getTime())) return "Belgilanmagan";
 
+      // 3️⃣ Sana qismlarini ajratish
       const day = date.getDate();
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
@@ -71,8 +73,7 @@ export default function Students() {
         "Dekabr",
       ];
 
-      const monthName = uzbekMonths[month - 1];
-      return `${day} ${monthName} ${year}`;
+      return `${day} ${uzbekMonths[month - 1]} ${year}`;
     } catch (error) {
       return "Belgilanmagan";
     }
@@ -206,41 +207,19 @@ export default function Students() {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {/* Qadam */}
             <CardRow label="Qadam:" color="#8b5cf6" value={stats.step} />
-
-            {/* Jami ball */}
-            <CardRow
-              label="Jami ball:"
-              color="#10b981"
-              value={totalScore}
-            />
-
-            {/* Shu oy ball */}
+            <CardRow label="Jami ball:" color="#10b981" value={totalScore} />
             <CardRow
               label="Shu oy ball:"
               color="#3b82f6"
-              value={stats.monthPoints.reduce(
-                (a: number, b: number) => a + b,
-                0
-              )}
+              value={stats.monthPoints.reduce((a: number, b: number) => a + b, 0)}
             />
-
-            {/* O'rtacha ball */}
-            <CardRow
-              label="O'rtacha ball:"
-              color="#f59e0b"
-              value={stats.avg}
-            />
-
-            {/* Eng yomon kun */}
+            <CardRow label="O'rtacha ball:" color="#f59e0b" value={stats.avg} />
             <CardRow
               label="Eng yomon kun:"
               color="#ef4444"
               value={`${stats.worstDay} (${stats.worstDayValue})`}
             />
-
-            {/* Kelgan sana */}
             <CardRow
               label="Kelgan sana:"
               color="#059669"
@@ -253,7 +232,7 @@ export default function Students() {
   );
 }
 
-// 🔹 Kichik yordamchi komponent — kodni soddalashtiradi
+// 🔹 Yordamchi komponent
 function CardRow({
   label,
   color,
