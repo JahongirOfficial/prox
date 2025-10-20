@@ -243,3 +243,73 @@
 .hover-bounce:hover .animate-bounce-emoji {
   animation: bounce 0.6s ease-in-out;
 }
+
+/* iPhone and mobile optimizations */
+@media screen and (max-width: 480px) {
+  /* Ensure proper viewport handling on iPhone */
+  html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+  
+  /* Prevent zoom on input focus */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  
+  /* Better touch targets for iPhone */
+  button, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Smooth scrolling for iPhone */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Fix backdrop blur on iPhone */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  
+  /* Ensure proper text rendering on iPhone */
+  body, * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* iPhone specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* This targets only iOS Safari */
+  .animate-fade-in {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+  
+  /* Fix for gradient backgrounds on iPhone */
+  .bg-gradient-to-r, .bg-gradient-to-br, [style*="gradient"] {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+  
+  /* Better performance for animations on iPhone */
+  .animate-pulse, .animate-bounce-emoji {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+}
+
+/* Safe area handling for iPhone X and newer */
+@supports (padding: max(0px)) {
+  .safe-area-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
