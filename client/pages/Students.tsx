@@ -93,10 +93,24 @@ export default function Students() {
   const totalScore = getTotalScore(user);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] px-2 sm:px-4 py-8 sm:py-12 animate-fade-in safe-area-top safe-area-bottom">
+    <div 
+      className="min-h-screen w-full flex flex-col items-center justify-center"
+      style={{
+        padding: '16px',
+        paddingTop: 'max(16px, env(safe-area-inset-top, 16px))',
+        paddingBottom: 'max(16px, env(safe-area-inset-bottom, 16px))',
+        background: '#0a0a0a'
+      }}
+    >
       <button
-        className="mb-6 sm:mb-8 self-start flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
+        className="mb-6 self-start flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
         onClick={() => navigate("/prox-offline")}
+        style={{
+          padding: '8px 16px',
+          border: '1px solid rgba(255,255,255,0.2)',
+          borderRadius: '8px',
+          background: 'rgba(255,255,255,0.05)'
+        }}
       >
         <svg
           width="20"
@@ -112,10 +126,13 @@ export default function Students() {
         Orqaga
       </button>
       <div
-        className="relative rounded-2xl shadow-2xl p-4 sm:p-6 lg:p-8 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl animate-fade-in overflow-hidden transform transition-all duration-700 hover:scale-[1.02]"
+        className="relative w-full overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)`,
+          maxWidth: '400px',
+          background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '16px',
+          padding: '24px',
           boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)'
         }}
       >
@@ -133,69 +150,211 @@ export default function Students() {
         {/* Animated border glow */}
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/20 via-cyan-500/20 to-emerald-500/20 animate-pulse opacity-30" />
 
-        <div className="relative z-10">
-          {/* Mobile-first layout - always vertical on small screens */}
-          <div className="flex flex-col gap-6 mb-6">
-            {/* User info section */}
-            <div className="flex items-center gap-3 sm:gap-4 hover-bounce">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full bg-gradient-to-br from-purple-500/30 via-cyan-500/20 to-emerald-500/30 backdrop-blur-sm flex items-center justify-center ring-2 ring-white/20 shadow-lg transition-all duration-300 hover:scale-110 hover:rotate-3">
-                <span className="text-2xl sm:text-3xl animate-bounce-emoji filter drop-shadow-lg">👨‍💻</span>
+        <div style={{ position: 'relative', zIndex: 10 }}>
+          {/* User info section - iPhone optimized */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '24px' }}>
+            {/* User profile */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div 
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.3) 0%, rgba(6, 182, 212, 0.2) 50%, rgba(16, 185, 129, 0.3) 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+                }}
+              >
+                <span style={{ fontSize: '28px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>👨‍💻</span>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-lg sm:text-xl text-white drop-shadow-md truncate">{user.fullName}</div>
-                <div className="text-xs sm:text-sm text-white/70 drop-shadow-sm">Dasturchi</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div 
+                  style={{ 
+                    fontWeight: 'bold', 
+                    fontSize: '20px', 
+                    color: 'white', 
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {user.fullName}
+                </div>
+                <div 
+                  style={{ 
+                    fontSize: '14px', 
+                    color: 'rgba(255, 255, 255, 0.7)', 
+                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' 
+                  }}
+                >
+                  Dasturchi
+                </div>
               </div>
             </div>
             
-            {/* Stats section - optimized for mobile */}
-            <div className="grid grid-cols-1 gap-3 sm:gap-4">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
-                <span className="inline-flex items-center gap-2 text-xs sm:text-sm text-white/90 drop-shadow-sm">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-gradient-to-r from-purple-400 to-cyan-400 animate-pulse"></div>
+            {/* Stats section - iPhone optimized with inline styles */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {/* Qadam */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(45deg, #a855f7, #06b6d4)',
+                    animation: 'pulse 2s infinite'
+                  }}></div>
                   Qadam:
                 </span>
-                <span className="font-bold text-sm sm:text-base text-white drop-shadow-sm">{stats.step}</span>
+                <span style={{ fontWeight: 'bold', fontSize: '16px', color: 'white' }}>{stats.step}</span>
               </div>
               
-              <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
-                <span className="inline-flex items-center gap-2 text-xs sm:text-sm text-white/90 drop-shadow-sm">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 animate-pulse"></div>
+              {/* Jami ball */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(45deg, #10b981, #06b6d4)',
+                    animation: 'pulse 2s infinite'
+                  }}></div>
                   Jami ball:
                 </span>
-                <span className="font-bold text-sm sm:text-base text-white drop-shadow-sm">{totalScore}</span>
+                <span style={{ fontWeight: 'bold', fontSize: '16px', color: 'white' }}>{totalScore}</span>
               </div>
               
-              <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
-                <span className="inline-flex items-center gap-2 text-xs sm:text-sm text-white/90 drop-shadow-sm">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse"></div>
+              {/* Shu oy ball */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(45deg, #3b82f6, #a855f7)',
+                    animation: 'pulse 2s infinite'
+                  }}></div>
                   Shu oy ball:
                 </span>
-                <span className="font-bold text-sm sm:text-base text-white drop-shadow-sm">{stats.monthPoints.reduce((a, b) => a + b, 0)}</span>
+                <span style={{ fontWeight: 'bold', fontSize: '16px', color: 'white' }}>{stats.monthPoints.reduce((a, b) => a + b, 0)}</span>
               </div>
               
-              <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
-                <span className="inline-flex items-center gap-2 text-xs sm:text-sm text-white/90 drop-shadow-sm">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-gradient-to-r from-orange-400 to-red-400 animate-pulse"></div>
+              {/* O'rtacha ball */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(45deg, #f59e0b, #ef4444)',
+                    animation: 'pulse 2s infinite'
+                  }}></div>
                   O'rtacha ball:
                 </span>
-                <span className="font-bold text-sm sm:text-base text-white drop-shadow-sm">{stats.avg}</span>
+                <span style={{ fontWeight: 'bold', fontSize: '16px', color: 'white' }}>{stats.avg}</span>
               </div>
               
-              <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
-                <span className="inline-flex items-center gap-2 text-xs sm:text-sm text-white/90 drop-shadow-sm">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-gradient-to-r from-red-400 to-pink-400 animate-pulse"></div>
+              {/* Eng yomon kun */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(45deg, #ef4444, #ec4899)',
+                    animation: 'pulse 2s infinite'
+                  }}></div>
                   Eng yomon kun:
                 </span>
-                <span className="font-bold text-sm sm:text-base text-white drop-shadow-sm">{stats.worstDay} ({stats.worstDayValue})</span>
+                <span style={{ fontWeight: 'bold', fontSize: '16px', color: 'white' }}>{stats.worstDay} ({stats.worstDayValue})</span>
               </div>
               
-              {/* Kelgan sana - iOS optimized */}
-              <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
-                <span className="inline-flex items-center gap-2 text-xs sm:text-sm text-white/90 drop-shadow-sm">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-gradient-to-r from-green-400 to-teal-400 animate-pulse"></div>
+              {/* Kelgan sana - iPhone optimized */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(45deg, #10b981, #14b8a6)',
+                    animation: 'pulse 2s infinite'
+                  }}></div>
                   Kelgan sana:
                 </span>
-                <span className="font-bold text-sm sm:text-base text-white drop-shadow-sm text-right">
+                <span style={{ 
+                  fontWeight: 'bold', 
+                  fontSize: '16px', 
+                  color: 'white',
+                  textAlign: 'right',
+                  maxWidth: '150px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
                   {formatArrivalDate(user.arrivalDate)}
                 </span>
               </div>
