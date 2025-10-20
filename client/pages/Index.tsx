@@ -4417,21 +4417,19 @@ function ProxOffline() {
                 {/* Info Cards: Arrival, Today, Total Days (reordered) */}
                 <div className="mt-6 sm:mt-8 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Boshlangan sana */}
-                  {selectedUser.arrivalDate && (
-                    <div className="relative rounded-3xl p-5 border-4 border-amber-400/40 bg-white/5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
-                          <Calendar className="w-5 h-5 text-white/90" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">Boshlangan sana</div>
-                          <div className="text-white/95 font-extrabold text-2xl sm:text-3xl mt-1 truncate">
-                            {formatDateDDMMYY(selectedUser.arrivalDate)}
-                          </div>
+                  <div className="relative rounded-3xl p-5 border-4 border-amber-400/40 bg-white/5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
+                        <Calendar className="w-5 h-5 text-white/90" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">Boshlangan sana</div>
+                        <div className="text-white/95 font-extrabold text-2xl sm:text-3xl mt-1 truncate">
+                          {formatDateDDMMYY(selectedUser.arrivalDate)}
                         </div>
                       </div>
                     </div>
-                  )}
+                  </div>
                   {/* Bugungi sana */}
                   <div className="relative rounded-3xl p-5 border-4 border-emerald-400/40 bg-white/5">
                     <div className="flex items-center gap-3">
@@ -4489,7 +4487,7 @@ function ProxOffline() {
                             )}
                           </div>
                           <div className="text-xl font-bold text-amber-100 mb-2 tracking-wide">
-                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "1-oogohlantirish berildi!" : "1-Ogohlantirish"}
+                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "1-Ogohlantirish berildi!" : "1-Ogohlantirish"}
                           </div>
                           <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
                             {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "" : ""}
@@ -4511,7 +4509,7 @@ function ProxOffline() {
                             )}
                           </div>
                           <div className="text-xl font-bold text-amber-200 mb-2">
-                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "1-oogohlantirish berildi" : "1-Ogohlantirish"}
+                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "1-Ogohlantirish berildi" : "1-Ogohlantirish"}
                           </div>
                           <div className="text-sm text-white/90 min-h-[20px] font-medium">
                             {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "" : ""}
@@ -4551,7 +4549,7 @@ function ProxOffline() {
                             )}
                           </div>
                           <div className="text-xl font-bold mb-2 tracking-wide text-rose-200">
-                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "2-oogohlantirish berildi" : "2-Ogohlantirish"}
+                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "2-Ogohlantirish berildi" : "2-Ogohlantirish"}
                           </div>
                           <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
                             {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "" : ""}
@@ -4573,7 +4571,7 @@ function ProxOffline() {
                             )}
                           </div>
                           <div className="text-xl font-bold mb-2 text-rose-300">
-                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "2-oogohlantirish berildi" : "2-Ogohlantirish"}
+                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "2-Ogohlantirish berildi" : "2-Ogohlantirish"}
                           </div>
                           <div className="text-sm text-white/90 min-h-[20px] font-medium">
                             {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "" : ""}
@@ -4616,7 +4614,7 @@ function ProxOffline() {
                             )}
                           </div>
                           <div className={`text-xl font-bold mb-2 ${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-100' : 'text-slate-400'}`}>
-                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-oogohlantirish berildi" : "3-Ogohlantirish"}
+                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-Ogohlantirish berildi" : "3-Ogohlantirish"}
                           </div>
                           <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
                             {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-Ogohlantirish olindi" : ""}
@@ -4645,7 +4643,7 @@ function ProxOffline() {
                             )}
                           </div>
                           <div className={`text-xl font-bold mb-2 ${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-200' : 'text-slate-400'}`}>
-                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-oogohlantirish berildi" : "3-Ogohlantirish"}
+                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-Ogohlantirish berildi" : "3-Ogohlantirish"}
                           </div>
                         </div>
                       </div>
