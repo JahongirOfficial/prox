@@ -3817,7 +3817,20 @@ function ProxOffline() {
   const formatDateDDMMYY = (dateString: string) => {
     if (!dateString) return "—";
     try {
-      const date = new Date(dateString);
+      let date: Date;
+      
+      // Handle ISO string format (YYYY-MM-DD or full ISO)
+      if (typeof dateString === 'string' && dateString.includes('T')) {
+        // Full ISO format - parse directly
+        date = new Date(dateString);
+      } else if (typeof dateString === 'string' && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // Date-only format (YYYY-MM-DD) - add time to avoid timezone issues
+        date = new Date(dateString + 'T00:00:00Z');
+      } else {
+        // Try parsing as-is
+        date = new Date(dateString);
+      }
+      
       if (isNaN(date.getTime())) return "—";
 
       const day = String(date.getDate()).padStart(2, '0');
@@ -4402,21 +4415,23 @@ function ProxOffline() {
                 </div>
 
                 {/* Info Cards: Arrival, Today, Total Days (reordered) */}
-                <div className="mt-6 sm:mt-8 max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="mt-6 sm:mt-8 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Boshlangan sana */}
-                  <div className="relative rounded-3xl p-5 border-4 border-amber-400/40 bg-white/5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
-                        <Calendar className="w-5 h-5 text-white/90" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">Boshlangan sana</div>
-                        <div className="text-white/95 font-extrabold text-2xl sm:text-3xl mt-1 truncate">
-                          {formatDateDDMMYY(selectedUser.arrivalDate)}
+                  {selectedUser.arrivalDate && (
+                    <div className="relative rounded-3xl p-5 border-4 border-amber-400/40 bg-white/5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
+                          <Calendar className="w-5 h-5 text-white/90" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">Boshlangan sana</div>
+                          <div className="text-white/95 font-extrabold text-2xl sm:text-3xl mt-1 truncate">
+                            {formatDateDDMMYY(selectedUser.arrivalDate)}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                   {/* Bugungi sana */}
                   <div className="relative rounded-3xl p-5 border-4 border-emerald-400/40 bg-white/5">
                     <div className="flex items-center gap-3">
