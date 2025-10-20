@@ -868,22 +868,34 @@ export function createServer() {
       ).sort({ createdAt: -1 });
       res.json({
         success: true,
-        users: users.map((user) => ({
-          id: user._id,
-          fullName: user.fullName,
-          phone: user.phone,
-          role: user.role,
-          balance: user.balance,
-          enrolledCourses: user.enrolledCourses,
-          completedCourses: user.completedCourses || [],
-          createdAt: user.createdAt,
-          step: user.step ?? 1,
-          attendanceDays: (user as any).attendanceDays ?? [],
-          todayScores: Array.isArray((user as any).todayScores) ? (user as any).todayScores : [],
-          arrivalDate: (user as any).arrivalDate ?? "",
-          warnings: (user as any).warnings ?? [],
-          certificates: (user as any).certificates ?? [],
-        })),
+        users: users.map((user) => {
+          const arrival = (user as any).arrivalDate;
+          let formattedArrival = "";
+          if (arrival) {
+            // If it's a Date object, convert to ISO string
+            if (arrival instanceof Date) {
+              formattedArrival = arrival.toISOString().split('T')[0];
+            } else if (typeof arrival === 'string') {
+              formattedArrival = arrival;
+            }
+          }
+          return {
+            id: user._id,
+            fullName: user.fullName,
+            phone: user.phone,
+            role: user.role,
+            balance: user.balance,
+            enrolledCourses: user.enrolledCourses,
+            completedCourses: user.completedCourses || [],
+            createdAt: user.createdAt,
+            step: user.step ?? 1,
+            attendanceDays: (user as any).attendanceDays ?? [],
+            todayScores: Array.isArray((user as any).todayScores) ? (user as any).todayScores : [],
+            arrivalDate: formattedArrival,
+            warnings: (user as any).warnings ?? [],
+            certificates: (user as any).certificates ?? [],
+          };
+        }),
       });
     } catch (error) {
       res.status(500).json({ success: false, message: "Server xatosi" });

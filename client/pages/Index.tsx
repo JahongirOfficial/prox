@@ -220,14 +220,17 @@ function CoursesList({
     if (!arrival) return 0;
     let a: Date;
     
+    // Normalize the string (trim whitespace)
+    const normalized = String(arrival).trim();
+    
     // Parse date string
-    if (arrival.includes('T')) {
-      a = new Date(arrival);
-    } else if (arrival.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      const parts = arrival.split('-');
+    if (normalized.includes('T')) {
+      a = new Date(normalized);
+    } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const parts = normalized.split('-');
       a = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
     } else {
-      a = new Date(arrival);
+      a = new Date(normalized);
     }
     
     if (isNaN(a.getTime())) return 0;
@@ -3800,14 +3803,17 @@ function ProxOffline() {
     if (!arrival) return 0;
     let a: Date;
     
+    // Normalize the string (trim whitespace)
+    const normalized = String(arrival).trim();
+    
     // Parse date string
-    if (arrival.includes('T')) {
-      a = new Date(arrival);
-    } else if (arrival.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      const parts = arrival.split('-');
+    if (normalized.includes('T')) {
+      a = new Date(normalized);
+    } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const parts = normalized.split('-');
       a = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
     } else {
-      a = new Date(arrival);
+      a = new Date(normalized);
     }
     
     if (isNaN(a.getTime())) return 0;
@@ -3845,17 +3851,20 @@ function ProxOffline() {
     try {
       let date: Date;
       
+      // Normalize the string (trim whitespace)
+      const normalized = String(dateString).trim();
+      
       // Handle ISO string format (YYYY-MM-DD or full ISO)
-      if (typeof dateString === 'string' && dateString.includes('T')) {
+      if (normalized.includes('T')) {
         // Full ISO format - parse directly
-        date = new Date(dateString);
-      } else if (typeof dateString === 'string' && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        date = new Date(normalized);
+      } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
         // Date-only format (YYYY-MM-DD) - parse as UTC to avoid timezone issues
-        const parts = dateString.split('-');
+        const parts = normalized.split('-');
         date = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
       } else {
         // Try parsing as-is
-        date = new Date(dateString);
+        date = new Date(normalized);
       }
       
       if (isNaN(date.getTime())) return "—";
@@ -3866,7 +3875,7 @@ function ProxOffline() {
       const year = String(date.getUTCFullYear()).slice(-2);
 
       return `${day}/${month}/${year}`;
-    } catch {
+    } catch (error) {
       return "—";
     }
   };
