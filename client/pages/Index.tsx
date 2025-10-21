@@ -13,6 +13,7 @@ import {
   BookOpen,
   Calendar,
   CheckCircle,
+  ChevronLeft, // Added ChevronLeft icon
   Code,
   CreditCard,
   Download,
@@ -3628,6 +3629,9 @@ export function MobileNavbar({
   handleProjectClick,
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isHome = location.pathname === "/home" || location.pathname === "/";
 
   const onMenuClick = (title) => {
     handleMenuClick(title);
@@ -3646,37 +3650,52 @@ export function MobileNavbar({
       {/* Mobile Navbar - Enhanced */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 border-b border-slate-700 shadow-lg backdrop-blur-sm">
         <div className="flex items-center justify-between px-4 py-0 h-12 relative">
-          {/* Logo Section - Enhanced */}
+          {/* Left: Back button (hidden on home) */}
           <div className="flex items-center gap-2">
+            {isHome ? (
+              <div className="w-10 h-10" aria-hidden />
+            ) : (
+              <button
+                onClick={() => {
+                  if (location.pathname.startsWith("/offline")) {
+                    try {
+                      window.dispatchEvent(new CustomEvent("prox:offline-back"));
+                    } catch {}
+                  } else {
+                    navigate(-1);
+                  }
+                }}
+                className="relative w-10 h-10 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg flex items-center justify-center transition-all duration-300 border border-slate-600/50 hover:border-cyan-500/50"
+                aria-label="Orqaga"
+                title="Orqaga"
+              >
+                <ChevronLeft className="w-5 h-5 text-white" />
+              </button>
+            )}
+          </div>
+
+          {/* Center: ProX logo clickable -> Home (no full overlay) */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <button
-              onClick={() => onMenuClick("Bosh sahifa")}
+              type="button"
+              onClick={() => navigate("/home")}
+              className="flex items-center justify-center"
               aria-label="Bosh sahifa"
-              className="relative w-10 h-10 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg flex items-center justify-center transition-all duration-300 border border-slate-600/50 hover:border-cyan-500/50"
               title="Bosh sahifa"
             >
-              <Home className="w-5 h-5 text-white" />
+              <img src="/images/prox.png" alt="ProX logo" className="h-7 object-contain" />
             </button>
           </div>
 
-          {/* Centered Logo */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <img
-              src="/images/prox.png"
-              alt="ProX logo"
-              className="h-7 object-contain"
-            />
-          </div>
-
-          {/* Right actions: Menu */}
+          {/* Right: Drawer toggle */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="relative w-10 h-10 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg flex items-center justify-center transition-all duration-300 border border-slate-600/50 hover:border-cyan-500/50 group"
               aria-label="Menyuni ochish"
+              title="Menyu"
             >
-              <Menu
-                className={`w-5 h-5 text-white transition-all duration-300 ${isMenuOpen ? "rotate-90 text-cyan-400" : "group-hover:text-cyan-400"}`}
-              />
+              <Menu className={`w-5 h-5 text-white transition-all duration-300 ${isMenuOpen ? "rotate-90 text-cyan-400" : "group-hover:text-cyan-400"}`} />
             </button>
           </div>
         </div>
@@ -3823,10 +3842,21 @@ function ProxOffline() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   // Helper to safely get selected user's ID (backend may return id or _id)
   const currentUserId = selectedUser ? (selectedUser as any).id || (selectedUser as any)._id : null;
+  
+  // Listen for navbar back on /offline: profile -> list, list -> home
+  useEffect(() => {
+    const handler = () => {
+      if (selectedUser) setSelectedUser(null);
+      else navigate("/home");
+    };
+    window.addEventListener("prox:offline-back", handler as EventListener);
+    return () => window.removeEventListener("prox:offline-back", handler as EventListener);
+  }, [selectedUser, navigate]);
   // Warnings state per user (local, UI-only)
   const [warningsByUser, setWarningsByUser] = useState<Record<string, string[]>>({});
   const [warningModalOpen, setWarningModalOpen] = useState(false);
@@ -3925,9 +3955,10 @@ function ProxOffline() {
     const step = Number(user?.step || 0);
     if (!days) return { text: "", classes: "" };
     const diff = step - days;
-    if (diff > 0) return { text: `O'quvchi ${diff} kun yutgan`, classes: "text-emerald-300" };
-    if (diff < 0) return { text: `O'quvchining ${Math.abs(diff)} kuni kuygan`, classes: "text-red-300" };
-    return { text: "Balans teng", classes: "text-white/60" };
+    const isRu = typeof navigator !== 'undefined' && (navigator.language || '').toLowerCase().startsWith('ru');
+    if (diff > 0) return { text: isRu ? `Ученик выиграл ${diff} дн.` : `O'quvchi ${diff} kun yutgan`, classes: "text-emerald-300" };
+    if (diff < 0) return { text: isRu ? `У ученика сгорело ${Math.abs(diff)} дн.` : `O'quvchining ${Math.abs(diff)} kuni kuygan`, classes: "text-red-300" };
+    return { text: isRu ? "Баланс равен" : "Balans teng", classes: "text-white/60" };
   };
 
   // Helper function to format date as DD/MM/YY - iOS Safari compatible
@@ -4298,7 +4329,7 @@ function ProxOffline() {
                 {!hasQuery && (
                   <>
                     <h2 className="text-3xl font-bold text-foreground mb-4">
-                      Offline O'quvchilar
+                      {(typeof navigator !== 'undefined' && (navigator.language || '').toLowerCase().startsWith('ru')) ? 'Офлайн учащиеся' : "Offline O'quvchilar"}
                     </h2>
                     <p className="text-muted-foreground mb-6">
                       Bizning dasturlash akademiyasimizda o'qiyotgan talabalar
@@ -4324,7 +4355,7 @@ function ProxOffline() {
                     </svg>
                   </span>
                   <Input
-                    placeholder="O'quvchini qidirish..."
+                    placeholder={(typeof navigator !== 'undefined' && (navigator.language || '').toLowerCase().startsWith('ru')) ? 'Поиск ученика...' : "O'quvchini qidirish..."}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full pl-14 pr-6 py-4 text-lg sm:py-5 sm:text-xl bg-white/10 border-white/20 text-white placeholder:text-white/60 rounded-2xl backdrop-blur-sm focus:bg-white/20 focus:border-cyan-400 transition-all duration-300"
@@ -4338,7 +4369,7 @@ function ProxOffline() {
                 </div>
                 {hasQuery && filteredUsers.length === 0 && (
                   <div className="text-center text-white/80 bg-white/10 p-4 rounded-xl backdrop-blur-sm mt-3">
-                    O'quvchi topilmadi
+                    {(typeof navigator !== 'undefined' && (navigator.language || '').toLowerCase().startsWith('ru')) ? 'Ученик не найден' : "O'quvchi topilmadi"}
                   </div>
                 )}
               </div>
@@ -4412,27 +4443,6 @@ function ProxOffline() {
               </svg>
             </div>
 
-            {/* Back button */}
-            <div className="absolute top-4 left-4 sm:top-8 sm:left-8 z-20">
-              <button
-                className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-white/10 hover:bg-white/20 rounded-xl backdrop-blur-sm border border-white/20 text-white transition-all duration-300 hover:scale-105"
-                onClick={() => setSelectedUser(null)}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="w-4 h-4 sm:w-5 sm:h-5"
-                >
-                  <path d="M15 19l-7-7 7-7" />
-                </svg>
-                <span className="font-medium text-sm sm:text-base">Orqaga</span>
-              </button>
-            </div>
-
             {/* Content container */}
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-16 sm:pt-8 pb-8 flex flex-col items-center">
               {/* Decorative background */}
@@ -4497,7 +4507,7 @@ function ProxOffline() {
                       {selectedUser.step ?? 1}
                     </div>
                     <div className="hidden sm:block text-sm font-semibold text-emerald-200/90 uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(16,185,129,0.2)]">
-                      Qadam
+                      {(typeof navigator !== 'undefined' && (navigator.language || '').toLowerCase().startsWith('ru')) ? 'Шаг' : 'Qadam'}
                     </div>
 
                     <div className="sm:hidden text-3xl font-extrabold text-emerald-200/95 ios-text-render">
@@ -4615,7 +4625,7 @@ function ProxOffline() {
                         <Calendar className="w-5 h-5 text-white/90" />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">Boshlangan sana</div>
+                        <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">{(typeof navigator !== 'undefined' && (navigator.language || '').toLowerCase().startsWith('ru')) ? 'Дата начала' : 'Boshlangan sana'}</div>
                         <div className="text-white/95 font-extrabold text-2xl sm:text-3xl mt-1 truncate ios-date-fix ios-text-render">
                           {formatDateDDMMYY(selectedUser.arrivalDate)}
                         </div>
@@ -4629,7 +4639,7 @@ function ProxOffline() {
                         <Target className="w-5 h-5 text-white/90" />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">Bugungi sana</div>
+                        <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">{(typeof navigator !== 'undefined' && (navigator.language || '').toLowerCase().startsWith('ru')) ? 'Сегодня' : 'Bugungi sana'}</div>
                         <div className="text-white/95 font-extrabold text-2xl sm:text-3xl mt-1 truncate ios-date-fix ios-text-render">
                           {formatDateDDMMYY(new Date().toISOString())}
                         </div>
@@ -4643,7 +4653,7 @@ function ProxOffline() {
                         <Zap className="w-5 h-5 text-white/90" />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">Jami kunlar</div>
+                        <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">{(typeof navigator !== 'undefined' && (navigator.language || '').toLowerCase().startsWith('ru')) ? 'Всего дней' : 'Jami kunlar'}</div>
                         <div className="text-white/95 font-extrabold text-3xl sm:text-4xl mt-1 truncate ios-text-render">
                           {daysSinceArrival(selectedUser.arrivalDate)}
                         </div>
