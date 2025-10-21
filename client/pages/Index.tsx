@@ -220,18 +220,29 @@ function CoursesList({
     if (!arrival) return 0;
     let a: Date;
     
-    // Normalize the string (trim whitespace)
-    const normalized = String(arrival).trim();
-    
-    // Parse date string safely (iOS-friendly)
-if (normalized.includes('T')) {
-  a = new Date(normalized);
-} else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
-  const parts = normalized.split('-');
+  // Normalize the string (trim whitespace)
+const normalized = String(arrival).trim().replace(/\//g, "-");
+let parts;
+
+// Parse date string safely (iOS-friendly)
+if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+  // YYYY-MM-DD
+  parts = normalized.split("-");
   a = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+} else if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(normalized)) {
+  // YYYY-MM-DD HH:mm:ss → convert to ISO
+  a = new Date(normalized.replace(" ", "T"));
+} else if (normalized.includes("T")) {
+  // ISO format
+  a = new Date(normalized);
 } else {
-  // Fix for iOS: replace space with "T" before parsing
-  a = new Date(normalized.replace(' ', 'T'));
+  // Fallback: parse manually
+  const m = normalized.match(/^(\d{4})[-/](\d{2})[-/](\d{2})/);
+  if (m) {
+    a = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  } else {
+    return 0;
+  }
 }
 
 if (isNaN(a.getTime())) return 0;
