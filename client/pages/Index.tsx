@@ -223,18 +223,19 @@ function CoursesList({
     // Normalize the string (trim whitespace)
     const normalized = String(arrival).trim();
     
-    // Parse date string
-    if (normalized.includes('T')) {
-      a = new Date(normalized);
-    } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      const parts = normalized.split('-');
-      a = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
-    } else {
-      a = new Date(normalized);
-    }
-    
-    if (isNaN(a.getTime())) return 0;
-    
+    // Parse date string safely (iOS-friendly)
+if (normalized.includes('T')) {
+  a = new Date(normalized);
+} else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
+  const parts = normalized.split('-');
+  a = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+} else {
+  // Fix for iOS: replace space with "T" before parsing
+  a = new Date(normalized.replace(' ', 'T'));
+}
+
+if (isNaN(a.getTime())) return 0;
+
     // Use UTC to avoid timezone issues
     const start = new Date(Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate()));
     const now = new Date();
