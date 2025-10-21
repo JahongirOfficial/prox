@@ -1894,6 +1894,7 @@ function ProfileContent({
     phone: "+998",
     password: "",
     confirmPassword: "",
+    arrivalDate: "",
   });
 
   // Cascading selects data
@@ -2082,33 +2083,74 @@ function ProfileContent({
     ? UZ_REGIONS[formData.region] || []
     : [];
 
-  // Format date function
+  // Format date function - iOS Safari compatible
   const formatDate = (dateString) => {
     if (!dateString) return "Ma'lumot yo'q";
 
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = date.getDate();
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
+    try {
+      let date: Date;
+      const normalized = String(dateString).trim();
+      
+      // iOS Safari uchun maxsus parsing
+      if (normalized.includes('T')) {
+        date = new Date(normalized);
+      } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // iOS Safari uchun explicit Date constructor
+        const parts = normalized.split('-');
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1;
+        const day = parseInt(parts[2]);
+        date = new Date(year, month, day);
+      } else if (normalized.match(/^\d{4}\/\d{2}\/\d{2}$/)) {
+        // Alternative format (YYYY/MM/DD) - iOS Safari uchun
+        const parts = normalized.split('/');
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1;
+        const day = parseInt(parts[2]);
+        date = new Date(year, month, day);
+      } else {
+        date = new Date(normalized);
+        
+        // Agar parsing xato bo'lsa, manual parsing sinab ko'rish
+        if (isNaN(date.getTime())) {
+          const cleanString = normalized.replace(/[^\d]/g, '');
+          if (cleanString.length >= 8) {
+            const year = parseInt(cleanString.substring(0, 4));
+            const month = parseInt(cleanString.substring(4, 6)) - 1;
+            const day = parseInt(cleanString.substring(6, 8));
+            date = new Date(year, month, day);
+          }
+        }
+      }
 
-    const months = [
-      "yanvar",
-      "fevral",
-      "mart",
-      "aprel",
-      "may",
-      "iyun",
-      "iyul",
-      "avgust",
-      "sentyabr",
-      "oktyabr",
-      "noyabr",
-      "dekabr",
-    ];
+      if (isNaN(date.getTime())) return "Ma'lumot yo'q";
 
-    return `${year}-yil ${day}-${months[month]} ${hours}:${minutes}`;
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const day = date.getDate();
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+
+      const months = [
+        "yanvar",
+        "fevral",
+        "mart",
+        "aprel",
+        "may",
+        "iyun",
+        "iyul",
+        "avgust",
+        "sentyabr",
+        "oktyabr",
+        "noyabr",
+        "dekabr",
+      ];
+
+      return `${year}-yil ${day}-${months[month]} ${hours}:${minutes}`;
+    } catch (error) {
+      console.error('Date formatting error:', error, 'for input:', dateString);
+      return "Ma'lumot yo'q";
+    }
   };
 
   const loadEnrolledCourses = async () => {
@@ -2330,6 +2372,7 @@ function ProfileContent({
           phone: "+998",
           password: "",
           confirmPassword: "",
+          arrivalDate: "",
         });
       } else {
         setError(data.message);
@@ -3798,7 +3841,7 @@ function ProxOffline() {
 
 
 
-  // Local helpers for progress to avoid scope issues
+  // Local helpers for progress to avoid scope issues - iOS Safari compatible
   const daysSinceArrival = (arrival?: string) => {
     if (!arrival) return 0;
     let a: Date;
@@ -3806,22 +3849,52 @@ function ProxOffline() {
     // Normalize the string (trim whitespace)
     const normalized = String(arrival).trim();
     
-    // Parse date string
+    // iOS Safari uchun maxsus parsing
     if (normalized.includes('T')) {
       a = new Date(normalized);
     } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      // iOS Safari uchun explicit Date constructor
       const parts = normalized.split('-');
-      a = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1;
+      const day = parseInt(parts[2]);
+      
+      // Avval local Date constructor bilan sinab ko'rish
+      a = new Date(year, month, day);
+      
+      // Agar xato bo'lsa, UTC method bilan sinab ko'rish
+      if (isNaN(a.getTime())) {
+        a = new Date(Date.UTC(year, month, day));
+      }
+    } else if (normalized.match(/^\d{4}\/\d{2}\/\d{2}$/)) {
+      // Alternative format (YYYY/MM/DD) - iOS Safari uchun
+      const parts = normalized.split('/');
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1;
+      const day = parseInt(parts[2]);
+      a = new Date(year, month, day);
     } else {
+      // Try parsing as-is, lekin iOS Safari uchun fallback
       a = new Date(normalized);
+      
+      // Agar parsing xato bo'lsa, manual parsing sinab ko'rish
+      if (isNaN(a.getTime())) {
+        const cleanString = normalized.replace(/[^\d]/g, '');
+        if (cleanString.length >= 8) {
+          const year = parseInt(cleanString.substring(0, 4));
+          const month = parseInt(cleanString.substring(4, 6)) - 1;
+          const day = parseInt(cleanString.substring(6, 8));
+          a = new Date(year, month, day);
+        }
+      }
     }
     
     if (isNaN(a.getTime())) return 0;
     
-    // Use UTC to avoid timezone issues
-    const start = new Date(Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate()));
+    // iOS Safari uchun timezone muammolarini oldini olish
+    const start = new Date(a.getFullYear(), a.getMonth(), a.getDate());
     const now = new Date();
-    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const diffMs = today.getTime() - start.getTime();
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     return Math.max(0, days);
@@ -3845,37 +3918,92 @@ function ProxOffline() {
     return { text: "Balans teng", classes: "text-white/60" };
   };
 
-  // Helper function to format date as DD/MM/YY
+  // Helper function to format date as DD/MM/YY - iOS Safari compatible
   const formatDateDDMMYY = (dateString: string) => {
-    if (!dateString) return "—";
+    if (!dateString) {
+      console.log('formatDateDDMMYY: No dateString provided');
+      return "—";
+    }
+    
+    console.log('formatDateDDMMYY: Input:', dateString, 'Type:', typeof dateString);
+    
     try {
       let date: Date;
       
       // Normalize the string (trim whitespace)
       const normalized = String(dateString).trim();
+      console.log('formatDateDDMMYY: Normalized:', normalized);
       
-      // Handle ISO string format (YYYY-MM-DD or full ISO)
+      // iOS Safari uchun maxsus handling
       if (normalized.includes('T')) {
         // Full ISO format - parse directly
+        console.log('formatDateDDMMYY: Parsing as ISO format');
         date = new Date(normalized);
       } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        // Date-only format (YYYY-MM-DD) - parse as UTC to avoid timezone issues
+        // Date-only format (YYYY-MM-DD) - iOS Safari uchun maxsus parsing
+        console.log('formatDateDDMMYY: Parsing as YYYY-MM-DD format');
         const parts = normalized.split('-');
-        date = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1; // Month is 0-indexed
+        const day = parseInt(parts[2]);
+        
+        console.log('formatDateDDMMYY: Parsed parts:', { year, month, day });
+        
+        // iOS Safari uchun explicit Date constructor ishlatish
+        date = new Date(year, month, day);
+        
+        // Agar parsing xato bo'lsa, UTC method bilan sinab ko'rish
+        if (isNaN(date.getTime())) {
+          console.log('formatDateDDMMYY: Local parsing failed, trying UTC');
+          date = new Date(Date.UTC(year, month, day));
+        }
+      } else if (normalized.match(/^\d{4}\/\d{2}\/\d{2}$/)) {
+        // Alternative format (YYYY/MM/DD) - iOS Safari uchun
+        console.log('formatDateDDMMYY: Parsing as YYYY/MM/DD format');
+        const parts = normalized.split('/');
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1;
+        const day = parseInt(parts[2]);
+        date = new Date(year, month, day);
       } else {
-        // Try parsing as-is
+        // Try parsing as-is, lekin iOS Safari uchun fallback
+        console.log('formatDateDDMMYY: Parsing as-is');
         date = new Date(normalized);
+        
+        // Agar parsing xato bo'lsa, manual parsing sinab ko'rish
+        if (isNaN(date.getTime())) {
+          console.log('formatDateDDMMYY: Direct parsing failed, trying manual parsing');
+          // Ba'zi formatlarni manual parse qilish
+          const cleanString = normalized.replace(/[^\d]/g, '');
+          console.log('formatDateDDMMYY: Clean string:', cleanString);
+          if (cleanString.length >= 8) {
+            const year = parseInt(cleanString.substring(0, 4));
+            const month = parseInt(cleanString.substring(4, 6)) - 1;
+            const day = parseInt(cleanString.substring(6, 8));
+            console.log('formatDateDDMMYY: Manual parsed parts:', { year, month, day });
+            date = new Date(year, month, day);
+          }
+        }
       }
       
-      if (isNaN(date.getTime())) return "—";
+      console.log('formatDateDDMMYY: Final date object:', date, 'Valid:', !isNaN(date.getTime()));
+      
+      // Final check - agar hali ham xato bo'lsa
+      if (isNaN(date.getTime())) {
+        console.log('formatDateDDMMYY: All parsing attempts failed');
+        return "—";
+      }
 
-      // Use UTC methods to avoid timezone offset issues on iOS
-      const day = String(date.getUTCDate()).padStart(2, '0');
-      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-      const year = String(date.getUTCFullYear()).slice(-2);
+      // iOS Safari uchun timezone muammolarini oldini olish
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = String(date.getFullYear()).slice(-2);
 
-      return `${day}/${month}/${year}`;
+      const result = `${day}/${month}/${year}`;
+      console.log('formatDateDDMMYY: Final result:', result);
+      return result;
     } catch (error) {
+      console.error('formatDateDDMMYY: Date parsing error:', error, 'for input:', dateString);
       return "—";
     }
   };
@@ -4001,10 +4129,23 @@ function ProxOffline() {
       setLoading(true);
       setError("");
       try {
+        console.log('ProxOffline: Fetching offline students...');
         const res = await fetch("/api/offline-students");
         if (res.ok) {
           const data = await res.json();
+          console.log('ProxOffline: API response:', data);
           setUsers(data.users || []);
+          
+          // Log user data for debugging
+          (data.users || []).forEach((user: any, index: number) => {
+            console.log(`ProxOffline: User ${index + 1}:`, {
+              id: user.id,
+              fullName: user.fullName,
+              arrivalDate: user.arrivalDate,
+              arrivalDateType: typeof user.arrivalDate
+            });
+          });
+          
           // Initialize warnings map from backend (support id or _id)
           try {
             const map: Record<string, string[]> = {};
@@ -4055,9 +4196,11 @@ function ProxOffline() {
             } catch { }
           } catch { }
         } else {
+          console.error('ProxOffline: API request failed:', res.status, res.statusText);
           setError("Foydalanuvchilarni yuklashda xatolik");
         }
-      } catch {
+      } catch (error) {
+        console.error('ProxOffline: Fetch error:', error);
         setError("Server bilan bog'lanishda xatolik");
       } finally {
         setLoading(false);
@@ -4196,13 +4339,13 @@ function ProxOffline() {
                     onClick={() => setSelectedUser(user)}
                   >
                     <div className="mb-4">
-                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
+                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-300 ios-text-render">
                         {user.fullName}
                       </h3>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
+                      <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium ios-text-render">
                         Offline Student
                       </span>
                       <div className="w-2 h-2 bg-green-400 rounded-full"></div>
@@ -4288,7 +4431,7 @@ function ProxOffline() {
               </div>
               <div className="w-full text-center mb-4">
                 {/* Student Name */}
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)] mt-2 mb-10 sm:mb-12 tracking-tight">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)] mt-2 mb-10 sm:mb-12 tracking-tight ios-text-render">
                   {selectedUser.fullName}
                 </h1>
 
@@ -4338,14 +4481,14 @@ function ProxOffline() {
                     </div>
 
                     {/* Step value with gradient text */}
-                    <div className="hidden sm:block text-5xl font-black mb-2 bg-gradient-to-r from-emerald-200 via-green-200 to-teal-200 bg-clip-text text-transparent drop-shadow-[0_4px_8px_rgba(16,185,129,0.3)]">
+                    <div className="hidden sm:block text-5xl font-black mb-2 bg-gradient-to-r from-emerald-200 via-green-200 to-teal-200 bg-clip-text text-transparent drop-shadow-[0_4px_8px_rgba(16,185,129,0.3)] ios-text-render">
                       {selectedUser.step ?? 1}
                     </div>
                     <div className="hidden sm:block text-sm font-semibold text-emerald-200/90 uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(16,185,129,0.2)]">
                       Qadam
                     </div>
 
-                    <div className="sm:hidden text-3xl font-extrabold text-emerald-200/95">
+                    <div className="sm:hidden text-3xl font-extrabold text-emerald-200/95 ios-text-render">
                       {(selectedUser.step ?? 1)}-qadam
                     </div>
                   </div>
@@ -4377,7 +4520,7 @@ function ProxOffline() {
                     </div>
 
                     {/* Score value with gradient text */}
-                    <div className="text-5xl font-black mb-2 bg-gradient-to-r from-slate-200 via-gray-200 to-white bg-clip-text text-transparent drop-shadow-[0_4px_8px_rgba(148,163,184,0.3)]">
+                    <div className="text-5xl font-black mb-2 bg-gradient-to-r from-slate-200 via-gray-200 to-white bg-clip-text text-transparent drop-shadow-[0_4px_8px_rgba(148,163,184,0.3)] ios-text-render">
                       {(selectedUser.todayScores || []).reduce(
                         (sum, s) => sum + (s.score || 0),
                         0,
@@ -4420,7 +4563,7 @@ function ProxOffline() {
                 {/* Progress */}
                 <div className="mt-5 max-w-5xl mx-auto w-full">
                   <div className="flex items-center justify-start mb-3 mt-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-white/95">
+                    <span className="text-2xl sm:text-3xl font-extrabold text-white/95 ios-text-render">
                       <strong className="text-cyan-300">ProX akademiyasida</strong> o'quvchining natijasi va ota-onasining pulini oqlash darajasi
                     </span>
                   </div>
@@ -4438,7 +4581,7 @@ function ProxOffline() {
                       ? 'bg-emerald-500/20 border-emerald-400/30'
                       : 'bg-red-500/20 border-red-400/30'
                       }`}>
-                      <span className={`font-black tracking-wide text-2xl sm:text-3xl ${progressPercent(selectedUser) > 55 ? 'text-emerald-300' : 'text-red-300'
+                      <span className={`font-black tracking-wide text-2xl sm:text-3xl ios-text-render ${progressPercent(selectedUser) > 55 ? 'text-emerald-300' : 'text-red-300'
                         }`}>
                         {Math.round(progressPercent(selectedUser))}%
                       </span>
@@ -4446,7 +4589,7 @@ function ProxOffline() {
                   </div>
                   {(() => {
                     const info = progressGainLoss(selectedUser); return info.text ? (
-                      <div className={`mt-3 text-center text-base ${info.classes}`}>{info.text}</div>
+                      <div className={`mt-3 text-center text-base ios-text-render ${info.classes}`}>{info.text}</div>
                     ) : null
                   })()}
                 </div>
@@ -4461,7 +4604,7 @@ function ProxOffline() {
                       </div>
                       <div className="min-w-0">
                         <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">Boshlangan sana</div>
-                        <div className="text-white/95 font-extrabold text-2xl sm:text-3xl mt-1 truncate">
+                        <div className="text-white/95 font-extrabold text-2xl sm:text-3xl mt-1 truncate ios-date-fix ios-text-render">
                           {formatDateDDMMYY(selectedUser.arrivalDate)}
                         </div>
                       </div>
@@ -4475,7 +4618,7 @@ function ProxOffline() {
                       </div>
                       <div className="min-w-0">
                         <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">Bugungi sana</div>
-                        <div className="text-white/95 font-extrabold text-2xl sm:text-3xl mt-1 truncate">
+                        <div className="text-white/95 font-extrabold text-2xl sm:text-3xl mt-1 truncate ios-date-fix ios-text-render">
                           {formatDateDDMMYY(new Date().toISOString())}
                         </div>
                       </div>
@@ -4489,7 +4632,7 @@ function ProxOffline() {
                       </div>
                       <div className="min-w-0">
                         <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">Jami kunlar</div>
-                        <div className="text-white/95 font-extrabold text-3xl sm:text-4xl mt-1 truncate">
+                        <div className="text-white/95 font-extrabold text-3xl sm:text-4xl mt-1 truncate ios-text-render">
                           {daysSinceArrival(selectedUser.arrivalDate)}
                         </div>
                       </div>
@@ -4994,7 +5137,7 @@ function ProxOffline() {
                           {/* Certificate Description */}
                           <div className="bg-slate-800/60 rounded-2xl p-6 mb-6 border border-slate-700/50">
                             <p className="text-white/90 leading-relaxed text-lg">
-                              {getCertificateDescription(certificateTitles[certInfo.index])}
+                              Bu sertifikat dasturlash sohasida {certificateTitles[certInfo.index].toLowerCase()} sohasida professional bilim va ko'nikmalarga ega ekanligingizni tasdiqlaydi.
                             </p>
                           </div>
 
@@ -5007,12 +5150,22 @@ function ProxOffline() {
                               Sertifikat talablari:
                             </h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {getCertificateRequirements(certificateTitles[certInfo.index]).map((req, idx) => (
-                                <div key={idx} className="flex items-start gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
-                                  <div className="w-3 h-3 rounded-full bg-blue-400 mt-1 flex-shrink-0"></div>
-                                  <span className="text-white/90 text-base leading-relaxed">{req}</span>
-                                </div>
-                              ))}
+                              <div className="flex items-start gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
+                                <div className="w-3 h-3 rounded-full bg-blue-400 mt-1 flex-shrink-0"></div>
+                                <span className="text-white/90 text-base leading-relaxed">Mavzularni to'liq o'zlashtirish</span>
+                              </div>
+                              <div className="flex items-start gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
+                                <div className="w-3 h-3 rounded-full bg-blue-400 mt-1 flex-shrink-0"></div>
+                                <span className="text-white/90 text-base leading-relaxed">Amaliy mashqlarni bajarish</span>
+                              </div>
+                              <div className="flex items-start gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
+                                <div className="w-3 h-3 rounded-full bg-blue-400 mt-1 flex-shrink-0"></div>
+                                <span className="text-white/90 text-base leading-relaxed">Loyihalarni yakunlash</span>
+                              </div>
+                              <div className="flex items-start gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
+                                <div className="w-3 h-3 rounded-full bg-blue-400 mt-1 flex-shrink-0"></div>
+                                <span className="text-white/90 text-base leading-relaxed">Imtihondan muvaffaqiyatli o'tish</span>
+                              </div>
                             </div>
                           </div>
                         </div>

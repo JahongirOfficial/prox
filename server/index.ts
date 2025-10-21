@@ -3599,13 +3599,53 @@ export function createServer() {
     },
   );
 
-  // Public: Get all offline students
+  // Public: Get all offline students - iOS Safari compatible date formatting
   app.get("/api/offline-students", async (req, res) => {
     try {
       const users = await User.find(
         { role: "student_offline" },
         { password: 0 },
       ).sort({ createdAt: -1 });
+      
+      // iOS Safari uchun sana formatini optimizatsiya qilish
+      const formatDateForIOS = (dateValue: any) => {
+        if (!dateValue) return "";
+        
+        try {
+          let date: Date;
+          
+          if (dateValue instanceof Date) {
+            date = dateValue;
+          } else if (typeof dateValue === 'string') {
+            const normalized = dateValue.trim();
+            
+            // iOS Safari uchun maxsus handling
+            if (normalized.includes('T')) {
+              date = new Date(normalized);
+            } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              // YYYY-MM-DD formatini explicit parsing
+              const parts = normalized.split('-');
+              const year = parseInt(parts[0]);
+              const month = parseInt(parts[1]) - 1;
+              const day = parseInt(parts[2]);
+              date = new Date(year, month, day);
+            } else {
+              date = new Date(normalized);
+            }
+          } else {
+            return "";
+          }
+          
+          if (isNaN(date.getTime())) return "";
+          
+          // iOS Safari uchun ISO format qaytarish
+          return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+        } catch (error) {
+          console.error('Date formatting error on server:', error);
+          return "";
+        }
+      };
+      
       res.json({
         success: true,
         users: users.map((user) => ({
@@ -3616,11 +3656,11 @@ export function createServer() {
           balance: user.balance,
           enrolledCourses: user.enrolledCourses,
           completedCourses: user.completedCourses || [],
-          createdAt: user.createdAt,
+          createdAt: formatDateForIOS(user.createdAt),
           step: user.step ?? 1,
           attendanceDays: user.attendanceDays ?? [],
           todayScores: user.todayScores ?? {},
-          arrivalDate: user.arrivalDate ?? "", // Yangi qo'shilgan
+          arrivalDate: formatDateForIOS(user.arrivalDate), // iOS Safari uchun optimizatsiya qilingan
         })),
       });
     } catch (error) {
