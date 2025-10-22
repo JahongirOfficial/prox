@@ -1,3 +1,18 @@
+/* Safe area and anti-bounce helpers */
+:root { --sat: env(safe-area-inset-top); }
+
+html, body {
+  height: 100%;
+  overscroll-behavior-y: none; /* reduce rubber-band overscroll chaining */
+}
+
+/* Use this as the primary scroll container under fixed navbar */
+.main-scroll {
+  height: 100dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* smooth iOS */
+  overscroll-behavior-y: contain;    /* contain rubber-band */
+}
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;

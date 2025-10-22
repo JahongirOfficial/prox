@@ -3650,7 +3650,32 @@ export function MobileNavbar({
       {/* Mobile Navbar - Enhanced */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 border-b border-slate-700 shadow-lg backdrop-blur-sm">
         <div className="flex items-center justify-between px-4 py-0 h-12 relative">
-          {/* Left: Back button (hidden on home) */}
+          {/* Left: Drawer toggle */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="relative w-10 h-10 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg flex items-center justify-center transition-all duration-300 border border-slate-600/50 hover:border-cyan-500/50 group"
+              aria-label="Menyuni ochish"
+              title="Menyu"
+            >
+              <Menu className={`w-5 h-5 text-white transition-all duration-300 ${isMenuOpen ? "rotate-90 text-cyan-400" : "group-hover:text-cyan-400"}`} />
+            </button>
+          </div>
+
+          {/* Center: ProX logo clickable -> Home (no full overlay) */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <button
+              type="button"
+              onClick={() => navigate("/home")}
+              className="flex items-center justify-center"
+              aria-label="Bosh sahifa"
+              title="Bosh sahifa"
+            >
+              <img src="/images/prox.png" alt="ProX logo" className="h-7 object-contain" />
+            </button>
+          </div>
+
+          {/* Right: Back button (hidden on home via disabled style) */}
           <div className="flex items-center gap-2">
             {isHome ? (
               <div className="w-10 h-10" aria-hidden />
@@ -3672,31 +3697,6 @@ export function MobileNavbar({
                 <ChevronLeft className="w-5 h-5 text-white" />
               </button>
             )}
-          </div>
-
-          {/* Center: ProX logo clickable -> Home (no full overlay) */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <button
-              type="button"
-              onClick={() => navigate("/home")}
-              className="flex items-center justify-center"
-              aria-label="Bosh sahifa"
-              title="Bosh sahifa"
-            >
-              <img src="/images/prox.png" alt="ProX logo" className="h-7 object-contain" />
-            </button>
-          </div>
-
-          {/* Right: Drawer toggle */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="relative w-10 h-10 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg flex items-center justify-center transition-all duration-300 border border-slate-600/50 hover:border-cyan-500/50 group"
-              aria-label="Menyuni ochish"
-              title="Menyu"
-            >
-              <Menu className={`w-5 h-5 text-white transition-all duration-300 ${isMenuOpen ? "rotate-90 text-cyan-400" : "group-hover:text-cyan-400"}`} />
-            </button>
           </div>
         </div>
       </div>
@@ -3883,6 +3883,13 @@ function ProxOffline() {
 
 
 
+  const mobileNameSize = (name?: string) => {
+    const l = (name || "").length;
+    if (l <= 16) return "text-4xl";
+    if (l <= 24) return "text-3xl";
+    if (l <= 32) return "text-2xl";
+    return "text-xl";
+  };
   // Local helpers for progress to avoid scope issues - iOS Safari compatible
   const daysSinceArrival = (arrival?: string) => {
     if (!arrival) return 0;
@@ -4443,8 +4450,29 @@ function ProxOffline() {
               </svg>
             </div>
 
+            {/* Desktop/Tablet Back button (hidden on mobile) */}
+            <div className="hidden md:block absolute top-6 left-8 z-20">
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl backdrop-blur-sm border border-white/20 text-white transition-all duration-300 hover:scale-[1.02]"
+                onClick={() => setSelectedUser(null)}
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="w-5 h-5"
+                >
+                  <path d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="font-medium text-base">Orqaga</span>
+              </button>
+            </div>
+
             {/* Content container */}
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-16 sm:pt-8 pb-8 flex flex-col items-center">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-8 pb-8 flex flex-col items-center">
               {/* Decorative background */}
               <div className="pointer-events-none absolute inset-0 -z-10">
                 <div className="absolute -top-24 -left-16 w-80 h-80 bg-fuchsia-500/10 rounded-full blur-3xl" />
@@ -4453,7 +4481,7 @@ function ProxOffline() {
               </div>
               <div className="w-full text-center mb-4">
                 {/* Student Name */}
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)] mt-2 mb-10 sm:mb-12 tracking-tight ios-text-render">
+                <h1 className={`text-[clamp(1.1rem,6vw,2.25rem)] sm:text-5xl lg:text-6xl font-bold text-white/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)] mt-2 mb-10 sm:mb-12 tracking-tight leading-tight break-words whitespace-normal overflow-visible max-w-[92vw] mx-auto ios-text-render`}>
                   {selectedUser.fullName}
                 </h1>
 

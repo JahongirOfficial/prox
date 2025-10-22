@@ -231,7 +231,7 @@ export default function CourseDetails() {
             variant="default"
             size="sm"
             onClick={() => navigate(-1)}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="hidden md:inline-flex bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <ArrowLeft className="w-4 h-4 mr-1" /> Orqaga
           </Button>
