@@ -16,6 +16,7 @@ import {
   ChevronLeft, // Added ChevronLeft icon
   Code,
   CreditCard,
+  DollarSign,
   Download,
   Eye,
   FolderOpen,
@@ -30,7 +31,6 @@ import {
   Target,
   TrendingUp,
   User,
-  DollarSign,
   Users,
   X,
   Zap
@@ -4658,7 +4658,7 @@ function ProxOffline() {
                 {/* Progress */}
                 <div className="mt-5 max-w-5xl mx-auto w-full">
                   <div className="flex items-center justify-start mb-3 mt-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-white/95 ios-text-render">
+                    <span className="font-extrabold text-white/95 ios-text-render text-[clamp(18px,3.2vw,36px)]">
                       <strong className="text-cyan-300">ProX akademiyasida</strong> o'quvchining natijasi va ota-onasining pulini oqlash darajasi:
                     </span>
                   </div>
@@ -4753,44 +4753,44 @@ function ProxOffline() {
                 </div>
 
                 {/* Info Cards: Arrival, Today, Total Days (reordered) */}
-                <div className="mt-6 sm:mt-8 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="mt-6 sm:mt-8 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[clamp(8px,1.5vw,16px)]">
                   {/* Boshlangan sana */}
-                  <div className="relative rounded-3xl p-4 md:p-5 border-4 border-amber-400/40 bg-white/5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
-                        <Calendar className="w-5 h-5 text-white/90" />
+                  <div className="relative rounded-3xl p-[clamp(10px,2.2vw,24px)] border-4 border-amber-400/40 bg-white/5 min-h-[clamp(76px,10vw,112px)]">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-[clamp(6px,1.2vw,12px)]">
+                      <div className="w-[clamp(28px,4.2vw,44px)] h-[clamp(28px,4.2vw,44px)] rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
+                        <Calendar className="w-[clamp(14px,2.2vw,20px)] h-[clamp(14px,2.2vw,20px)] text-white/90" />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">{isRuLang ? 'Дата начала' : 'Boshlangan sana'}</div>
-                        <div className="text-white/95 font-extrabold text-2xl md:text-[22px] lg:text-3xl mt-1 leading-tight ios-date-fix ios-text-render">
+                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(9px,1.1vw,13px)]" style={{fontSize:'clamp(9px,1.1vw,13px)', lineHeight:'clamp(12px,1.5vw,17px)'}}>{isRuLang ? 'Дата начала' : 'Kelgan sana'}</div>
+                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-date-fix ios-text-render text-[clamp(14px,2.6vw,30px)]" style={{fontSize:'clamp(14px,2.6vw,30px)', lineHeight:'clamp(18px,3vw,34px)'}}>
                           {formatDateDDMMYY(selectedUser.arrivalDate)}
                         </div>
                       </div>
                     </div>
                   </div>
                   {/* Bugungi sana */}
-                  <div className="relative rounded-3xl p-4 md:p-5 border-4 border-emerald-400/40 bg-white/5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
-                        <Target className="w-5 h-5 text-white/90" />
+                  <div className="relative rounded-3xl p-[clamp(10px,2.2vw,24px)] border-4 border-emerald-400/40 bg-white/5 min-h-[clamp(76px,10vw,112px)]">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-[clamp(6px,1.2vw,12px)]">
+                      <div className="w-[clamp(28px,4.2vw,44px)] h-[clamp(28px,4.2vw,44px)] rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
+                        <Target className="w-[clamp(14px,2.2vw,20px)] h-[clamp(14px,2.2vw,20px)] text-white/90" />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">{isRuLang ? 'Сегодня' : 'Bugungi sana'}</div>
-                        <div className="text-white/95 font-extrabold text-2xl md:text-[22px] lg:text-3xl mt-1 leading-tight ios-date-fix ios-text-render">
+                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(9px,1.1vw,13px)]" style={{fontSize:'clamp(9px,1.1vw,13px)', lineHeight:'clamp(12px,1.5vw,17px)'}}>{isRuLang ? 'Сегодня' : 'Bugungi sana'}</div>
+                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-date-fix ios-text-render text-[clamp(14px,2.6vw,30px)]" style={{fontSize:'clamp(14px,2.6vw,30px)', lineHeight:'clamp(18px,3vw,34px)'}}>
                           {formatDateDDMMYY(new Date().toISOString())}
                         </div>
                       </div>
                     </div>
                   </div>
                   {/* Jami kunlar */}
-                  <div className="relative rounded-3xl p-4 md:p-5 border-4 border-violet-400/40 bg-white/5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
-                        <Zap className="w-5 h-5 text-white/90" />
+                  <div className="relative rounded-3xl p-[clamp(10px,2.2vw,24px)] border-4 border-violet-400/40 bg-white/5 min-h-[clamp(76px,10vw,112px)]">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-[clamp(6px,1.2vw,12px)]">
+                      <div className="w-[clamp(28px,4.2vw,44px)] h-[clamp(28px,4.2vw,44px)] rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
+                        <Zap className="w-[clamp(14px,2.2vw,20px)] h-[clamp(14px,2.2vw,20px)] text-white/90" />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90">{isRuLang ? 'Всего дней' : 'Jami kunlar'}</div>
-                        <div className="text-white/95 font-extrabold text-3xl md:text-[26px] lg:text-4xl mt-1 leading-tight ios-text-render">
+                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(9px,1.1vw,13px)]" style={{fontSize:'clamp(9px,1.1vw,13px)', lineHeight:'clamp(12px,1.5vw,17px)'}}>{isRuLang ? 'Всего дней' : 'Jami kunlar'}</div>
+                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-text-render text-[clamp(14px,2.6vw,30px)]" style={{fontSize:'clamp(14px,2.6vw,30px)', lineHeight:'clamp(18px,3vw,34px)'}}>
                           {daysSinceArrival(selectedUser.arrivalDate)}
                         </div>
                       </div>
