@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 export default function Students() {
@@ -79,6 +80,47 @@ export default function Students() {
     }
   }
 
+  // dd/mm/yy ko'rinishidagi qisqa sana (universal)
+  function formatShortDate(input: string | Date) {
+    try {
+      let d: Date;
+      if (input instanceof Date) {
+        d = new Date(input.getFullYear(), input.getMonth(), input.getDate());
+      } else {
+        if (!input) return "--/--/--";
+        let s = input.trim().replace("T", " ").replace(/-/g, "/");
+        if (/^\d{4}\/\d{2}\/\d{2}$/.test(s)) s += " 00:00:00";
+        const parsed = new Date(s);
+        if (isNaN(parsed.getTime())) return "--/--/--";
+        d = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+      }
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const yy = String(d.getFullYear()).slice(-2);
+      return `${dd}/${mm}/${yy}`;
+    } catch {
+      return "--/--/--";
+    }
+  }
+
+  // Kelgan sanadan bugungacha bo'lgan jami kunlar
+  function getTotalDaysSince(input: string) {
+    if (!input) return 0;
+    try {
+      let s = input.trim().replace("T", " ").replace(/-/g, "/");
+      if (/^\d{4}\/\d{2}\/\d{2}$/.test(s)) s += " 00:00:00";
+      const start = new Date(s);
+      if (isNaN(start.getTime())) return 0;
+      const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const diff = Math.floor((today.getTime() - startDay.getTime()) / (1000 * 60 * 60 * 24));
+      return Math.max(0, diff);
+    } catch {
+      return 0;
+    }
+  }
+
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
@@ -108,6 +150,26 @@ export default function Students() {
 
   const stats = getUserStats(user);
   const totalScore = getTotalScore(user);
+  const arrivalShort = formatShortDate(user?.arrivalDate);
+  const todayShort = formatShortDate(new Date());
+  const totalDays = getTotalDaysSince(user?.arrivalDate);
+
+  // Faqat mobil holat uchun layoutni yoqish
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 480px)');
+    const onChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      // @ts-ignore
+      setIsMobile(e.matches ?? (e as MediaQueryList).matches);
+    };
+    setIsMobile(mql.matches);
+    if (mql.addEventListener) mql.addEventListener('change', onChange as any);
+    else if ((mql as any).addListener) (mql as any).addListener(onChange as any);
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener('change', onChange as any);
+      else if ((mql as any).removeListener) (mql as any).removeListener(onChange as any);
+    };
+  }, []);
 
   return (
     <div
@@ -207,6 +269,13 @@ export default function Students() {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {isMobile && (
+              <>
+                <MobileInfoRow icon="📅" title="Kelgan sana" value={arrivalShort} />
+                <MobileInfoRow icon="🗓️" title="Bugungi sana" value={todayShort} />
+                <MobileInfoRow icon="⏱️" title="Jami kunlar" value={totalDays} />
+              </>
+            )}
             <CardRow label="Qadam:" color="#8b5cf6" value={stats.step} />
             <CardRow label="Jami ball:" color="#10b981" value={totalScore} />
             <CardRow

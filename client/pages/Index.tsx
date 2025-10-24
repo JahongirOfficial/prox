@@ -4470,7 +4470,7 @@ function ProxOffline() {
           ) : null}
         </div>
       ) : (
-        <div key={currentUserId || 'profile'} ref={profileTopRef} className="w-full animate-fade-in pb-16">
+        <div key={currentUserId || 'profile'} ref={profileTopRef} className="w-full animate-fade-in pb-16 pt-[1px] md:pt-0">
           {/* Student Detail Hero Section */}
           <div className="relative min-h-[60vh] bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden">
             {/* Gradient overlay */}
@@ -4624,7 +4624,7 @@ function ProxOffline() {
 
                     {/* Label with modern styling */}
                     <div className="text-xs sm:text-sm font-semibold text-slate-300/90 uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(148,163,184,0.2)]">
-                      Jami ball
+                      Ball
                     </div>
                   </div>
                 </div>
@@ -4658,7 +4658,7 @@ function ProxOffline() {
                 {/* Progress */}
                 <div className="mt-5 max-w-5xl mx-auto w-full">
                   <div className="flex items-center justify-start mb-3 mt-2">
-                    <span className="font-extrabold text-white/95 ios-text-render text-[clamp(18px,3.2vw,36px)]">
+                    <span className="font-extrabold text-white/95 ios-text-render text-[clamp(20px,4vw,40px)]">
                       <strong className="text-cyan-300">ProX akademiyasida</strong> o'quvchining natijasi va ota-onasining pulini oqlash darajasi:
                     </span>
                   </div>
@@ -4755,42 +4755,49 @@ function ProxOffline() {
                 {/* Info Cards: Arrival, Today, Total Days (reordered) */}
                 <div className="mt-6 sm:mt-8 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[clamp(8px,1.5vw,16px)]">
                   {/* Boshlangan sana */}
-                  <div className="relative rounded-3xl p-[clamp(10px,2.2vw,24px)] border-4 border-amber-400/40 bg-white/5 min-h-[clamp(76px,10vw,112px)]">
-                    <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-[clamp(6px,1.2vw,12px)]">
-                      <div className="w-[clamp(28px,4.2vw,44px)] h-[clamp(28px,4.2vw,44px)] rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
-                        <Calendar className="w-[clamp(14px,2.2vw,20px)] h-[clamp(14px,2.2vw,20px)] text-white/90" />
+                  <div className="relative rounded-3xl p-[clamp(10px,2.2vw,24px)] border-4 border-amber-400/40 bg-white/5 min-h-[clamp(76px,10vw,112px)] flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-amber-500/5"></div>
+                    <div className="flex flex-row items-center text-center gap-[clamp(12px,2vw,16px)] relative z-10">
+                      <div className="relative w-[clamp(40px,6vw,44px)] h-[clamp(40px,6vw,44px)] rounded-2xl bg-gradient-to-br from-amber-500/30 via-yellow-500/20 to-orange-500/30 flex items-center justify-center shrink-0 shadow-lg">
+                        <div className="absolute inset-0 rounded-2xl bg-amber-400/20 animate-pulse"></div>
+                        <Calendar className="w-[clamp(18px,3vw,20px)] h-[clamp(18px,3vw,20px)] text-amber-100 relative z-10 drop-shadow-lg" />
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(9px,1.1vw,13px)]" style={{fontSize:'clamp(9px,1.1vw,13px)', lineHeight:'clamp(12px,1.5vw,17px)'}}>{isRuLang ? 'Дата начала' : 'Kelgan sana'}</div>
-                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-date-fix ios-text-render text-[clamp(14px,2.6vw,30px)]" style={{fontSize:'clamp(14px,2.6vw,30px)', lineHeight:'clamp(18px,3vw,34px)'}}>
+                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(12px,2vw,16px)]" style={{fontSize:'clamp(12px,2vw,16px)', lineHeight:'clamp(16px,2.4vw,20px)'}}>{isRuLang ? 'Дата начала' : 'Kelgan sana'}</div>
+                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-date-fix ios-text-render text-[clamp(22px,3.6vw,30px)]" style={{fontSize:'clamp(22px,3.6vw,30px)', lineHeight:'clamp(26px,4vw,34px)'}}>
                           {formatDateDDMMYY(selectedUser.arrivalDate)}
                         </div>
                       </div>
                     </div>
                   </div>
+
                   {/* Bugungi sana */}
-                  <div className="relative rounded-3xl p-[clamp(10px,2.2vw,24px)] border-4 border-emerald-400/40 bg-white/5 min-h-[clamp(76px,10vw,112px)]">
-                    <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-[clamp(6px,1.2vw,12px)]">
-                      <div className="w-[clamp(28px,4.2vw,44px)] h-[clamp(28px,4.2vw,44px)] rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
-                        <Target className="w-[clamp(14px,2.2vw,20px)] h-[clamp(14px,2.2vw,20px)] text-white/90" />
+                  <div className="relative rounded-3xl p-[clamp(10px,2.2vw,24px)] border-4 border-emerald-400/40 bg-white/5 min-h-[clamp(76px,10vw,112px)] flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-emerald-500/5"></div>
+                    <div className="flex flex-row items-center text-center gap-[clamp(12px,2vw,16px)] relative z-10">
+                      <div className="relative w-[clamp(40px,6vw,44px)] h-[clamp(40px,6vw,44px)] rounded-2xl bg-gradient-to-br from-emerald-500/30 via-green-500/20 to-teal-500/30 flex items-center justify-center shrink-0 shadow-lg">
+                        <div className="absolute inset-0 rounded-2xl bg-emerald-400/20 animate-pulse"></div>
+                        <Target className="w-[clamp(18px,3vw,20px)] h-[clamp(18px,3vw,20px)] text-emerald-100 relative z-10 drop-shadow-lg" />
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(9px,1.1vw,13px)]" style={{fontSize:'clamp(9px,1.1vw,13px)', lineHeight:'clamp(12px,1.5vw,17px)'}}>{isRuLang ? 'Сегодня' : 'Bugungi sana'}</div>
-                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-date-fix ios-text-render text-[clamp(14px,2.6vw,30px)]" style={{fontSize:'clamp(14px,2.6vw,30px)', lineHeight:'clamp(18px,3vw,34px)'}}>
+                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(12px,2vw,16px)]" style={{fontSize:'clamp(12px,2vw,16px)', lineHeight:'clamp(16px,2.4vw,20px)'}}>{isRuLang ? 'Сегодня' : 'Bugungi sana'}</div>
+                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-date-fix ios-text-render text-[clamp(22px,3.6vw,30px)]" style={{fontSize:'clamp(22px,3.6vw,30px)', lineHeight:'clamp(26px,4vw,34px)'}}>
                           {formatDateDDMMYY(new Date().toISOString())}
                         </div>
                       </div>
                     </div>
                   </div>
                   {/* Jami kunlar */}
-                  <div className="relative rounded-3xl p-[clamp(10px,2.2vw,24px)] border-4 border-violet-400/40 bg-white/5 min-h-[clamp(76px,10vw,112px)]">
-                    <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-[clamp(6px,1.2vw,12px)]">
-                      <div className="w-[clamp(28px,4.2vw,44px)] h-[clamp(28px,4.2vw,44px)] rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
-                        <Zap className="w-[clamp(14px,2.2vw,20px)] h-[clamp(14px,2.2vw,20px)] text-white/90" />
+                  <div className="relative rounded-3xl p-[clamp(10px,2.2vw,24px)] border-4 border-violet-400/40 bg-white/5 min-h-[clamp(76px,10vw,112px)] flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-violet-500/5"></div>
+                    <div className="flex flex-row items-center text-center gap-[clamp(12px,2vw,16px)] relative z-10 -translate-x-1">
+                      <div className="relative w-[clamp(40px,6vw,44px)] h-[clamp(40px,6vw,44px)] rounded-2xl bg-gradient-to-br from-violet-500/30 via-purple-500/20 to-indigo-500/30 flex items-center justify-center shrink-0 shadow-lg">
+                        <div className="absolute inset-0 rounded-2xl bg-violet-400/20 animate-pulse"></div>
+                        <Zap className="w-[clamp(18px,3vw,20px)] h-[clamp(18px,3vw,20px)] text-violet-100 relative z-10 drop-shadow-lg -translate-x-0.5" />
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(9px,1.1vw,13px)]" style={{fontSize:'clamp(9px,1.1vw,13px)', lineHeight:'clamp(12px,1.5vw,17px)'}}>{isRuLang ? 'Всего дней' : 'Jami kunlar'}</div>
-                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-text-render text-[clamp(14px,2.6vw,30px)]" style={{fontSize:'clamp(14px,2.6vw,30px)', lineHeight:'clamp(18px,3vw,34px)'}}>
+                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(12px,2vw,16px)]" style={{fontSize:'clamp(12px,2vw,16px)', lineHeight:'clamp(16px,2.4vw,20px)'}}>{isRuLang ? 'Всего дней' : 'Jami kunlar'}</div>
+                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-text-render text-[clamp(22px,3.6vw,30px)]" style={{fontSize:'clamp(22px,3.6vw,30px)', lineHeight:'clamp(26px,4vw,34px)'}}>
                           {daysSinceArrival(selectedUser.arrivalDate)}
                         </div>
                       </div>
@@ -4800,7 +4807,7 @@ function ProxOffline() {
 
                 {/* Warnings - Ogohlantirishlar */}
                 <div className="mt-5 max-w-5xl mx-auto">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {/* 1-Ogohlantirish */}
                     {isAdmin ? (
                       <button
@@ -4931,7 +4938,7 @@ function ProxOffline() {
                           setWarningModalOpen(true);
                         }}
                         disabled={!currentUserId || !(warningsByUser[currentUserId]?.[1])}
-                        className={`relative rounded-3xl border-4 border-slate-600/80 p-7 text-center col-span-2 sm:col-span-1 ${currentUserId && warningsByUser[currentUserId]?.[1]
+                        className={`relative rounded-3xl border-4 border-slate-600/80 p-7 text-center sm:col-span-1 ${currentUserId && warningsByUser[currentUserId]?.[1]
                           ? "bg-gradient-to-br from-slate-900/80 via-gray-900/70 to-black/60 shadow-2xl"
                           : "opacity-75 cursor-not-allowed bg-slate-800/40 border-slate-500/60"}
                       `}
@@ -4960,7 +4967,7 @@ function ProxOffline() {
                         </div>
                       </button>
                     ) : (
-                      <div className="relative rounded-3xl border-4 border-slate-600/80 bg-gradient-to-br from-slate-900/80 via-gray-900/70 to-black/60 p-7 text-center backdrop-blur-sm opacity-85 cursor-not-allowed shadow-2xl col-span-2 sm:col-span-1">
+                      <div className="relative rounded-3xl border-4 border-slate-600/80 bg-gradient-to-br from-slate-900/80 via-gray-900/70 to-black/60 p-7 text-center backdrop-blur-sm opacity-85 cursor-not-allowed shadow-2xl sm:col-span-1">
                         <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-35 ${currentUserId && warningsByUser[currentUserId]?.[1]
                           ? "from-slate-600/15 via-gray-600/8 to-black/15"
                           : "from-slate-400/8 via-slate-500/5 to-slate-600/8"}
