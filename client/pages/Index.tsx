@@ -644,7 +644,7 @@ if (isNaN(a.getTime())) return 0;
                           className="bg-primary hover:bg-primary/90 text-primary-foreground"
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(`/learning/${course.id}`, "_blank");
+                            navigate(`/learning/${course.id}`);
                           }}
                         >
                           Davom etish
