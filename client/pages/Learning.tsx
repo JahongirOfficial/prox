@@ -7,6 +7,23 @@ import { useUser } from "@/hooks/useUser";
 const PRIMARY_COLOR = 'var(--primary, #4169E1)';
 const MAIN_BG = 'var(--background, #0b1324)';
 
+function buildEmbedHTML(url: string): string {
+    if (!url) return "";
+    const u = url.trim();
+    if (/^\s*<iframe[\s\S]*<\/iframe>\s*$/i.test(u)) return u; // already iframe
+    // YouTube watch or short links
+    const ytWatch = u.match(/^https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([\w-]{6,})/i);
+    if (ytWatch) return `<iframe src="https://www.youtube.com/embed/${ytWatch[1]}" allowfullscreen></iframe>`;
+    const ytShort = u.match(/^https?:\/\/(?:www\.)?youtu\.be\/([\w-]{6,})/i);
+    if (ytShort) return `<iframe src="https://www.youtube.com/embed/${ytShort[1]}" allowfullscreen></iframe>`;
+    // Vimeo
+    const vimeo = u.match(/^https?:\/\/vimeo\.com\/(\d+)/i);
+    if (vimeo) return `<iframe src="https://player.vimeo.com/video/${vimeo[1]}" allowfullscreen></iframe>`;
+    // Direct mp4
+    if (/\.mp4($|\?)/i.test(u)) return `<video src="${u}" controls playsinline></video>`;
+    return "";
+}
+
 export default function Learning() {
     const { courseId } = useParams();
     const navigate = useNavigate();
@@ -102,16 +119,18 @@ export default function Learning() {
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    setModules(data.modules);
-                    if (data.modules.length > 0) {
+                    setModules(data.modules || []);
+                    if ((data.modules || []).length > 0) {
                         setOpenModuleId(data.modules[0]._id || data.modules[0].id);
                         setSelectedModuleId(data.modules[0]._id || data.modules[0].id);
                     }
                 } else {
-                    setError(data.message || "Modullarni yuklashda xatolik");
+                    setModules([]);
+                    setError(data.message || "Modullar topilmadi");
                 }
             } catch {
-                setError("Modullarni yuklashda xatolik");
+                setModules([]);
+                setError("Modullar topilmadi");
             } finally {
                 setLoadingModules(false);
             }
@@ -407,14 +426,18 @@ export default function Learning() {
                     <div className="w-full max-w-4xl aspect-video rounded-2xl flex items-center justify-center mb-8 border shadow-2xl overflow-hidden bg-card border-border">
                         {selectedModuleId && loadingLessons[selectedModuleId] ? (
                             <Skeleton className="w-full h-full rounded-2xl" />
-                        ) : selectedLesson && selectedLesson.videoUrl ? (
-                            <div
-                                className="flex items-center justify-center w-full h-full rounded-2xl [&>iframe]:w-auto [&>iframe]:h-auto [&>iframe]:max-w-full [&>iframe]:max-h-full [&>iframe]:rounded-2xl [&>iframe]:border-0 [&>iframe]:object-contain"
-                                dangerouslySetInnerHTML={{ __html: selectedLesson.videoUrl }}
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-lg text-muted-foreground">Video mavjud emas</div>
-                        )}
+                        ) : (() => {
+                            const raw = selectedLesson?.videoUrl || "";
+                            const html = buildEmbedHTML(raw);
+                            return html ? (
+                                <div
+                                    className="flex items-center justify-center w-full h-full rounded-2xl [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:rounded-2xl [&>iframe]:border-0 [&>video]:w-full [&>video]:h-full [&>video]:rounded-2xl"
+                                    dangerouslySetInnerHTML={{ __html: html }}
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-lg text-muted-foreground">Video mavjud emas</div>
+                            );
+                        })()}
                     </div>
                     {/* Video ma'lumotlari */}
                     <div className="w-full max-w-3xl rounded-xl p-6 border shadow-md bg-card border-border mb-6">
