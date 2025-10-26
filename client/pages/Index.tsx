@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import { Badge } from "@/components/ui/badge"
@@ -482,7 +482,7 @@ if (isNaN(a.getTime())) return 0;
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="courses-grid">
         {[...Array(6)].map((_, i) => (
           <Card key={i} className="relative overflow-hidden">
             <CardContent className="p-6">
@@ -538,9 +538,9 @@ if (isNaN(a.getTime())) return 0;
 
   return (
     <>
-      <div className="mb-8">
+      <div className="max-w-7xl mx-auto mb-8">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-foreground font-jetbrains">
+          <h2 className="text-xl sm:text-2xl font-semibold text-foreground font-jetbrains">
             Kurslar
           </h2>
           {/* <Button variant="ghost" size="sm" className="text-primary">
@@ -550,14 +550,14 @@ if (isNaN(a.getTime())) return 0;
       </div>
 
       {courses.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 courses-grid">
           {courses.map((course) => {
             const isEnrolled = enrolledCourses.some((c) => c.id === course.id);
             const locked = !isEnrolled && !allowEnroll(course);
             return (
               <Card
                 key={course.id}
-                className={`relative overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer group hover:shadow-lg hover:shadow-primary/10 ${(highlightTarget === "html" && isHTMLCourse(course)) ||
+                className={`relative overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer group hover:shadow-lg hover:shadow-primary/10 min-w-0 h-full flex flex-col course-card 
                   (highlightTarget === "css" &&
                     (isCSSCourse(course) || isBootstrapCourse(course))) ||
                   (highlightTarget === "bootstrap" &&
@@ -577,19 +577,16 @@ if (isNaN(a.getTime())) return 0;
                     <img
                       src={course.imageUrl}
                       alt={course.title}
-                      className="w-full h-48 object-cover object-center rounded-t-xl"
+                      className="course-image object-center rounded-t-xl"
                     />
                   ) : (
-                    <div className="w-full h-48 bg-slate-800/30 flex items-center justify-center rounded-t-xl">
+                    <div className="course-image bg-slate-800/30 flex items-center justify-center rounded-t-xl">
                       <BookOpen className="w-16 h-16 text-white" />
                     </div>
                   )}
 
-
-
-
-                  <div className="p-8">
-                    <h3 className="text-xl font-semibold font-jetbrains text-card-foreground mb-2 flex items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
+                  <div className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col min-w-0">
+                    <h3 className="course-title font-semibold font-jetbrains text-card-foreground mb-2 flex items-center gap-2">
                       <span className="truncate">{course.title}</span>
                       {locked && <Lock className="w-4 h-4 text-yellow-400" />}
                     </h3>
@@ -637,7 +634,7 @@ if (isNaN(a.getTime())) return 0;
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="mt-auto flex items-center justify-between mb-6">
                       <Badge variant="secondary" className="text-xs">
                         {course.level}
                       </Badge>
@@ -1299,18 +1296,18 @@ function ProjectsList() {
           </h2>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="courses-grid">
         {projects.map((project, index) => (
           <Card
             key={index}
-            className="relative overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer group hover:shadow-lg hover:shadow-primary/10"
+            className="relative overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer group hover:shadow-lg hover:shadow-primary/10 min-w-0 h-full flex flex-col"
             onClick={() => {
               if (project.url) {
                 window.open(project.url, "_blank");
               }
             }}
           >
-            <CardContent className="p-6">
+            <CardContent className="p-6 flex-1 flex flex-col min-w-0">
               <div className="flex items-center gap-4 mb-4">
                 {project.url && project.url.includes("javohirhakimov.uz") ? (
                   <div className="relative flex-shrink-0 w-20 h-20">
@@ -1370,7 +1367,7 @@ function ProjectsList() {
               <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
                 {project.description}
               </p>
-              <div className="flex items-center justify-between">
+              <div className="mt-auto flex items-center justify-between">
                 <Badge variant="secondary" className="text-xs">
                   {project.badge}
                 </Badge>
@@ -1672,15 +1669,15 @@ function ResumeBuilderContent() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-foreground mb-2">
+    <div className="space-y-6 max-w-3xl mx-auto px-2 sm:px-0">
+      <h2 className="font-bold text-foreground mb-2 text-[clamp(1.25rem,3.5vw,2rem)]">
         Resume Builder
       </h2>
-      <p className="text-muted-foreground max-w-2xl">
+      <p className="text-muted-foreground break-words text-[clamp(.95rem,2.6vw,1rem)] leading-relaxed">
         Oson va tez professional rezyume tayyorlash uchun qulay vosita. Tez
         orada ishga tushadi!
       </p>
-      <div className="rounded-lg border bg-card p-6 text-muted-foreground">
+      <div className="rounded-lg border bg-card p-4 sm:p-6 text-muted-foreground">
         <span>Resume builder funksiyasi tez orada...</span>
       </div>
     </div>
@@ -1755,9 +1752,9 @@ function MyCoursesContent({ navigate }) {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="courses-grid">
           {[...Array(3)].map((_, i) => (
-            <Card key={i} className="relative overflow-hidden">
+            <Card key={i} className="relative overflow-hidden h-full">
               <CardContent className="p-6">
                 <div className="mb-4">
                   <Skeleton className="w-full h-40 rounded-lg" />
@@ -1779,26 +1776,26 @@ function MyCoursesContent({ navigate }) {
           Hozircha hech qanday kursga yozilmagansiz
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="courses-grid">
           {enrolledCourses.map((course) => (
             <Card
               key={course.id}
-              className="relative overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-300 group hover:shadow-lg hover:shadow-primary/10"
+              className="relative overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-300 group hover:shadow-lg hover:shadow-primary/10 min-w-0 h-full flex flex-col course-card"
             >
               <CardContent className="p-0">
                 {course.imageUrl ? (
                   <img
                     src={course.imageUrl}
                     alt={course.title}
-                    className="w-full h-40 object-cover object-center rounded-t-2xl"
+                    className="course-image object-center rounded-t-2xl"
                   />
                 ) : (
-                  <div className="w-full h-40 bg-slate-800/30 flex items-center justify-center rounded-t-2xl">
+                  <div className="course-image bg-slate-800/30 flex items-center justify-center rounded-t-2xl">
                     <BookOpen className="w-16 h-16 text-white" />
                   </div>
                 )}
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-card-foreground mb-2 whitespace-nowrap overflow-hidden text-ellipsis">
+                <div className="p-6 flex-1 flex flex-col min-w-0">
+                  <h3 className="course-title font-semibold text-card-foreground mb-2">
                     {course.title}
                   </h3>
                   <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
@@ -1806,16 +1803,6 @@ function MyCoursesContent({ navigate }) {
                   </p>
 
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Progress:</span>
-                      <span className="font-medium text-primary">{course.progress || 0}%</span>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div
-                        className="bg-primary h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${course.progress || 0}%` }}
-                      ></div>
-                    </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">O'qituvchi:</span>
                       <span className="font-medium">{course.instructor || "ProX Academy"}</span>
@@ -1830,7 +1817,7 @@ function MyCoursesContent({ navigate }) {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="mt-auto flex items-center justify-between">
                     <Badge variant="secondary" className="text-xs">
                       {course.level || "Boshlang'ich"}
                     </Badge>
@@ -2940,20 +2927,20 @@ function SecurityContent() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">
+          <h2 className="font-bold text-foreground mb-2 text-[clamp(1.25rem,3.5vw,2rem)]">
             Xavfsizlik
           </h2>
-          <p className="text-muted-foreground max-w-2xl">
+          <p className="text-muted-foreground max-w-2xl text-[clamp(.95rem,2.6vw,1rem)] leading-relaxed">
             Bu bo'limda siz o'z akkauntingiz xavfsizligini boshqarishingiz
             mumkin.
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
         {/* Parol o'zgartirish */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
@@ -3060,7 +3047,7 @@ function SecurityContent() {
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Boshqa qurilmalar</h3>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+            <div className="flex flex-wrap items-center justify-between gap-3 md:gap-0 p-3 bg-muted rounded-md">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Monitor className="w-4 h-4 text-primary" />
@@ -3072,12 +3059,12 @@ function SecurityContent() {
                   </p>
                 </div>
               </div>
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs md:ml-auto">
                 Joriy
               </Badge>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+            <div className="flex flex-wrap items-center justify-between gap-3 md:gap-0 p-3 bg-muted rounded-md">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Phone className="w-4 h-4 text-primary" />
@@ -3092,13 +3079,13 @@ function SecurityContent() {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-red-500 hover:text-red-600"
+                className="text-red-500 hover:text-red-600 w-full md:w-auto md:ml-auto"
               >
                 Chiqarish
               </Button>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+            <div className="flex flex-wrap items-center justify-between gap-3 md:gap-0 p-3 bg-muted rounded-md">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Monitor className="w-4 h-4 text-primary" />
@@ -3113,7 +3100,7 @@ function SecurityContent() {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-red-500 hover:text-red-600"
+                className="text-red-500 hover:text-red-600 w-full md:w-auto md:ml-auto"
               >
                 Chiqarish
               </Button>
@@ -3131,7 +3118,7 @@ function SecurityContent() {
       {/* Xavfsizlik maslahatlari */}
       <Card className="p-6">
         <h3 className="text-lg font-semibold mb-4">Xavfsizlik maslahatlari</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mt-1">
               <span className="text-green-600 text-xs font-bold">✓</span>
@@ -4009,6 +3996,16 @@ function ProxOffline() {
   };
 
   const incomeThreshold = 600;
+
+  // Jami o'quvchilar foizi (o'rtacha ROI %)
+  const totalProgress = useMemo(() => {
+    try {
+      const arr = (users || []).map((u: any) => Math.max(0, Math.round(progressPercent(u))));
+      if (arr.length === 0) return 0;
+      const sum = arr.reduce((s, v) => s + v, 0);
+      return Math.round(sum / arr.length);
+    } catch { return 0; }
+  }, [users]);
   const incomeRemainingText = (user: any) => {
     const step = Number(user?.step || 0);
     const remain = Math.max(0, incomeThreshold - step);
@@ -4389,13 +4386,22 @@ function ProxOffline() {
                   </div>
                 )}
 
-                {/* Total Students Count (above search) */}
-                <div className="w-full max-w-6xl mx-auto mb-3">
-                  <div className="flex justify-center">
-                    <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 text-white/90 ring-1 ring-white/20 shadow-lg backdrop-blur-md">
-                      <Users className="w-5 h-5 text-cyan-300" />
-                      <span className="text-sm sm:text-base font-medium">Jami o'quvchilar</span>
+                {/* Metrics row */}
+                <div className="w-full max-w-6xl mx-auto mb-4">
+                  <div className="grid grid-cols-1 sm:flex sm:flex-wrap sm:justify-center gap-3">
+                    <div className="flex w-full sm:w-auto items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 text-white/90 ring-1 ring-white/20 shadow-lg backdrop-blur-md justify-between sm:justify-center">
+                      <span className="inline-flex items-center gap-2">
+                        <Users className="w-5 h-5 text-cyan-300" />
+                        <span className="text-sm sm:text-base font-medium">Jami o'quvchilar</span>
+                      </span>
                       <span className="ml-2 px-3 py-1 rounded-full bg-white/15 text-white font-bold text-base sm:text-lg">{users.length}</span>
+                    </div>
+                    <div className="flex w-full sm:w-auto items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500/20 via-green-500/20 to-teal-500/20 text-white/90 ring-1 ring-white/20 shadow-lg backdrop-blur-md justify-between sm:justify-center">
+                      <span className="inline-flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-emerald-300" />
+                        <span className="text-sm sm:text-base font-medium">Umumiy foiz</span>
+                      </span>
+                      <span className="ml-2 px-3 py-1 rounded-full bg-white/15 text-white font-bold text-base sm:text-lg">{totalProgress}%</span>
                     </div>
                   </div>
                 </div>
@@ -4443,12 +4449,14 @@ function ProxOffline() {
                       </h3>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-3">
                       <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium ios-text-render">
                         Offline Student
                       </span>
                       <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                     </div>
+
+                    {/* ROI progress removed as requested */}
                   </div>
                 ))}
               </div>
@@ -5952,7 +5960,7 @@ export default function Index() {
                   navigate={navigate}
                 />
               )}
-            {activeTab === "Loyihalarimiz" &&
+{activeTab === "Loyihalarimiz" &&
               activeProject === "Resume Builder" && <SecurityContent />}
             {activeTab === "Loyihalarimiz" &&
               activeProject === "Payments" && <PaymentsContent />}

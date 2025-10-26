@@ -69,19 +69,19 @@ function CoursesContent() {
 
   return (
     <div className="space-y-8">
-      <div className="text-center py-8">
-        <h1 className="text-4xl font-bold text-white mb-4">Kurslar</h1>
-        <p className="text-xl text-gray-300">Sizning kelajagingizni shakllantiruvchi kurslar</p>
+      <div className="text-center py-8 max-w-7xl mx-auto px-4">
+        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 sm:mb-4">Kurslar</h1>
+        <p className="text-base sm:text-xl text-gray-300">Sizning kelajagingizni shakllantiruvchi kurslar</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {courses.map((course) => (
-          <div key={course.id} className="bg-slate-800 rounded-lg p-6 hover:bg-slate-750 transition-all duration-300">
+          <div key={course.id} className="bg-slate-800 rounded-lg p-4 sm:p-6 hover:bg-slate-750 transition-all duration-300">
             <div className="mb-4">
               <img
                 src={course.image}
                 alt={course.title}
-                className="w-full h-48 object-cover rounded-lg"
+                className="w-full aspect-video md:aspect-[4/3] object-cover rounded-lg"
                 onError={(e) => {
                   e.target.src = "https://via.placeholder.com/400x200?text=Kurs+Rasmi";
                 }}
@@ -105,7 +105,7 @@ function CoursesContent() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-400 mb-4">
               <span>👥 {course.students} o'quvchi</span>
               <span>⏱️ {course.duration}</span>
               <span className={`px-2 py-1 rounded text-xs ${
