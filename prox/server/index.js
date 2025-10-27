@@ -1,58 +1,55 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-require("dotenv").config();
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// .env faylini yuklash
+dotenv.config();
+
+// ES module uchun __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // MongoDB ulanish
-mongoose
-  .connect(
-    process.env.MONGODB_URI || "mongodb://localhost:27017/prox_academy",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    },
-  )
-  .then(() => {
-    console.log("✅ MongoDB ga muvaffaqiyatli ulanildi");
-  })
-  .catch((error) => {
-    console.error("❌ MongoDB ulanish xatoligi:", error);
-  });
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("✅ MongoDB ga muvaffaqiyatli ulanildi"))
+.catch((err) => console.error("❌ MongoDB ulanish xatoligi:", err));
 
 // Routes
-const studentRoutes = require("./routes/students");
+import studentRoutes from "./routes/students.js"; 
 app.use("/api", studentRoutes);
 
-// Health check endpoint
+// Health check
 app.get("/api/health", (req, res) => {
-  res.json({
-    status: "OK",
-    message: "ProX Academy Backend ishlamoqda",
-    timestamp: new Date().toISOString(),
-  });
+  res.json({ status: "OK", message: "Backend ishlamoqda" });
 });
 
-// 404 handler
-app.use("*", (req, res) => {
-  res.status(404).json({ error: "Endpoint topilmadi" });
+// React build fayllarini servis qilish
+app.use(express.static(path.join(__dirname, "client/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/build", "index.html"));
 });
 
 // Error handler
-app.use((error, req, res, next) => {
-  console.error("Server xatoligi:", error);
+app.use((err, req, res, next) => {
+  console.error("Server xatoligi:", err);
   res.status(500).json({ error: "Server ichki xatoligi" });
 });
 
 // Server ishga tushirish
 app.listen(PORT, () => {
-  console.log(`🚀 ProX Academy Backend ${PORT} portda ishlamoqda`);
+  console.log(`🚀 Server ${PORT} portda ishlamoqda`);
 });
-
-module.exports = app;
