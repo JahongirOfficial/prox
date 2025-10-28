@@ -100,7 +100,7 @@ export function createServer() {
   });
 
   // Serve static files from uploads directory
-  app.use("/uploads", express.static(uploadsDir));
+  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
   // MongoDB connection with fallback
   let isMongoConnected = false;
@@ -3746,11 +3746,13 @@ export function createServer() {
 
   // Only serve static files in production mode
   if (process.env.NODE_ENV === "production") {
-    const __dirname = path.dirname(new URL(import.meta.url).pathname);
-    app.use(express.static(path.join(__dirname, "client/build")));
+    const clientBuildPath = path.join(process.cwd(), "client/dist");
+    app.use(express.static(clientBuildPath));
 
     app.get("*", (req, res) => {
-      res.sendFile(path.join(__dirname, "client/build", "index.html"));
+      if (!req.path.startsWith("/api")) {
+        res.sendFile(path.join(clientBuildPath, "index.html"));
+      }
     });
   }
 
