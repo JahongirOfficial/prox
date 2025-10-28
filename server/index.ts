@@ -3854,17 +3854,64 @@ export function createServer() {
     res.json({ success: true });
   });
 
-  // Get modules for a course
-  app.get("/api/admin/courses/:courseId/modules", async (req, res) => {
+  // Get modules for a course (Admin)
+  app.get(
+    "/api/admin/courses/:courseId/modules",
+    requireAdmin,
+    async (req, res) => {
+      try {
+        const { courseId } = req.params;
+        if ((mongoose.connection?.readyState ?? 0) !== 1) {
+          return res.json({ success: true, modules: [] });
+        }
+        const modules = await Module.find({ courseId }).sort({
+          order: 1,
+          createdAt: 1,
+        });
+        res.json({ success: true, modules });
+      } catch (error) {
+        res.json({ success: true, modules: [] });
+      }
+    },
+  );
+
+  // Get modules for a course (Public)
+  app.get("/api/courses/:courseId/modules", async (req, res) => {
     try {
       const { courseId } = req.params;
+      const token = req.headers.authorization?.replace("Bearer ", "");
+
+      if (!token) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Token topilmadi" });
+      }
+
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      const user = await User.findById(decoded.userId);
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Foydalanuvchi topilmadi" });
+      }
+
+      // Foydalanuvchi kursga a'zo bo'lganligini tekshirish
+      if (!user.enrolledCourses?.includes(courseId)) {
+        return res
+          .status(403)
+          .json({ success: false, message: "Bu kursga a'zo bo'lmagansiz" });
+      }
+
       if ((mongoose.connection?.readyState ?? 0) !== 1) {
         return res.json({ success: true, modules: [] });
       }
+
       const modules = await Module.find({ courseId }).sort({
         order: 1,
         createdAt: 1,
       });
+
       res.json({ success: true, modules });
     } catch (error) {
       res.json({ success: true, modules: [] });
@@ -3940,17 +3987,72 @@ export function createServer() {
     },
   );
 
-  // Get lessons for a module
-  app.get("/api/admin/modules/:moduleId/lessons", async (req, res) => {
+  // Get lessons for a module (Admin)
+  app.get(
+    "/api/admin/modules/:moduleId/lessons",
+    requireAdmin,
+    async (req, res) => {
+      try {
+        const { moduleId } = req.params;
+        if ((mongoose.connection?.readyState ?? 0) !== 1) {
+          return res.json({ success: true, lessons: [] });
+        }
+        const lessons = await Lesson.find({ moduleId }).sort({
+          order: 1,
+          createdAt: 1,
+        });
+        res.json({ success: true, lessons });
+      } catch (error) {
+        res.json({ success: true, lessons: [] });
+      }
+    },
+  );
+
+  // Get lessons for a module (Public)
+  app.get("/api/modules/:moduleId/lessons", async (req, res) => {
     try {
       const { moduleId } = req.params;
+      const token = req.headers.authorization?.replace("Bearer ", "");
+
+      if (!token) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Token topilmadi" });
+      }
+
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      const user = await User.findById(decoded.userId);
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Foydalanuvchi topilmadi" });
+      }
+
+      // Kursni topish
+      const module = await Module.findById(moduleId);
+      if (!module) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Modul topilmadi" });
+      }
+
+      // Foydalanuvchi kursga a'zo bo'lganligini tekshirish
+      if (!user.enrolledCourses?.includes(module.courseId.toString())) {
+        return res
+          .status(403)
+          .json({ success: false, message: "Bu kursga a'zo bo'lmagansiz" });
+      }
+
       if ((mongoose.connection?.readyState ?? 0) !== 1) {
         return res.json({ success: true, lessons: [] });
       }
+
       const lessons = await Lesson.find({ moduleId }).sort({
         order: 1,
         createdAt: 1,
       });
+
       res.json({ success: true, lessons });
     } catch (error) {
       res.json({ success: true, lessons: [] });
