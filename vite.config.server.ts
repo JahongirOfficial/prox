@@ -9,6 +9,7 @@ export default defineConfig({
     ssr: true,
     rollupOptions: {
       input: path.resolve(__dirname, "server/node-build.ts"),
+      inlineDynamicImports: true,
       external: [
         // Node.js built-ins
         "fs",
@@ -40,7 +41,7 @@ export default defineConfig({
       },
     },
     minify: false, // Keep readable for debugging
-    sourcemap: true,
+    sourcemap: false,
   },
   resolve: {
     alias: {

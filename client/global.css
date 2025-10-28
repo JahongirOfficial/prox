@@ -1,7 +1,15 @@
-/* Safe area and anti-bounce helpers */
-:root { --sat: env(safe-area-inset-top); }
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-html, body {
+/* Safe area and anti-bounce helpers */
+:root {
+  --sat: env(safe-area-inset-top);
+}
+
+html,
+body {
   height: 100%;
   overscroll-behavior-y: none; /* reduce rubber-band overscroll chaining */
 }
@@ -11,12 +19,8 @@ html, body {
   height: 100dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch; /* smooth iOS */
-  overscroll-behavior-y: contain;    /* contain rubber-band */
+  overscroll-behavior-y: contain; /* contain rubber-band */
 }
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap");
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 @layer base {
   /**
@@ -129,13 +133,13 @@ html, body {
 @supports (-webkit-touch-callout: none) {
   /* iOS Safari specific styles */
   .ios-date-fix {
-    -webkit-text-stroke: 0.5px rgba(255,255,255,0.1);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     /* iOS Safari uchun qo'shimcha optimizatsiya */
     -webkit-backface-visibility: hidden;
     -webkit-transform: translateZ(0);
   }
-  
+
   /* iOS Safari uchun text rendering */
   .ios-text-render {
     -webkit-font-smoothing: antialiased;
@@ -144,7 +148,7 @@ html, body {
     -webkit-backface-visibility: hidden;
     -webkit-transform: translateZ(0);
   }
-  
+
   /* iOS Safari uchun umumiy optimizatsiya */
   .ios-optimize {
     -webkit-backface-visibility: hidden;
@@ -299,41 +303,46 @@ html, body {
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
   }
-  
+
   /* Prevent zoom on input focus */
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     font-size: 16px !important;
   }
-  
+
   /* Better touch targets for iPhone */
-  button, .btn, [role="button"] {
+  button,
+  .btn,
+  [role="button"] {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   /* Smooth scrolling for iPhone */
   * {
     -webkit-overflow-scrolling: touch;
   }
-  
+
   /* Fix backdrop blur on iPhone */
   .backdrop-blur-sm {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
-  
+
   /* Ensure proper text rendering on iPhone */
-  body, * {
+  body,
+  * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
+
   /* Fix date display on iOS */
   .text-right {
     text-align: right !important;
     direction: ltr;
   }
-  
+
   /* Better text wrapping for dates on small screens */
   .font-bold {
     word-break: keep-all;
@@ -350,15 +359,18 @@ html, body {
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
   }
-  
+
   /* Fix for gradient backgrounds on iPhone */
-  .bg-gradient-to-r, .bg-gradient-to-br, [style*="gradient"] {
+  .bg-gradient-to-r,
+  .bg-gradient-to-br,
+  [style*="gradient"] {
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
   }
-  
+
   /* Better performance for animations on iPhone */
-  .animate-pulse, .animate-bounce-emoji {
+  .animate-pulse,
+  .animate-bounce-emoji {
     will-change: transform, opacity;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
@@ -370,7 +382,7 @@ html, body {
   .safe-area-top {
     padding-top: max(1rem, env(safe-area-inset-top));
   }
-  
+
   .safe-area-bottom {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
@@ -384,22 +396,42 @@ html, body {
   align-items: stretch;
 }
 @media (min-width: 640px) {
-  .courses-grid { gap: 1.25rem; }
+  .courses-grid {
+    gap: 1.25rem;
+  }
 }
 @media (min-width: 1024px) {
-  .courses-grid { gap: 2rem; }
+  .courses-grid {
+    gap: 2rem;
+  }
 }
 /* Very small screens fallback */
 @media (max-width: 380px) {
-  .courses-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .courses-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
 }
 
 /* Course card helpers */
-.course-card { min-width: 0; display: flex; flex-direction: column; height: 100%; }
-.course-image { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+.course-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.course-image {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}
 .course-title {
   font-size: clamp(1rem, 1.2vw, 1.25rem);
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-  line-height: 1.25; min-height: 2.5rem; /* keep two-line space */
-  hyphens: auto; word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.25;
+  min-height: 2.5rem; /* keep two-line space */
+  hyphens: auto;
+  word-break: break-word;
 }

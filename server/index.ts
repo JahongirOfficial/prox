@@ -30,6 +30,11 @@ if (!fs.existsSync(coursesUploadsDir)) {
 }
 
 // Configure multer for file uploads
+// Helper to check if file is an image
+const isImage = (file: Express.Multer.File): boolean => {
+  return file.mimetype.startsWith("image/");
+};
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, coursesUploadsDir);
@@ -45,17 +50,22 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 20 * 1024 * 1024, // 20MB limit
   },
   fileFilter: (req, file, cb) => {
-    // Allow only image files
-    if (file.mimetype.startsWith("image/")) {
+    // Accept any field name to be more flexible, just verify it's an image
+    if (isImage(file)) {
       cb(null, true);
     } else {
       cb(new Error("Faqat rasm fayllari yuklash mumkin"));
     }
   },
 });
+
+// Multer xatolarini aniqroq qaytarish (masalan, fayl hajmi limitidan oshsa)
+// NOTE: The multer error handler must be registered on the Express `app` instance.
+// It's added inside `createServer()` below (after app is created) so importing
+// this module doesn't reference `app` at module scope.
 
 let wsServer: WebSocketServer | null = null;
 const wsClients = new Set<WebSocket>();
@@ -75,6 +85,19 @@ export function createServer() {
   // Middleware
   app.use(cors());
   app.use(express.json());
+
+  // Multer-specific error handler (e.g., file size limit). Keep inside createServer
+  // so `app` exists when the handler is registered.
+  app.use((err: any, _req: any, res: any, next: any) => {
+    if (err && (err.name === "MulterError" || err.code === "LIMIT_FILE_SIZE")) {
+      const msg =
+        err.code === "LIMIT_FILE_SIZE"
+          ? "Rasm hajmi juda katta. Limit: 20MB"
+          : err.message || "Yuklashda xatolik";
+      return res.status(400).json({ success: false, message: msg });
+    }
+    return next(err);
+  });
 
   // Serve static files from uploads directory
   app.use("/uploads", express.static(uploadsDir));
@@ -465,7 +488,13 @@ export function createServer() {
   // Register endpoint
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const { fullName, phone, password, role = "student", arrivalDate } = req.body;
+      const {
+        fullName,
+        phone,
+        password,
+        role = "student",
+        arrivalDate,
+      } = req.body;
       let formattedPhone = phone.replace(/\s/g, "");
       if (!formattedPhone.startsWith("+998")) {
         formattedPhone = "+998" + formattedPhone.replace(/^\+/, "");
@@ -878,8 +907,8 @@ export function createServer() {
           if (arrival) {
             // If it's a Date object, convert to ISO string
             if (arrival instanceof Date) {
-              formattedArrival = arrival.toISOString().split('T')[0];
-            } else if (typeof arrival === 'string') {
+              formattedArrival = arrival.toISOString().split("T")[0];
+            } else if (typeof arrival === "string") {
               formattedArrival = arrival;
             }
           }
@@ -894,7 +923,9 @@ export function createServer() {
             createdAt: user.createdAt,
             step: user.step ?? 1,
             attendanceDays: (user as any).attendanceDays ?? [],
-            todayScores: Array.isArray((user as any).todayScores) ? (user as any).todayScores : [],
+            todayScores: Array.isArray((user as any).todayScores)
+              ? (user as any).todayScores
+              : [],
             arrivalDate: formattedArrival,
             warnings: (user as any).warnings ?? [],
             certificates: (user as any).certificates ?? [],
@@ -1255,7 +1286,9 @@ export function createServer() {
           completedCourses: user.completedCourses || [],
           createdAt: user.createdAt,
           step: user.step ?? 1,
-          todayScores: Array.isArray((user as any).todayScores) ? (user as any).todayScores : [],
+          todayScores: Array.isArray((user as any).todayScores)
+            ? (user as any).todayScores
+            : [],
           attendanceDays: (user as any).attendanceDays ?? [],
           arrivalDate: (user as any).arrivalDate ?? "",
           warnings: (user as any).warnings ?? [],
@@ -1267,145 +1300,157 @@ export function createServer() {
     }
   });
 
-  // Admin: Create new course
-  app.post("/api/admin/courses", upload.single("imageUrl"), async (req, res) => {
-    try {
-      const {
-        title,
-        description,
-        instructor,
-        price,
-        duration,
-        level,
-        status,
-        enrolledStudents,
-        rating,
-        totalRatings,
-        category,
-        tags,
-      } = req.body;
+  // Admin: Create new course (legacy path kept to avoid shadowing main secured endpoint)
+  app.post(
+    "/api/admin/courses-legacy",
+    upload.single("imageUrl"),
+    async (req, res) => {
+      try {
+        const {
+          title,
+          description,
+          instructor,
+          price,
+          duration,
+          level,
+          status,
+          enrolledStudents,
+          rating,
+          totalRatings,
+          category,
+          tags,
+        } = req.body;
 
-      const imageUrl = req.file ? `/uploads/courses/${req.file.filename}` : "";
+        const imageUrl = req.file
+          ? `/uploads/courses/${req.file.filename}`
+          : "";
 
-      const courseData = {
-        title,
-        description,
-        instructor,
-        price,
-        duration,
-        level,
-        status,
-        enrolledStudents,
-        rating,
-        totalRatings,
-        imageUrl,
-        category,
-        tags,
-      };
+        const courseData = {
+          title,
+          description,
+          instructor,
+          price,
+          duration,
+          level,
+          status,
+          enrolledStudents,
+          rating,
+          totalRatings,
+          imageUrl,
+          category,
+          tags,
+        };
 
-      const course = new Course(courseData);
-      await course.save();
+        const course = new Course(courseData);
+        await course.save();
 
-      res.status(201).json({
-        success: true,
-        message: "Yangi kurs yaratildi",
-        course: {
-          id: course._id,
-          title: course.title,
-          description: course.description,
-          instructor: course.instructor,
-          price: course.price,
-          duration: course.duration,
-          level: course.level,
-          status: course.status,
-          enrolledStudents: course.enrolledStudents,
-          rating: course.rating,
-          totalRatings: course.totalRatings,
-          imageUrl: course.imageUrl,
-          category: course.category,
-          tags: course.tags,
-          createdAt: course.createdAt,
-          updatedAt: course.updatedAt,
-        },
-      });
-    } catch (error) {
-      res.status(500).json({ success: false, message: "Server xatosi" });
-    }
-  });
+        res.status(201).json({
+          success: true,
+          message: "Yangi kurs yaratildi",
+          course: {
+            id: course._id,
+            title: course.title,
+            description: course.description,
+            instructor: course.instructor,
+            price: course.price,
+            duration: course.duration,
+            level: course.level,
+            status: course.status,
+            enrolledStudents: course.enrolledStudents,
+            rating: course.rating,
+            totalRatings: course.totalRatings,
+            imageUrl: course.imageUrl,
+            category: course.category,
+            tags: course.tags,
+            createdAt: course.createdAt,
+            updatedAt: course.updatedAt,
+          },
+        });
+      } catch (error) {
+        res.status(500).json({ success: false, message: "Server xatosi" });
+      }
+    },
+  );
 
   // Admin: Update course
-  app.put("/api/admin/courses/:id", upload.single("imageUrl"), async (req, res) => {
-    try {
-      const { id } = req.params;
-      const {
-        title,
-        description,
-        instructor,
-        price,
-        duration,
-        level,
-        status,
-        enrolledStudents,
-        rating,
-        totalRatings,
-        category,
-        tags,
-      } = req.body;
+  app.put(
+    "/api/admin/courses/:id",
+    upload.single("imageUrl"),
+    async (req, res) => {
+      try {
+        const { id } = req.params;
+        const {
+          title,
+          description,
+          instructor,
+          price,
+          duration,
+          level,
+          status,
+          enrolledStudents,
+          rating,
+          totalRatings,
+          category,
+          tags,
+        } = req.body;
 
-      const imageUrl = req.file ? `/uploads/courses/${req.file.filename}` : "";
+        const imageUrl = req.file
+          ? `/uploads/courses/${req.file.filename}`
+          : "";
 
-      const course = await Course.findById(id);
+        const course = await Course.findById(id);
 
-      if (!course) {
-        return res.status(404).json({
-          success: false,
-          message: "Kurs topilmadi",
+        if (!course) {
+          return res.status(404).json({
+            success: false,
+            message: "Kurs topilmadi",
+          });
+        }
+
+        if (title) course.title = title;
+        if (description) course.description = description;
+        if (instructor) course.instructor = instructor;
+        if (price) course.price = price;
+        if (duration) course.duration = duration;
+        if (level) course.level = level;
+        if (status) course.status = status;
+        if (enrolledStudents !== undefined)
+          course.enrolledStudents = enrolledStudents;
+        if (rating !== undefined) course.rating = rating;
+        if (totalRatings !== undefined) course.totalRatings = totalRatings;
+        if (imageUrl) course.imageUrl = imageUrl;
+        if (category) course.category = category;
+        if (tags) course.tags = tags;
+
+        await course.save();
+
+        res.json({
+          success: true,
+          message: "Kurs ma'lumotlari yangilandi",
+          course: {
+            id: course._id,
+            title: course.title,
+            description: course.description,
+            instructor: course.instructor,
+            price: course.price,
+            duration: course.duration,
+            level: course.level,
+            status: course.status,
+            enrolledStudents: course.enrolledStudents,
+            rating: course.rating,
+            totalRatings: course.totalRatings,
+            imageUrl: course.imageUrl,
+            category: course.category,
+            tags: course.tags,
+            createdAt: course.createdAt,
+            updatedAt: course.updatedAt,
+          },
         });
+      } catch (error) {
+        res.status(500).json({ success: false, message: "Server xatosi" });
       }
-
-      if (title) course.title = title;
-      if (description) course.description = description;
-      if (instructor) course.instructor = instructor;
-      if (price) course.price = price;
-      if (duration) course.duration = duration;
-      if (level) course.level = level;
-      if (status) course.status = status;
-      if (enrolledStudents !== undefined)
-        course.enrolledStudents = enrolledStudents;
-      if (rating !== undefined) course.rating = rating;
-      if (totalRatings !== undefined) course.totalRatings = totalRatings;
-      if (imageUrl) course.imageUrl = imageUrl;
-      if (category) course.category = category;
-      if (tags) course.tags = tags;
-
-      await course.save();
-
-      res.json({
-        success: true,
-        message: "Kurs ma'lumotlari yangilandi",
-        course: {
-          id: course._id,
-          title: course.title,
-          description: course.description,
-          instructor: course.instructor,
-          price: course.price,
-          duration: course.duration,
-          level: course.level,
-          status: course.status,
-          enrolledStudents: course.enrolledStudents,
-          rating: course.rating,
-          totalRatings: course.totalRatings,
-          imageUrl: course.imageUrl,
-          category: course.category,
-          tags: course.tags,
-          createdAt: course.createdAt,
-          updatedAt: course.updatedAt,
-        },
-      });
-    } catch (error) {
-      res.status(500).json({ success: false, message: "Server xatosi" });
-    }
-  });
+    },
+  );
 
   // Admin: Delete course
   app.delete("/api/admin/courses/:id", async (req, res) => {
@@ -1475,7 +1520,9 @@ export function createServer() {
   // Admin: Get all courses
   app.get("/api/admin/courses", async (req, res) => {
     try {
-      const courses = await Course.find({}, { password: 0 }).sort({ createdAt: -1 });
+      const courses = await Course.find({}, { password: 0 }).sort({
+        createdAt: -1,
+      });
 
       res.json({
         success: true,
@@ -1635,7 +1682,9 @@ export function createServer() {
   // Admin: Get all modules
   app.get("/api/admin/modules", async (req, res) => {
     try {
-      const modules = await Module.find({}, { password: 0 }).sort({ createdAt: -1 });
+      const modules = await Module.find({}, { password: 0 }).sort({
+        createdAt: -1,
+      });
 
       res.json({
         success: true,
@@ -1798,7 +1847,9 @@ export function createServer() {
   // Admin: Get all lessons
   app.get("/api/admin/lessons", async (req, res) => {
     try {
-      const lessons = await Lesson.find({}, { password: 0 }).sort({ createdAt: -1 });
+      const lessons = await Lesson.find({}, { password: 0 }).sort({
+        createdAt: -1,
+      });
 
       res.json({
         success: true,
@@ -2532,7 +2583,9 @@ export function createServer() {
     }
   });
 
-  app.post("/api/admin/courses", upload.single("image"), async (req, res) => {
+  // Accept any file field name for course image uploads to be tolerant
+  // of different client field names (e.g. `image` or `imageUrl`).
+  app.post("/api/admin/courses", upload.any(), async (req, res) => {
     try {
       const token = req.headers.authorization?.replace("Bearer ", "");
       if (!token) {
@@ -2728,7 +2781,7 @@ export function createServer() {
               fs.unlinkSync(oldImagePath);
             }
           }
-          course.imageUrl = `/uploads/courses/${req.file.filename}`;
+          course.imageUrl = `/uploads/courses/${uploadedFile.filename}`;
         }
 
         course.title = title;
@@ -3353,18 +3406,23 @@ export function createServer() {
         ];
       }
       if (arrivalDate !== undefined) user.arrivalDate = String(arrivalDate);
-      if (Array.isArray(warnings)) (user as any).warnings = warnings.map((w) => String(w || ""));
-      if (Array.isArray(certificates)) (user as any).certificates = certificates.map((c) => String(c || ""));
+      if (Array.isArray(warnings))
+        (user as any).warnings = warnings.map((w) => String(w || ""));
+      if (Array.isArray(certificates))
+        (user as any).certificates = certificates.map((c) => String(c || ""));
       if (user.role === "student_offline") {
         if (step !== undefined) user.step = step;
         if (user.todayScores === undefined)
           user.todayScores = [{ date: "", score: 0 }];
-        
+
         // Jami ballni o'zgartirish
-        if (totalScore !== undefined && typeof totalScore === 'number') {
+        if (totalScore !== undefined && typeof totalScore === "number") {
           // Hozirgi jami ballni hisoblash
-          const currentTotal = user.todayScores.reduce((sum, s) => sum + (s.score || 0), 0);
-          
+          const currentTotal = user.todayScores.reduce(
+            (sum, s) => sum + (s.score || 0),
+            0,
+          );
+
           // Agar yangi jami ball kiritilgan bo'lsa va u hozirgi jami balldan farq qilsa
           if (totalScore !== currentTotal) {
             // Barcha ballarni yangi jami ballga moslash
@@ -3378,8 +3436,18 @@ export function createServer() {
             } else {
               // Agar hech qanday yozuv bo'lmasa, yangi yozuv yaratish
               const months = [
-                "yanvar", "fevral", "mart", "aprel", "may", "iyun",
-                "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr",
+                "yanvar",
+                "fevral",
+                "mart",
+                "aprel",
+                "may",
+                "iyun",
+                "iyul",
+                "avgust",
+                "sentabr",
+                "oktabr",
+                "noyabr",
+                "dekabr",
               ];
               const d = new Date();
               const day = d.getDate();
@@ -3388,7 +3456,7 @@ export function createServer() {
               user.todayScores.push({
                 date: uzDate,
                 score: totalScore,
-                note: "Jami ball o'zgartirildi"
+                note: "Jami ball o'zgartirildi",
               });
             }
           }
@@ -3400,8 +3468,10 @@ export function createServer() {
             // Faqat ball kiritilgan bo'lsa qo'shish
             if (ws.score && ws.score > 0) {
               // Shu sana uchun mavjud yozuvni topish
-              const existingIndex = user.todayScores.findIndex(s => s.date === ws.date);
-              
+              const existingIndex = user.todayScores.findIndex(
+                (s) => s.date === ws.date,
+              );
+
               if (existingIndex >= 0) {
                 // Mavjud yozuvni yangilash
                 user.todayScores[existingIndex].score = ws.score;
@@ -3417,7 +3487,7 @@ export function createServer() {
             }
           }
         }
-        
+
         // Eski kodni saqlab qo'yamiz (kommentariyaga aylantiramiz)
         /*
         if (Array.isArray(req.body.weekScores)) {
@@ -3434,7 +3504,7 @@ export function createServer() {
           }
         }
         */
-        
+
         if (todayScore !== undefined) {
           const months = [
             "yanvar",
@@ -3481,7 +3551,9 @@ export function createServer() {
           balance: user.balance,
           step: user.step ?? 1,
           attendanceDays: (user as any).attendanceDays ?? [],
-          todayScores: Array.isArray((user as any).todayScores) ? (user as any).todayScores : [],
+          todayScores: Array.isArray((user as any).todayScores)
+            ? (user as any).todayScores
+            : [],
           arrivalDate: (user as any).arrivalDate ?? "",
           warnings: (user as any).warnings ?? [],
           certificates: (user as any).certificates ?? [],
@@ -3610,25 +3682,25 @@ export function createServer() {
         { role: "student_offline" },
         { password: 0 },
       ).sort({ createdAt: -1 });
-      
+
       // iOS Safari uchun sana formatini optimizatsiya qilish
       const formatDateForIOS = (dateValue: any) => {
         if (!dateValue) return "";
-        
+
         try {
           let date: Date;
-          
+
           if (dateValue instanceof Date) {
             date = dateValue;
-          } else if (typeof dateValue === 'string') {
+          } else if (typeof dateValue === "string") {
             const normalized = dateValue.trim();
-            
+
             // iOS Safari uchun maxsus handling
-            if (normalized.includes('T')) {
+            if (normalized.includes("T")) {
               date = new Date(normalized);
             } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
               // YYYY-MM-DD formatini explicit parsing
-              const parts = normalized.split('-');
+              const parts = normalized.split("-");
               const year = parseInt(parts[0]);
               const month = parseInt(parts[1]) - 1;
               const day = parseInt(parts[2]);
@@ -3639,17 +3711,17 @@ export function createServer() {
           } else {
             return "";
           }
-          
+
           if (isNaN(date.getTime())) return "";
-          
+
           // iOS Safari uchun ISO format qaytarish
-          return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+          return date.toISOString().split("T")[0]; // YYYY-MM-DD format
         } catch (error) {
-          console.error('Date formatting error on server:', error);
+          console.error("Date formatting error on server:", error);
           return "";
         }
       };
-      
+
       res.json({
         success: true,
         users: users.map((user) => ({
@@ -3964,7 +4036,7 @@ export function createServer() {
 
   // Only serve static files in production mode
   if (process.env.NODE_ENV === "production") {
-    // Serve static files for the frontend
+    // Serve static files for the frontend (Vite output)
     const distPath = path.join(process.cwd(), "dist/spa");
     app.use(express.static(distPath));
 
@@ -4012,4 +4084,3 @@ export function createServer() {
 }
 
 export { broadcastNotification };
-

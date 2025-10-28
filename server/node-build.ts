@@ -1,28 +1,14 @@
-import path from "path"
-import { fileURLToPath } from "url"
-import { createServer } from "./index"
+import { createServer } from "./index";
 
-const server = createServer();
-const port = 3000; // Explicitly set port to 3000
+const app = createServer();
+const PORT = parseInt(process.env.PORT || "8080", 10);
 
-console.log(`Starting server on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📱 Frontend: http://localhost:${PORT}`);
+  console.log(`🔧 API: http://localhost:${PORT}/api`);
+});
 
-// Get __dirname equivalent for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// In production, serve the built SPA files
-const distPath = path.join(__dirname, "../spa");
-
-// The server is already created and listening from createServer()
-// We just need to add static file serving to the existing Express app
-// But since createServer() returns an HTTP server, we need to modify the approach
-
-console.log(`🚀 Server running on port ${port}`);
-console.log(`📱 Frontend: http://localhost:${port}`);
-console.log(`🔧 API: http://localhost:${port}/api`);
-
-// Graceful shutdown
 process.on("SIGTERM", () => {
   console.log("🛑 Received SIGTERM, shutting down gracefully");
   process.exit(0);

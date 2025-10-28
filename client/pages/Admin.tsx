@@ -1,27 +1,27 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Sidebar,
   SidebarContent,
@@ -31,9 +31,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-} from "@/components/ui/sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
-import { CourseModule, Lesson } from "@shared/api"
+} from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CourseModule, Lesson } from "@shared/api";
 import {
   BarChart2,
   BarChart3,
@@ -58,18 +58,18 @@ import {
   User,
   Users,
   Wifi,
-  X
-} from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+  X,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
   Navigate,
   Route,
   Routes,
   useLocation,
   useNavigate,
-} from "react-router-dom"
-import CourseDetailsModal from "./CourseDetailsModal"
-import DatabaseContent from "./DatabaseContent"
+} from "react-router-dom";
+import CourseDetailsModal from "./CourseDetailsModal";
+import DatabaseContent from "./DatabaseContent";
 
 const adminMenuItems = [
   { title: "Dashboard", icon: BarChart3, path: "dashboard" },
@@ -1079,7 +1079,6 @@ function UsersContent() {
                     {formatDate(viewingUser.createdAt)}
                   </span>
                 </div>
-                
               </div>
             ) : (
               <div className="space-y-4">
@@ -1144,19 +1143,18 @@ function UsersContent() {
                   <Input
                     name="balance"
                     type="number"
-                    value={(editForm.balance as any) === "" ? "" : editForm.balance}
+                    value={
+                      (editForm.balance as any) === "" ? "" : editForm.balance
+                    }
                     onChange={handleEditFormChange}
                     placeholder="Balans"
                     className="w-full"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    
-                  </label>
-                  
+                  <label className="block text-sm font-medium text-foreground mb-2"></label>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Ro'yxatdan o'tgan sana
@@ -1464,7 +1462,7 @@ function CoursesContent() {
       formData.append("tags", JSON.stringify(courseForm.tags));
 
       if (selectedImage) {
-        formData.append("image", selectedImage);
+        formData.append("imageUrl", selectedImage);
       }
 
       const response = await fetch("/api/admin/courses", {
@@ -1551,7 +1549,7 @@ function CoursesContent() {
       formData.append("tags", JSON.stringify(courseForm.tags));
 
       if (selectedImage) {
-        formData.append("image", selectedImage);
+        formData.append("imageUrl", selectedImage);
       }
 
       const response = await fetch(`/api/admin/courses/${editingCourse.id}`, {
@@ -2888,7 +2886,7 @@ function PaymentsContent() {
                             payment.status === "pending"
                               ? "secondary"
                               : payment.status === "completed" ||
-                                payment.status === "success"
+                                  payment.status === "success"
                                 ? "outline"
                                 : payment.status === "rejected"
                                   ? "destructive"
@@ -2898,7 +2896,7 @@ function PaymentsContent() {
                           {payment.status === "pending"
                             ? "Kutilmoqda"
                             : payment.status === "completed" ||
-                              payment.status === "success"
+                                payment.status === "success"
                               ? "Tasdiqlangan"
                               : payment.status === "rejected"
                                 ? "Rad etilgan"
@@ -3352,9 +3350,9 @@ function AdminProxOffline() {
       const newScore = Number(singleScore.score) || 0;
       const newTotal = currentTotal + newScore;
 
-      setEditForm(prev => ({
+      setEditForm((prev) => ({
         ...prev,
-        totalScore: newTotal
+        totalScore: newTotal,
       }));
     }
   }, [singleScore.score, editingUser]);
@@ -3541,7 +3539,10 @@ function AdminProxOffline() {
     setEditForm((prev) => ({
       ...prev,
       [name]:
-        name === "balance" || name === "step" || name === "todayScore" || name === "totalScore"
+        name === "balance" ||
+        name === "step" ||
+        name === "todayScore" ||
+        name === "totalScore"
           ? Number(value)
           : value,
     }));
@@ -3563,8 +3564,18 @@ function AdminProxOffline() {
       if (singleScore.score !== "" && !isNaN(Number(singleScore.score))) {
         const today = new Date();
         const months = [
-          "yanvar", "fevral", "mart", "aprel", "may", "iyun",
-          "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr"
+          "yanvar",
+          "fevral",
+          "mart",
+          "aprel",
+          "may",
+          "iyun",
+          "iyul",
+          "avgust",
+          "sentabr",
+          "oktabr",
+          "noyabr",
+          "dekabr",
         ];
         const day = today.getDate();
         const month = months[today.getMonth()];
@@ -3573,7 +3584,7 @@ function AdminProxOffline() {
         todayScoresArr.push({
           date: uzDate,
           score: Number(singleScore.score),
-          note: singleScore.note || ""
+          note: singleScore.note || "",
         });
       }
 
@@ -3586,7 +3597,10 @@ function AdminProxOffline() {
         arrivalDate: editForm.arrivalDate,
         weekScores: todayScoresArr, // Send as array with one object
         role: editForm.role, // Rol maydonini yuborish
-        totalScore: typeof editForm.totalScore === 'number' ? editForm.totalScore : Number(editForm.totalScore) || 0,
+        totalScore:
+          typeof editForm.totalScore === "number"
+            ? editForm.totalScore
+            : Number(editForm.totalScore) || 0,
       };
 
       const res = await fetch(`/api/admin/users/${editingUser.id}`, {
@@ -3605,13 +3619,13 @@ function AdminProxOffline() {
         prev.map((u) =>
           u.id === editingUser.id
             ? {
-              ...u,
-              ...editForm,
-              todayScores: data.user?.todayScores ?? u.todayScores,
-              attendanceDays: Array.isArray(data.user?.attendanceDays)
-                ? data.user.attendanceDays
-                : u.attendanceDays,
-            }
+                ...u,
+                ...editForm,
+                todayScores: data.user?.todayScores ?? u.todayScores,
+                attendanceDays: Array.isArray(data.user?.attendanceDays)
+                  ? data.user.attendanceDays
+                  : u.attendanceDays,
+              }
             : u,
         ),
       );
@@ -3665,7 +3679,10 @@ function AdminProxOffline() {
           </div>
           <div className="w-full max-w-4xl mx-auto -mt-3 mb-4">
             <div className="text-right text-muted-foreground">
-              Jami o'quvchilar: <span className="font-semibold text-foreground">{users.length}</span>
+              Jami o'quvchilar:{" "}
+              <span className="font-semibold text-foreground">
+                {users.length}
+              </span>
             </div>
           </div>
           {loading ? (
@@ -3690,7 +3707,12 @@ function AdminProxOffline() {
                   </div>
                   <div className="flex-1">
                     <p className="font-medium">{user.fullName}</p>
-                    <p className="text-xs mt-1"><span className="text-muted-foreground">Jami ball:</span> <span className="font-semibold">{getTotalScore(user)}</span></p>
+                    <p className="text-xs mt-1">
+                      <span className="text-muted-foreground">Jami ball:</span>{" "}
+                      <span className="font-semibold">
+                        {getTotalScore(user)}
+                      </span>
+                    </p>
                   </div>
                   <button
                     className="ml-2 p-2 rounded hover:bg-primary/10 transition-colors"
@@ -3713,7 +3735,11 @@ function AdminProxOffline() {
                     O'quvchini tahrirlash
                   </h3>
                   <div className="text-sm text-muted-foreground">
-                    Jami ball: <span className="font-semibold text-foreground">{editForm.totalScore || (editingUser ? getTotalScore(editingUser) : 0)}</span>
+                    Jami ball:{" "}
+                    <span className="font-semibold text-foreground">
+                      {editForm.totalScore ||
+                        (editingUser ? getTotalScore(editingUser) : 0)}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center justify-end gap-2 pt-2">
@@ -3798,16 +3824,23 @@ function AdminProxOffline() {
                       name="totalScore"
                       type="number"
                       min={0}
-                      value={typeof editForm.totalScore === "number" ? editForm.totalScore : Number(editForm.totalScore) || 0}
+                      value={
+                        typeof editForm.totalScore === "number"
+                          ? editForm.totalScore
+                          : Number(editForm.totalScore) || 0
+                      }
                       onChange={handleEditFormChange}
-                      onWheel={(e) => (e.currentTarget as HTMLInputElement).blur()}
+                      onWheel={(e) =>
+                        (e.currentTarget as HTMLInputElement).blur()
+                      }
                       onFocus={(e) => e.currentTarget.select()}
                       inputMode="numeric"
                       placeholder={String(getTotalScore(editingUser))}
                       className="w-full"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Jami ballni qo'lda tahrirlash mumkin. Saqlangandan so'ng MongoDB'da yoziladi.
+                      Jami ballni qo'lda tahrirlash mumkin. Saqlangandan so'ng
+                      MongoDB'da yoziladi.
                     </p>
                   </div>
                   <div>
@@ -3852,14 +3885,18 @@ function AdminProxOffline() {
                     </label>
                     <div className="flex flex-wrap gap-2 mb-3">
                       {dayCodes.map((code) => {
-                        const active = Array.isArray(editForm.attendanceDays) && editForm.attendanceDays.includes(code);
+                        const active =
+                          Array.isArray(editForm.attendanceDays) &&
+                          editForm.attendanceDays.includes(code);
                         return (
                           <button
                             type="button"
                             key={code}
                             onClick={() =>
                               setEditForm((f) => {
-                                const curr = Array.isArray(f.attendanceDays) ? f.attendanceDays : [];
+                                const curr = Array.isArray(f.attendanceDays)
+                                  ? f.attendanceDays
+                                  : [];
                                 const next = curr.includes(code)
                                   ? curr.filter((d) => d !== code)
                                   : [...curr, code];
@@ -3892,8 +3929,15 @@ function AdminProxOffline() {
                           type="number"
                           min="0"
                           value={singleScore.score}
-                          onChange={(e) => setSingleScore({ ...singleScore, score: e.target.value })}
-                          onWheel={(e) => (e.currentTarget as HTMLInputElement).blur()}
+                          onChange={(e) =>
+                            setSingleScore({
+                              ...singleScore,
+                              score: e.target.value,
+                            })
+                          }
+                          onWheel={(e) =>
+                            (e.currentTarget as HTMLInputElement).blur()
+                          }
                           onFocus={(e) => e.currentTarget.select()}
                           placeholder="Ball kiriting"
                           className="w-full"
@@ -3906,7 +3950,12 @@ function AdminProxOffline() {
                         <textarea
                           rows={3}
                           value={singleScore.note}
-                          onChange={(e) => setSingleScore({ ...singleScore, note: e.target.value })}
+                          onChange={(e) =>
+                            setSingleScore({
+                              ...singleScore,
+                              note: e.target.value,
+                            })
+                          }
                           placeholder="Sabab/izoh..."
                           className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground"
                         />
@@ -4176,7 +4225,7 @@ function AdminPanel() {
           setUserData(data.user);
         }
       }
-    } catch { }
+    } catch {}
   };
 
   // When switching to settings tab, reload user data
@@ -4257,7 +4306,11 @@ function AdminPanel() {
                 {adminMenuItems.map((item) => (
                   <Button
                     key={item.title}
-                    variant={location.pathname.includes(item.path) ? "secondary" : "ghost"}
+                    variant={
+                      location.pathname.includes(item.path)
+                        ? "secondary"
+                        : "ghost"
+                    }
                     className="w-full justify-start"
                     onClick={() => {
                       navigate(item.path);

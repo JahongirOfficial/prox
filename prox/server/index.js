@@ -36,11 +36,11 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "OK", message: "Backend ishlamoqda" });
 });
 
-// React build fayllarini servis qilish
-app.use(express.static(path.join(__dirname, "client/build")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client/build", "index.html"));
+// React build fayllarini servis qilish (Vite output)
+const distPath = path.join(process.cwd(), "dist/spa");
+app.use(express.static(distPath));
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
 });
 
 // Error handler
@@ -49,7 +49,9 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Server ichki xatoligi" });
 });
 
-// Server ishga tushirish
-app.listen(PORT, () => {
-  console.log(`🚀 Server ${PORT} portda ishlamoqda`);
-});
+// Server ishga tushirish – PM2 bilan boshqariladi (node-build tomonidan)
+if (process.env.DIRECT_LISTEN === "1") {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server ${PORT} portda ishlamoqda`);
+  });
+}
