@@ -120,6 +120,19 @@ export default function Students() {
       return 0;
     }
   }
+  // Pulni oqlash darajasi progressini hisoblash (foiz)
+  function getReturnOnTuitionPercent(u: any): number {
+    // 1) Agar serverdan kelsa, to'g'ridan-to'g'ri ishlatamiz
+    const direct = Number(u?.returnOnTuitionPercent ?? u?.performanceRoiPercent ?? u?.progressPercent);
+    if (!Number.isNaN(direct) && direct > 0) return Math.round(direct);
+
+    // 2) Zaxira formula: kelgan kundan beri kunlar va step asosida
+    const days = getTotalDaysSince(u?.arrivalDate);
+    const step = Number(u?.step || 0);
+    if (days <= 0) return 0;
+    const pct = Math.round((step / days) * 100);
+    return Math.max(0, pct);
+  }
 
   if (!user) {
     return (
@@ -153,6 +166,9 @@ export default function Students() {
   const arrivalShort = formatShortDate(user?.arrivalDate);
   const todayShort = formatShortDate(new Date());
   const totalDays = getTotalDaysSince(user?.arrivalDate);
+  const roiPercent = getReturnOnTuitionPercent(user);
+  // 100 dan past bo'lsa qizil, 100 yoki undan yuqori bo'lsa yashil
+  const roiColor = roiPercent < 100 ? "#ef4444" : "#10b981";
 
   // Faqat mobil holat uchun layoutni yoqish
   const [isMobile, setIsMobile] = useState(false);
@@ -276,6 +292,25 @@ export default function Students() {
                 <MobileInfoRow icon="⏱️" title="Jami kunlar" value={totalDays} />
               </>
             )}
+
+            {/* Pulni oqlash darajasi progress bloki */}
+            <div style={{ padding: "12px", backgroundColor: "#222", borderRadius: "8px", border: "1px solid #333" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+                <span style={{ fontSize: "14px", color: "#ccc" }}>
+                  ProX akademiyasida o'quvchining natijasi va ota-onasining pulini oqlash darajasi
+                </span>
+                <span style={{ fontSize: "14px", fontWeight: 700, color: roiColor }}>{roiPercent}%</span>
+              </div>
+              <div style={{ width: "100%", height: "10px", backgroundColor: "#111", borderRadius: "999px", overflow: "hidden", border: "1px solid #333" }}>
+                <div style={{ width: `${Math.min(roiPercent, 200)}%`, height: "100%", backgroundColor: roiColor, transition: "width .3s ease" }} />
+              </div>
+              {roiPercent > 100 && (
+                <div style={{ marginTop: "6px", fontSize: "12px", color: "#999" }}>
+                  100% dan yuqori — kutilgan natijadan yuqori samaradorlik
+                </div>
+              )}
+            </div>
+
             <CardRow label="Qadam:" color="#8b5cf6" value={stats.step} />
             <CardRow label="Jami ball:" color="#10b981" value={totalScore} />
             <CardRow

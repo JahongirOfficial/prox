@@ -1,21 +1,21 @@
-import "./global.css";
+import "./global.css"
 
-import { Toaster } from "@/components/ui/toaster";
-import { createRoot } from "react-dom/client";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import AdminPanel from "./pages/Admin";
-import { useEffect, useLayoutEffect } from "react";
-import Students from "./pages/Students";
-import AdminNotifications from "./pages/AdminNotifications";
-import Learning from "./pages/Learning";
-import AutoLogin from "./pages/auto-login";
-import CourseDetails from "./pages/CourseDetails";
-import AppLayout from "./AppLayout";
+import { Toaster as Sonner } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/toaster"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { useEffect, useLayoutEffect } from "react"
+import { createRoot } from "react-dom/client"
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom"
+import AppLayout from "./AppLayout"
+import AdminPanel from "./pages/Admin"
+import AdminNotifications from "./pages/AdminNotifications"
+import AutoLogin from "./pages/auto-login"
+import CourseDetails from "./pages/CourseDetails"
+import Index from "./pages/Index"
+import Learning from "./pages/Learning"
+import NotFound from "./pages/NotFound"
+import Students from "./pages/Students"
 
 const queryClient = new QueryClient();
 
@@ -85,6 +85,7 @@ const App = () => {
             <Route path="/projects" element={<Index />} />
             <Route path="/projects/:sub" element={<Index />} />
             <Route path="/offline" element={<Index />} />
+            <Route path="/debtors" element={<Index />} />
             {/* Wrap details page with layout to show sidebar + top navbar */}
             <Route element={<AppLayout />}>
               <Route path="courses/:courseId" element={<CourseDetails />} />

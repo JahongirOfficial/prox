@@ -114,6 +114,47 @@ export default function ProxOffline() {
       {error && (
         <div className="text-red-400 bg-red-500/10 border border-red-500/30 rounded p-3 mb-6">{error}</div>
       )}
+      
+      {/* O'quvchilar ro'yxati */}
+      {!loading && !error && usersWithProgress.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {usersWithProgress.map(user => (
+            <div key={user.id} className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-white/20 transition-all">
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="font-semibold text-white text-lg">{user.fullName}</h3>
+                {user.phone && (
+                  <span className="text-xs text-white/60">{user.phone}</span>
+                )}
+              </div>
+              
+              <div className="mb-2">
+                <div className={`text-sm mb-1 ${user.progress >= 100 ? 'text-green-500' : 'text-red-500'}`}>
+                  ProX akademiyasida o'quvchining natijasi va ota-onasining pulini oqlash darajasi:
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-full bg-white/10 rounded-full h-2.5">
+                    <div 
+                      className={`h-2.5 rounded-full ${user.progress >= 100 ? 'bg-green-500' : 'bg-red-500'}`} 
+                      style={{ width: `${Math.min(100, user.progress)}%` }}
+                    ></div>
+                  </div>
+                  <span 
+                    className={`text-sm font-medium ${user.progress >= 100 ? 'text-green-500' : 'text-red-500'}`}
+                  >
+                    {user.progress}%
+                  </span>
+                </div>
+              </div>
+              
+              <div className="text-xs text-white/60">
+                <span>Kelgan sana: {user.arrivalDate || 'Mavjud emas'}</span>
+                <span className="mx-2">•</span>
+                <span>Bosqich: {user.step || 0}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

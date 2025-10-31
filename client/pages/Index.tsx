@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
+import Debtors from "../components/Debtors"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -33,13 +34,14 @@ import {
   User,
   Users,
   X,
-  Zap
+  Zap,
 } from "lucide-react"
 
 export const menuItems = [
   { title: "Bosh sahifa", icon: Home },
   { title: "Kurslar", icon: BookOpen },
   { title: "Loyihalarimiz", icon: FolderOpen },
+  { title: "Qarzdorlar", icon: CreditCard },
 ];
 
 export const userMenuItems = [{ title: "Kurslarim", icon: BookOpen }];
@@ -97,7 +99,8 @@ const projects = [
     title: "Qarz daftarcha",
     icon: Code,
     image: "images/qarzdaftarcha_logo.png",
-    description: "Qarzlarni boshqarish va monitoring qilish uchun raqamli daftarcha.",
+    description:
+      "Qarzlarni boshqarish va monitoring qilish uchun raqamli daftarcha.",
     badge: "Faol",
     price: "500$",
     url: "https://qarzdaftarcha.uz/",
@@ -216,44 +219,52 @@ function CoursesList({
     setShowPaymentForm(false);
   };
 
-
-
   // Helper: progress based on arrival date vs current step
   const getDaysSinceArrival = (arrival?: string) => {
     if (!arrival) return 0;
     let a: Date;
-    
-  // Normalize the string (trim whitespace)
-const normalized = String(arrival).trim().replace(/\//g, "-");
-let parts;
 
-// Parse date string safely (iOS-friendly)
-if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
-  // YYYY-MM-DD
-  parts = normalized.split("-");
-  a = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
-} else if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(normalized)) {
-  // YYYY-MM-DD HH:mm:ss → convert to ISO
-  a = new Date(normalized.replace(" ", "T"));
-} else if (normalized.includes("T")) {
-  // ISO format
-  a = new Date(normalized);
-} else {
-  // Fallback: parse manually
-  const m = normalized.match(/^(\d{4})[-/](\d{2})[-/](\d{2})/);
-  if (m) {
-    a = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
-  } else {
-    return 0;
-  }
-}
+    // Normalize the string (trim whitespace)
+    const normalized = String(arrival).trim().replace(/\//g, "-");
+    let parts;
 
-if (isNaN(a.getTime())) return 0;
+    // Parse date string safely (iOS-friendly)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+      // YYYY-MM-DD
+      parts = normalized.split("-");
+      a = new Date(
+        Date.UTC(
+          parseInt(parts[0]),
+          parseInt(parts[1]) - 1,
+          parseInt(parts[2]),
+        ),
+      );
+    } else if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(normalized)) {
+      // YYYY-MM-DD HH:mm:ss → convert to ISO
+      a = new Date(normalized.replace(" ", "T"));
+    } else if (normalized.includes("T")) {
+      // ISO format
+      a = new Date(normalized);
+    } else {
+      // Fallback: parse manually
+      const m = normalized.match(/^(\d{4})[-/](\d{2})[-/](\d{2})/);
+      if (m) {
+        a = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+      } else {
+        return 0;
+      }
+    }
+
+    if (isNaN(a.getTime())) return 0;
 
     // Use UTC to avoid timezone issues
-    const start = new Date(Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate()));
+    const start = new Date(
+      Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate()),
+    );
     const now = new Date();
-    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const today = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+    );
     const diffMs = today.getTime() - start.getTime();
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     return Math.max(0, days);
@@ -358,7 +369,7 @@ if (isNaN(a.getTime())) return 0;
         const data = await response.json();
         setEnrolledCourses(data.courses || []);
       }
-    } catch { }
+    } catch {}
   };
 
   const formatCurrency = (amount) => {
@@ -1371,9 +1382,6 @@ function ProjectsList() {
                 <Badge variant="secondary" className="text-xs">
                   {project.badge}
                 </Badge>
-                <span className="text-lg font-bold text-primary">
-                  {project.price}
-                </span>
               </div>
             </CardContent>
           </Card>
@@ -1805,15 +1813,24 @@ function MyCoursesContent({ navigate }) {
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">O'qituvchi:</span>
-                      <span className="font-medium">{course.instructor || "ProX Academy"}</span>
+                      <span className="font-medium">
+                        {course.instructor || "ProX Academy"}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Darslar:</span>
-                      <span className="font-medium">{course.completedLessons || 0}/{course.totalLessons || 0}</span>
+                      <span className="font-medium">
+                        {course.completedLessons || 0}/
+                        {course.totalLessons || 0}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Davomiyligi:</span>
-                      <span className="font-medium">{course.duration || "4 hafta"}</span>
+                      <span className="text-muted-foreground">
+                        Davomiyligi:
+                      </span>
+                      <span className="font-medium">
+                        {course.duration || "4 hafta"}
+                      </span>
                     </div>
                   </div>
 
@@ -2092,30 +2109,30 @@ function ProfileContent({
     try {
       let date: Date;
       const normalized = String(dateString).trim();
-      
+
       // iOS Safari uchun maxsus parsing
-      if (normalized.includes('T')) {
+      if (normalized.includes("T")) {
         date = new Date(normalized);
       } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
         // iOS Safari uchun explicit Date constructor
-        const parts = normalized.split('-');
+        const parts = normalized.split("-");
         const year = parseInt(parts[0]);
         const month = parseInt(parts[1]) - 1;
         const day = parseInt(parts[2]);
         date = new Date(year, month, day);
       } else if (normalized.match(/^\d{4}\/\d{2}\/\d{2}$/)) {
         // Alternative format (YYYY/MM/DD) - iOS Safari uchun
-        const parts = normalized.split('/');
+        const parts = normalized.split("/");
         const year = parseInt(parts[0]);
         const month = parseInt(parts[1]) - 1;
         const day = parseInt(parts[2]);
         date = new Date(year, month, day);
       } else {
         date = new Date(normalized);
-        
+
         // Agar parsing xato bo'lsa, manual parsing sinab ko'rish
         if (isNaN(date.getTime())) {
-          const cleanString = normalized.replace(/[^\d]/g, '');
+          const cleanString = normalized.replace(/[^\d]/g, "");
           if (cleanString.length >= 8) {
             const year = parseInt(cleanString.substring(0, 4));
             const month = parseInt(cleanString.substring(4, 6)) - 1;
@@ -2150,7 +2167,7 @@ function ProfileContent({
 
       return `${year}-yil ${day}-${months[month]} ${hours}:${minutes}`;
     } catch (error) {
-      console.error('Date formatting error:', error, 'for input:', dateString);
+      console.error("Date formatting error:", error, "for input:", dateString);
       return "Ma'lumot yo'q";
     }
   };
@@ -2325,17 +2342,17 @@ function ProfileContent({
       const body = isLoginMode
         ? { phone: formData.phone, password: formData.password }
         : {
-          fullName: formData.fullName.trim(),
-          phone: formData.phone,
-          password: formData.password,
-          role: "student",
-          meta: {
-            region: formData.region,
-            district: formData.district,
-            school: formData.school,
-            grade: formData.grade,
-          },
-        };
+            fullName: formData.fullName.trim(),
+            phone: formData.phone,
+            password: formData.password,
+            role: "student",
+            meta: {
+              region: formData.region,
+              district: formData.district,
+              school: formData.school,
+              grade: formData.grade,
+            },
+          };
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -2704,11 +2721,16 @@ function ProfileContent({
             {enrolledCourses.length > 0 ? (
               <div className="space-y-3">
                 {enrolledCourses.map((course, index) => (
-                  <div key={course.id} className="relative bg-muted rounded-md overflow-hidden">
+                  <div
+                    key={course.id}
+                    className="relative bg-muted rounded-md overflow-hidden"
+                  >
                     <div className="p-3">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
-                          <h4 className="font-medium text-sm">{course.title}</h4>
+                          <h4 className="font-medium text-sm">
+                            {course.title}
+                          </h4>
                           <p className="text-xs text-muted-foreground">
                             {course.instructor}
                           </p>
@@ -2719,8 +2741,7 @@ function ProfileContent({
                       </div>
                     </div>
 
-                    <div className="relative bg-background rounded-md p-8">
-                    </div>
+                    <div className="relative bg-background rounded-md p-8"></div>
 
                     <div className="p-3 pt-2">
                       <div className="flex items-center justify-between text-xs">
@@ -3525,10 +3546,11 @@ function PaymentsContent() {
                 <button
                   type="submit"
                   disabled={loading || !paymentForm.amount}
-                  className={`flex-1 px-6 py-3 font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl ${loading || !paymentForm.amount
-                    ? "bg-slate-600 text-slate-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white hover:scale-105"
-                    }`}
+                  className={`flex-1 px-6 py-3 font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl ${
+                    loading || !paymentForm.amount
+                      ? "bg-slate-600 text-slate-400 cursor-not-allowed"
+                      : "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white hover:scale-105"
+                  }`}
                 >
                   {loading ? "Jarayonda..." : "To'lovni tasdiqlash"}
                 </button>
@@ -3647,7 +3669,9 @@ export function MobileNavbar({
               aria-label="Menyuni ochish"
               title="Menyu"
             >
-              <Menu className={`w-5 h-5 text-white transition-all duration-300 ${isMenuOpen ? "rotate-90 text-cyan-400" : "group-hover:text-cyan-400"}`} />
+              <Menu
+                className={`w-5 h-5 text-white transition-all duration-300 ${isMenuOpen ? "rotate-90 text-cyan-400" : "group-hover:text-cyan-400"}`}
+              />
             </button>
           </div>
 
@@ -3660,7 +3684,11 @@ export function MobileNavbar({
               aria-label="Bosh sahifa"
               title="Bosh sahifa"
             >
-              <img src="/images/prox.png" alt="ProX logo" className="h-7 object-contain" />
+              <img
+                src="/images/prox.png"
+                alt="ProX logo"
+                className="h-7 object-contain"
+              />
             </button>
           </div>
 
@@ -3673,7 +3701,9 @@ export function MobileNavbar({
                 onClick={() => {
                   if (location.pathname.startsWith("/offline")) {
                     try {
-                      window.dispatchEvent(new CustomEvent("prox:offline-back"));
+                      window.dispatchEvent(
+                        new CustomEvent("prox:offline-back"),
+                      );
                     } catch {}
                   } else {
                     navigate(-1);
@@ -3741,10 +3771,11 @@ export function MobileNavbar({
               {menuItems.map((item) => (
                 <button
                   key={item.title}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${activeTab === item.title && !activeProject
-                    ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg"
-                    : "text-gray-300 hover:bg-slate-700/50 hover:text-white"
-                    }`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+                    activeTab === item.title && !activeProject
+                      ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg"
+                      : "text-gray-300 hover:bg-slate-700/50 hover:text-white"
+                  }`}
                   onClick={() => onMenuClick(item.title)}
                 >
                   <item.icon className="w-5 h-5" />
@@ -3827,20 +3858,25 @@ function ProxOffline() {
   // Language: default to Uzbek; only switch if explicit override
   const getPreferredLang = () => {
     try {
-      const urlLang = new URLSearchParams(window.location.search).get('lang');
-      const stored = (localStorage.getItem('lang') || document.cookie.match(/(?:^|; )lang=([^;]+)/)?.[1] || '').toLowerCase();
-      const candidate = (urlLang || stored || '').toLowerCase();
-      if (candidate === 'ru' || candidate === 'uz') return candidate;
+      const urlLang = new URLSearchParams(window.location.search).get("lang");
+      const stored = (
+        localStorage.getItem("lang") ||
+        document.cookie.match(/(?:^|; )lang=([^;]+)/)?.[1] ||
+        ""
+      ).toLowerCase();
+      const candidate = (urlLang || stored || "").toLowerCase();
+      if (candidate === "ru" || candidate === "uz") return candidate;
     } catch {}
-    return 'uz';
+    return "uz";
   };
-  const isRuLang = getPreferredLang() === 'ru';
+  const isRuLang = getPreferredLang() === "ru";
 
   useEffect(() => {
     try {
       const current = getPreferredLang();
-      if (!localStorage.getItem('lang')) localStorage.setItem('lang', current);
-      if (!document.documentElement.lang) document.documentElement.lang = current;
+      if (!localStorage.getItem("lang")) localStorage.setItem("lang", current);
+      if (!document.documentElement.lang)
+        document.documentElement.lang = current;
       document.cookie = `lang=${current}; path=/; max-age=${60 * 60 * 24 * 365}`;
     } catch {}
   }, []);
@@ -3856,26 +3892,29 @@ function ProxOffline() {
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   // Helper to safely get selected user's ID (backend may return id or _id)
-  const currentUserId = selectedUser ? (selectedUser as any).id || (selectedUser as any)._id : null;
+  const currentUserId = selectedUser
+    ? (selectedUser as any).id || (selectedUser as any)._id
+    : null;
   const profileTopRef = useRef<HTMLDivElement | null>(null);
 
   useLayoutEffect(() => {
     if (!selectedUser) return;
     const raf = requestAnimationFrame(() => {
       try {
-        const idEl = document.getElementById('main-scroll');
-        if (idEl) idEl.scrollTo({ top: 0, behavior: 'auto' });
-        const classEl = document.querySelector<HTMLElement>('.main-scroll');
-        if (classEl) classEl.scrollTo({ top: 0, behavior: 'auto' });
-        if (profileTopRef.current) profileTopRef.current.scrollTo({ top: 0, behavior: 'auto' });
+        const idEl = document.getElementById("main-scroll");
+        if (idEl) idEl.scrollTo({ top: 0, behavior: "auto" });
+        const classEl = document.querySelector<HTMLElement>(".main-scroll");
+        if (classEl) classEl.scrollTo({ top: 0, behavior: "auto" });
+        if (profileTopRef.current)
+          profileTopRef.current.scrollTo({ top: 0, behavior: "auto" });
         const docEl = document.scrollingElement as HTMLElement | null;
-        if (docEl) docEl.scrollTo({ top: 0, behavior: 'auto' });
-        window.scrollTo({ top: 0, behavior: 'auto' });
+        if (docEl) docEl.scrollTo({ top: 0, behavior: "auto" });
+        window.scrollTo({ top: 0, behavior: "auto" });
       } catch {}
     });
     return () => cancelAnimationFrame(raf);
   }, [selectedUser]);
-  
+
   // Listen for navbar back on /offline: profile -> list, list -> home
   useEffect(() => {
     const handler = () => {
@@ -3883,17 +3922,23 @@ function ProxOffline() {
       else navigate("/home");
     };
     window.addEventListener("prox:offline-back", handler as EventListener);
-    return () => window.removeEventListener("prox:offline-back", handler as EventListener);
+    return () =>
+      window.removeEventListener("prox:offline-back", handler as EventListener);
   }, [selectedUser, navigate]);
   // Warnings state per user (local, UI-only)
-  const [warningsByUser, setWarningsByUser] = useState<Record<string, string[]>>({});
+  const [warningsByUser, setWarningsByUser] = useState<
+    Record<string, string[]>
+  >({});
   const [warningModalOpen, setWarningModalOpen] = useState(false);
   const [warningTarget, setWarningTarget] = useState<number>(1);
   const [warningReason, setWarningReason] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   // Certificate info modal
   const [certInfoOpen, setCertInfoOpen] = useState(false);
-  const [certInfo, setCertInfo] = useState<{ title: string; index: number }>({ title: "", index: 0 });
+  const [certInfo, setCertInfo] = useState<{ title: string; index: number }>({
+    title: "",
+    index: 0,
+  });
   // Certificates state
   const certificateTitles = [
     "HTML sertifikati",
@@ -3909,8 +3954,6 @@ function ProxOffline() {
   const [certTarget, setCertTarget] = useState<number>(-1);
   const [certAction, setCertAction] = useState<"unlock" | "lock">("unlock");
 
-
-
   const mobileNameSize = (name?: string) => {
     const l = (name || "").length;
     if (l <= 16) return "text-4xl";
@@ -3922,30 +3965,30 @@ function ProxOffline() {
   const daysSinceArrival = (arrival?: string) => {
     if (!arrival) return 0;
     let a: Date;
-    
+
     // Normalize the string (trim whitespace)
     const normalized = String(arrival).trim();
-    
+
     // iOS Safari uchun maxsus parsing
-    if (normalized.includes('T')) {
+    if (normalized.includes("T")) {
       a = new Date(normalized);
     } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
       // iOS Safari uchun explicit Date constructor
-      const parts = normalized.split('-');
+      const parts = normalized.split("-");
       const year = parseInt(parts[0]);
       const month = parseInt(parts[1]) - 1;
       const day = parseInt(parts[2]);
-      
+
       // Avval local Date constructor bilan sinab ko'rish
       a = new Date(year, month, day);
-      
+
       // Agar xato bo'lsa, UTC method bilan sinab ko'rish
       if (isNaN(a.getTime())) {
         a = new Date(Date.UTC(year, month, day));
       }
     } else if (normalized.match(/^\d{4}\/\d{2}\/\d{2}$/)) {
       // Alternative format (YYYY/MM/DD) - iOS Safari uchun
-      const parts = normalized.split('/');
+      const parts = normalized.split("/");
       const year = parseInt(parts[0]);
       const month = parseInt(parts[1]) - 1;
       const day = parseInt(parts[2]);
@@ -3953,10 +3996,10 @@ function ProxOffline() {
     } else {
       // Try parsing as-is, lekin iOS Safari uchun fallback
       a = new Date(normalized);
-      
+
       // Agar parsing xato bo'lsa, manual parsing sinab ko'rish
       if (isNaN(a.getTime())) {
-        const cleanString = normalized.replace(/[^\d]/g, '');
+        const cleanString = normalized.replace(/[^\d]/g, "");
         if (cleanString.length >= 8) {
           const year = parseInt(cleanString.substring(0, 4));
           const month = parseInt(cleanString.substring(4, 6)) - 1;
@@ -3965,9 +4008,9 @@ function ProxOffline() {
         }
       }
     }
-    
+
     if (isNaN(a.getTime())) return 0;
-    
+
     // iOS Safari uchun timezone muammolarini oldini olish
     const start = new Date(a.getFullYear(), a.getMonth(), a.getDate());
     const now = new Date();
@@ -3990,9 +4033,24 @@ function ProxOffline() {
     const step = Number(user?.step || 0);
     if (!days) return { text: "", classes: "" };
     const diff = step - days;
-    if (diff > 0) return { text: isRuLang ? `Ученик выиграл ${diff} дн.` : `O'quvchi ${diff} kun yutgan`, classes: "text-emerald-300" };
-    if (diff < 0) return { text: isRuLang ? `У ученика сгорело ${Math.abs(diff)} дн.` : `O'quvchining ${Math.abs(diff)} kuni kuygan`, classes: "text-red-300" };
-    return { text: isRuLang ? "Баланс равен" : "Balans teng", classes: "text-white/60" };
+    if (diff > 0)
+      return {
+        text: isRuLang
+          ? `Ученик выиграл ${diff} дн.`
+          : `O'quvchi ${diff} kun yutgan`,
+        classes: "text-emerald-300",
+      };
+    if (diff < 0)
+      return {
+        text: isRuLang
+          ? `У ученика сгорело ${Math.abs(diff)} дн.`
+          : `O'quvchining ${Math.abs(diff)} kuni kuygan`,
+        classes: "text-red-300",
+      };
+    return {
+      text: isRuLang ? "Баланс равен" : "Balans teng",
+      classes: "text-white/60",
+    };
   };
 
   const incomeThreshold = 600;
@@ -4000,11 +4058,15 @@ function ProxOffline() {
   // Jami o'quvchilar foizi (o'rtacha ROI %)
   const totalProgress = useMemo(() => {
     try {
-      const arr = (users || []).map((u: any) => Math.max(0, Math.round(progressPercent(u))));
+      const arr = (users || []).map((u: any) =>
+        Math.max(0, Math.round(progressPercent(u))),
+      );
       if (arr.length === 0) return 0;
       const sum = arr.reduce((s, v) => s + v, 0);
       return Math.round(sum / arr.length);
-    } catch { return 0; }
+    } catch {
+      return 0;
+    }
   }, [users]);
   const incomeRemainingText = (user: any) => {
     const step = Number(user?.step || 0);
@@ -4016,89 +4078,110 @@ function ProxOffline() {
   // Helper function to format date as DD/MM/YY - iOS Safari compatible
   const formatDateDDMMYY = (dateString: string) => {
     if (!dateString) {
-      console.log('formatDateDDMMYY: No dateString provided');
+      console.log("formatDateDDMMYY: No dateString provided");
       return "—";
     }
-    
-    console.log('formatDateDDMMYY: Input:', dateString, 'Type:', typeof dateString);
-    
+
+    console.log(
+      "formatDateDDMMYY: Input:",
+      dateString,
+      "Type:",
+      typeof dateString,
+    );
+
     try {
       let date: Date;
-      
+
       // Normalize the string (trim whitespace)
       const normalized = String(dateString).trim();
-      console.log('formatDateDDMMYY: Normalized:', normalized);
-      
+      console.log("formatDateDDMMYY: Normalized:", normalized);
+
       // iOS Safari uchun maxsus handling
-      if (normalized.includes('T')) {
+      if (normalized.includes("T")) {
         // Full ISO format - parse directly
-        console.log('formatDateDDMMYY: Parsing as ISO format');
+        console.log("formatDateDDMMYY: Parsing as ISO format");
         date = new Date(normalized);
       } else if (normalized.match(/^\d{4}-\d{2}-\d{2}$/)) {
         // Date-only format (YYYY-MM-DD) - iOS Safari uchun maxsus parsing
-        console.log('formatDateDDMMYY: Parsing as YYYY-MM-DD format');
-        const parts = normalized.split('-');
+        console.log("formatDateDDMMYY: Parsing as YYYY-MM-DD format");
+        const parts = normalized.split("-");
         const year = parseInt(parts[0]);
         const month = parseInt(parts[1]) - 1; // Month is 0-indexed
         const day = parseInt(parts[2]);
-        
-        console.log('formatDateDDMMYY: Parsed parts:', { year, month, day });
-        
+
+        console.log("formatDateDDMMYY: Parsed parts:", { year, month, day });
+
         // iOS Safari uchun explicit Date constructor ishlatish
         date = new Date(year, month, day);
-        
+
         // Agar parsing xato bo'lsa, UTC method bilan sinab ko'rish
         if (isNaN(date.getTime())) {
-          console.log('formatDateDDMMYY: Local parsing failed, trying UTC');
+          console.log("formatDateDDMMYY: Local parsing failed, trying UTC");
           date = new Date(Date.UTC(year, month, day));
         }
       } else if (normalized.match(/^\d{4}\/\d{2}\/\d{2}$/)) {
         // Alternative format (YYYY/MM/DD) - iOS Safari uchun
-        console.log('formatDateDDMMYY: Parsing as YYYY/MM/DD format');
-        const parts = normalized.split('/');
+        console.log("formatDateDDMMYY: Parsing as YYYY/MM/DD format");
+        const parts = normalized.split("/");
         const year = parseInt(parts[0]);
         const month = parseInt(parts[1]) - 1;
         const day = parseInt(parts[2]);
         date = new Date(year, month, day);
       } else {
         // Try parsing as-is, lekin iOS Safari uchun fallback
-        console.log('formatDateDDMMYY: Parsing as-is');
+        console.log("formatDateDDMMYY: Parsing as-is");
         date = new Date(normalized);
-        
+
         // Agar parsing xato bo'lsa, manual parsing sinab ko'rish
         if (isNaN(date.getTime())) {
-          console.log('formatDateDDMMYY: Direct parsing failed, trying manual parsing');
+          console.log(
+            "formatDateDDMMYY: Direct parsing failed, trying manual parsing",
+          );
           // Ba'zi formatlarni manual parse qilish
-          const cleanString = normalized.replace(/[^\d]/g, '');
-          console.log('formatDateDDMMYY: Clean string:', cleanString);
+          const cleanString = normalized.replace(/[^\d]/g, "");
+          console.log("formatDateDDMMYY: Clean string:", cleanString);
           if (cleanString.length >= 8) {
             const year = parseInt(cleanString.substring(0, 4));
             const month = parseInt(cleanString.substring(4, 6)) - 1;
             const day = parseInt(cleanString.substring(6, 8));
-            console.log('formatDateDDMMYY: Manual parsed parts:', { year, month, day });
+            console.log("formatDateDDMMYY: Manual parsed parts:", {
+              year,
+              month,
+              day,
+            });
             date = new Date(year, month, day);
           }
         }
       }
-      
-      console.log('formatDateDDMMYY: Final date object:', date, 'Valid:', !isNaN(date.getTime()));
-      
+
+      console.log(
+        "formatDateDDMMYY: Final date object:",
+        date,
+        "Valid:",
+        !isNaN(date.getTime()),
+      );
+
       // Final check - agar hali ham xato bo'lsa
       if (isNaN(date.getTime())) {
-        console.log('formatDateDDMMYY: All parsing attempts failed');
+        console.log("formatDateDDMMYY: All parsing attempts failed");
         return "—";
       }
 
       // iOS Safari uchun timezone muammolarini oldini olish
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
       const year = String(date.getFullYear()).slice(-2);
 
       const result = `${day}/${month}/${year}`;
-      console.log('formatDateDDMMYY: Final result:', result);
+      console.log("formatDateDDMMYY: Final result:", result);
       return result;
     } catch (error) {
-      console.error('formatDateDDMMYY: Date parsing error:', error, 'for input:', dateString);
+      console.error(
+        "formatDateDDMMYY: Date parsing error:",
+        error,
+        "for input:",
+        dateString,
+      );
       return "—";
     }
   };
@@ -4106,15 +4189,25 @@ function ProxOffline() {
   // Helper function to get technology logo/icon for each certificate
   const getTechnologyIcon = (title: string) => {
     const iconMap: Record<string, string> = {
-      "HTML sertifikati": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
-      "CSS & Bootstrap sertifikati": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg",
-      "JavaScript Asoslari sertifikati": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
-      "Nodejs Asoslari sertifikati": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
-      "Express Foundation sertifikati": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg",
-      "Mongo DB sertifikati": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
-      "Deployment Foundation sertifikati": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+      "HTML sertifikati":
+        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+      "CSS & Bootstrap sertifikati":
+        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg",
+      "JavaScript Asoslari sertifikati":
+        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+      "Nodejs Asoslari sertifikati":
+        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+      "Express Foundation sertifikati":
+        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg",
+      "Mongo DB sertifikati":
+        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
+      "Deployment Foundation sertifikati":
+        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
     };
-    return iconMap[title] || "https://via.placeholder.com/200x150/666666/ffffff?text=LOGO";
+    return (
+      iconMap[title] ||
+      "https://via.placeholder.com/200x150/666666/ffffff?text=LOGO"
+    );
   };
 
   const performanceInfo = (user: any) => {
@@ -4125,15 +4218,13 @@ function ProxOffline() {
       return {
         level: "good",
         text: "Ota-onasining pulini alo darajada oqlayapti",
-        classes:
-          "border-green-500/40 bg-green-500/10 text-green-200",
+        classes: "border-green-500/40 bg-green-500/10 text-green-200",
       };
     } else if (ratio >= 0.66) {
       return {
         level: "avg",
         text: "Ota-onasining pulini o'rtacha oqlayapti",
-        classes:
-          "border-amber-500/40 bg-amber-500/10 text-amber-200",
+        classes: "border-amber-500/40 bg-amber-500/10 text-amber-200",
       };
     }
     return {
@@ -4144,7 +4235,10 @@ function ProxOffline() {
   };
 
   // Helper: persist warnings to server (admin only)
-  const updateWarnings = async (userId: string, nextWarnings: string[]): Promise<boolean> => {
+  const updateWarnings = async (
+    userId: string,
+    nextWarnings: string[],
+  ): Promise<boolean> => {
     try {
       const token = getJwtToken();
       if (!token) return false;
@@ -4162,9 +4256,12 @@ function ProxOffline() {
         const ref = await fetch(`/api/admin/users/${userId}`);
         if (ref.ok) {
           const d = await ref.json();
-          setWarningsByUser((prev) => ({ ...prev, [userId]: d?.user?.warnings || nextWarnings }));
+          setWarningsByUser((prev) => ({
+            ...prev,
+            [userId]: d?.user?.warnings || nextWarnings,
+          }));
         }
-      } catch { }
+      } catch {}
       return true;
     } catch {
       return false;
@@ -4172,7 +4269,10 @@ function ProxOffline() {
   };
 
   // Persist certificates (admin only)
-  const updateCertificates = async (userId: string, unlocked: boolean[]): Promise<boolean> => {
+  const updateCertificates = async (
+    userId: string,
+    unlocked: boolean[],
+  ): Promise<boolean> => {
     try {
       const token = getJwtToken();
       if (!token) return false;
@@ -4194,7 +4294,7 @@ function ProxOffline() {
           const arr = certificateTitles.map((t) => serverTitles.includes(t));
           setCertsByUser((prev) => ({ ...prev, [userId]: arr }));
         }
-      } catch { }
+      } catch {}
       return true;
     } catch {
       return false;
@@ -4214,7 +4314,7 @@ function ProxOffline() {
           const data = await res.json();
           setIsAdmin(data?.user?.role === "admin");
         }
-      } catch { }
+      } catch {}
     };
     check();
   }, []);
@@ -4224,23 +4324,23 @@ function ProxOffline() {
       setLoading(true);
       setError("");
       try {
-        console.log('ProxOffline: Fetching offline students...');
+        console.log("ProxOffline: Fetching offline students...");
         const res = await fetch("/api/offline-students");
         if (res.ok) {
           const data = await res.json();
-          console.log('ProxOffline: API response:', data);
+          console.log("ProxOffline: API response:", data);
           setUsers(data.users || []);
-          
+
           // Log user data for debugging
           (data.users || []).forEach((user: any, index: number) => {
             console.log(`ProxOffline: User ${index + 1}:`, {
               id: user.id,
               fullName: user.fullName,
               arrivalDate: user.arrivalDate,
-              arrivalDateType: typeof user.arrivalDate
+              arrivalDateType: typeof user.arrivalDate,
             });
           });
-          
+
           // Initialize warnings map from backend (support id or _id)
           try {
             const map: Record<string, string[]> = {};
@@ -4269,33 +4369,42 @@ function ProxOffline() {
 
                 // Avtomatik sertifikat ochish logikasi
                 const step = Number(u.step || 0);
-                const totalScore = (u.todayScores || []).reduce((sum: number, s: any) => sum + (s.score || 0), 0);
+                const totalScore = (u.todayScores || []).reduce(
+                  (sum: number, s: any) => sum + (s.score || 0),
+                  0,
+                );
 
                 // HTML sertifikati - o'quvchining qadami 35 dan yuqori bo'lsa
                 if (step > 35 && !arr[0]) {
-                  console.log(`HTML sertifikati ochildi: ${u.fullName}, step: ${step}`);
+                  console.log(
+                    `HTML sertifikati ochildi: ${u.fullName}, step: ${step}`,
+                  );
                   arr[0] = true; // HTML sertifikati
                 }
 
                 // CSS & Bootstrap sertifikati - o'quvchining qadami 80 dan yuqori bo'lsa
                 if (step > 80 && !arr[1]) {
-                  console.log(`CSS & Bootstrap sertifikati ochildi: ${u.fullName}, step: ${step}`);
+                  console.log(
+                    `CSS & Bootstrap sertifikati ochildi: ${u.fullName}, step: ${step}`,
+                  );
                   arr[1] = true; // CSS & Bootstrap sertifikati
                 }
 
                 cmap[uid] = arr;
               });
               setCertsByUser(cmap);
-
-
-            } catch { }
-          } catch { }
+            } catch {}
+          } catch {}
         } else {
-          console.error('ProxOffline: API request failed:', res.status, res.statusText);
+          console.error(
+            "ProxOffline: API request failed:",
+            res.status,
+            res.statusText,
+          );
           setError("Foydalanuvchilarni yuklashda xatolik");
         }
       } catch (error) {
-        console.error('ProxOffline: Fetch error:', error);
+        console.error("ProxOffline: Fetch error:", error);
         setError("Server bilan bog'lanishda xatolik");
       } finally {
         setLoading(false);
@@ -4392,16 +4501,30 @@ function ProxOffline() {
                     <div className="flex w-full sm:w-auto items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 text-white/90 ring-1 ring-white/20 shadow-lg backdrop-blur-md justify-between sm:justify-center">
                       <span className="inline-flex items-center gap-2">
                         <Users className="w-5 h-5 text-cyan-300" />
-                        <span className="text-sm sm:text-base font-medium">Jami o'quvchilar</span>
+                        <span className="text-sm sm:text-base font-medium">
+                          Jami o'quvchilar
+                        </span>
                       </span>
-                      <span className="ml-2 px-3 py-1 rounded-full bg-white/15 text-white font-bold text-base sm:text-lg">{users.length}</span>
+                      <span className="ml-2 px-3 py-1 rounded-full bg-white/15 text-white font-bold text-base sm:text-lg relative flex items-center justify-center w-16">
+                        <span className="absolute inset-0 rounded-full border-2 border-white/30"></span>
+                        <span className="relative z-10">
+                          {users.length}
+                        </span>
+                      </span>
                     </div>
                     <div className="flex w-full sm:w-auto items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500/20 via-green-500/20 to-teal-500/20 text-white/90 ring-1 ring-white/20 shadow-lg backdrop-blur-md justify-between sm:justify-center">
                       <span className="inline-flex items-center gap-2">
                         <TrendingUp className="w-5 h-5 text-emerald-300" />
-                        <span className="text-sm sm:text-base font-medium">Umumiy foiz</span>
+                        <span className="text-sm sm:text-base font-medium">
+                          Umumiy foiz
+                        </span>
                       </span>
-                      <span className="ml-2 px-3 py-1 rounded-full bg-white/15 text-white font-bold text-base sm:text-lg">{totalProgress}%</span>
+                      <span className={`ml-2 px-3 py-1 rounded-full bg-white/15 font-bold text-base sm:text-lg relative flex items-center justify-center w-16 ${totalProgress >= 100 ? 'text-green-500' : 'text-red-500'}`}>
+                        <span className="absolute inset-0 rounded-full border-2 border-white/30"></span>
+                        <span className="relative z-10">
+                          {totalProgress}%
+                        </span>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -4431,34 +4554,67 @@ function ProxOffline() {
                 </div>
                 {hasQuery && filteredUsers.length === 0 && (
                   <div className="text-center text-white/80 bg-white/10 p-4 rounded-xl backdrop-blur-sm mt-3">
-                    {(typeof navigator !== 'undefined' && (navigator.language || '').toLowerCase().startsWith('ru')) ? 'Ученик не найден' : "O'quvchi topilmadi"}
+                    {typeof navigator !== "undefined" &&
+                    (navigator.language || "").toLowerCase().startsWith("ru")
+                      ? "Ученик не найден"
+                      : "O'quvchi topilmadi"}
                   </div>
                 )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredUsers.length > 0 && filteredUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="group bg-card border border-border rounded-2xl p-6 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary/10 hover:border-primary/50 hover:-translate-y-1"
-                    onClick={() => setSelectedUser(user)}
-                  >
-                    <div className="mb-4">
-                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-300 ios-text-render">
-                        {user.fullName}
-                      </h3>
-                    </div>
+                {filteredUsers.length > 0 &&
+                  filteredUsers.map((user) => (
+                    <div
+                      key={user.id}
+                      className="group bg-card border border-border rounded-2xl p-6 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary/10 hover:border-primary/50 hover:-translate-y-1"
+                      onClick={() => setSelectedUser(user)}
+                    >
+                      <div className="mb-4">
+                        <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-300 ios-text-render">
+                          {user.fullName}
+                        </h3>
+                      </div>
 
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium ios-text-render">
-                        Offline Student
-                      </span>
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    </div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium ios-text-render">
+                          {progressPercent(user) < 100 ? "Qarzdor" : "Offline Student"}
+                        </span>
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      </div>
 
-                    {/* ROI progress removed as requested */}
-                  </div>
-                ))}
+                      {/* Progress bar with gradient styling like profile view */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="relative flex-1 h-2 rounded-full bg-slate-900/30 border border-white/10 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full shadow-[0_0_4px_rgba(16,185,129,0.35)] transition-all duration-500 ${
+                              (!isNaN(user.progress) && user.progress >= 100) || (isNaN(user.progress) && progressPercent(user) >= 100)
+                                ? "bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-400"
+                                : "bg-gradient-to-r from-red-400 via-red-500 to-red-400"
+                            }`}
+                            style={{ width: `${isNaN(user.progress) ? progressPercent(user) : Math.min(100, user.progress)}%` }}
+                          />
+                        </div>
+                        <div
+                          className={`backdrop-blur-sm rounded-md px-2 py-1 border ${
+                            (!isNaN(user.progress) && user.progress >= 100) || (isNaN(user.progress) && progressPercent(user) >= 100)
+                              ? "bg-emerald-500/20 border-emerald-400/30"
+                              : "bg-red-500/20 border-red-400/30"
+                          }`}
+                        >
+                          <span
+                            className={`font-bold text-xs ${
+                              (!isNaN(user.progress) && user.progress >= 100) || (isNaN(user.progress) && progressPercent(user) >= 100)
+                                ? "text-emerald-300"
+                                : "text-red-300"
+                            }`}
+                          >
+                            {isNaN(user.progress) ? progressPercent(user) : Math.round(user.progress)}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
@@ -4471,14 +4627,18 @@ function ProxOffline() {
             <div className="text-center text-red-500 bg-red-50 p-3 rounded-xl border border-red-200 mt-1">
               {error}
             </div>
-          ) : (!hasQuery && filteredUsers.length === 0) ? (
+          ) : !hasQuery && filteredUsers.length === 0 ? (
             <div className="text-center text-white/80 bg-white/10 p-4 rounded-xl backdrop-blur-sm mt-1">
               Offline o'quvchilar topilmadi
             </div>
           ) : null}
         </div>
       ) : (
-        <div key={currentUserId || 'profile'} ref={profileTopRef} className="w-full animate-fade-in pb-16 pt-[1px] md:pt-0">
+        <div
+          key={currentUserId || "profile"}
+          ref={profileTopRef}
+          className="w-full animate-fade-in pb-16 pt-[1px] md:pt-0"
+        >
           {/* Student Detail Hero Section */}
           <div className="relative min-h-[60vh] bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden">
             {/* Gradient overlay */}
@@ -4538,7 +4698,9 @@ function ProxOffline() {
               </div>
               <div className="w-full text-center mb-4">
                 {/* Student Name */}
-                <h1 className={`text-[clamp(1.1rem,6vw,2.25rem)] sm:text-5xl lg:text-6xl font-bold text-white/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)] mt-2 mb-10 sm:mb-12 tracking-tight leading-tight break-words whitespace-normal overflow-visible max-w-[92vw] mx-auto ios-text-render`}>
+                <h1
+                  className={`text-[clamp(1.1rem,6vw,2.25rem)] sm:text-5xl lg:text-6xl font-bold text-white/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)] mt-2 mb-10 sm:mb-12 tracking-tight leading-tight break-words whitespace-normal overflow-visible max-w-[92vw] mx-auto ios-text-render`}
+                >
                   {selectedUser.fullName}
                 </h1>
 
@@ -4592,7 +4754,7 @@ function ProxOffline() {
                       {selectedUser.step ?? 1}
                     </div>
                     <div className="text-xs sm:text-sm font-semibold text-emerald-200/90 uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(16,185,129,0.2)]">
-                      {isRuLang ? 'Шаг' : 'Qadam'}
+                      {isRuLang ? "Шаг" : "Qadam"}
                     </div>
                   </div>
 
@@ -4639,21 +4801,30 @@ function ProxOffline() {
 
                 {/* Performance Banner - removed as per request */}
 
-
                 {/* Termination overlay if 3 warnings (users only) */}
-                {!isAdmin && warningsByUser[selectedUser.id] &&
-                  warningsByUser[selectedUser.id].filter(Boolean).length >= 3 && (
+                {!isAdmin &&
+                  warningsByUser[selectedUser.id] &&
+                  warningsByUser[selectedUser.id].filter(Boolean).length >=
+                    3 && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
                       <div className="relative w-full max-w-lg mx-4 rounded-lg border border-red-500 bg-red-950 p-6 text-red-100 shadow-lg">
                         <div className="mb-4">
-                          <h3 className="text-xl font-bold text-center text-red-200">Sizning o'qishingiz to'xtatildi</h3>
+                          <h3 className="text-xl font-bold text-center text-red-200">
+                            Sizning o'qishingiz to'xtatildi
+                          </h3>
                         </div>
                         <div className="space-y-2 text-sm text-red-100">
                           {warningsByUser[selectedUser.id]
                             .filter(Boolean)
                             .map((r, idx) => (
-                              <div key={idx} className="p-2 bg-red-900/50 rounded">
-                                <span className="font-semibold">{idx + 1}-Ogohlantirish:</span> {r}
+                              <div
+                                key={idx}
+                                className="p-2 bg-red-900/50 rounded"
+                              >
+                                <span className="font-semibold">
+                                  {idx + 1}-Ogohlantirish:
+                                </span>{" "}
+                                {r}
                               </div>
                             ))}
                         </div>
@@ -4661,68 +4832,103 @@ function ProxOffline() {
                     </div>
                   )}
 
-
-
                 {/* Progress */}
                 <div className="mt-5 max-w-5xl mx-auto w-full">
                   <div className="flex items-center justify-start mb-3 mt-2">
                     <span className="font-extrabold text-white/95 ios-text-render text-[clamp(20px,4vw,40px)]">
-                      <strong className="text-cyan-300">ProX akademiyasida</strong> o'quvchining natijasi va ota-onasining pulini oqlash darajasi:
+                      <strong className="text-cyan-300">
+                        ProX akademiyasida
+                      </strong>{" "}
+                      o'quvchining natijasi va ota-onasining pulini oqlash
+                      darajasi:
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="relative flex-1 h-8 sm:h-10 rounded-full bg-slate-900/30 border border-white/10 overflow-hidden shadow-inner">
                       <div
-                        className={`h-full rounded-full shadow-[0_0_12px_rgba(16,185,129,0.35)] transition-all duration-500 ${progressPercent(selectedUser) > 55
-                          ? 'bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-400'
-                          : 'bg-gradient-to-r from-red-400 via-red-500 to-red-400'
-                          }`}
-                        style={{ width: `${Math.min(100, progressPercent(selectedUser))}%` }}
+                        className={`h-full rounded-full shadow-[0_0_12px_rgba(16,185,129,0.35)] transition-all duration-500 ${
+                          progressPercent(selectedUser) >= 100
+                            ? "bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-400"
+                            : "bg-gradient-to-r from-red-400 via-red-500 to-red-400"
+                        }`}
+                        style={{
+                          width: `${Math.min(100, progressPercent(selectedUser))}%`,
+                        }}
                       />
                     </div>
-                    <div className={`backdrop-blur-sm rounded-md px-3 py-2 border ${progressPercent(selectedUser) > 55
-                      ? 'bg-emerald-500/20 border-emerald-400/30'
-                      : 'bg-red-500/20 border-red-400/30'
-                      }`}>
-                      <span className={`font-black tracking-wide text-2xl sm:text-3xl ios-text-render ${progressPercent(selectedUser) > 55 ? 'text-emerald-300' : 'text-red-300'
-                        }`}>
+                    <div
+                      className={`backdrop-blur-sm rounded-md px-3 py-2 border ${
+                        progressPercent(selectedUser) >= 100
+                          ? "bg-emerald-500/20 border-emerald-400/30"
+                          : "bg-red-500/20 border-red-400/30"
+                      }`}
+                    >
+                      <span
+                        className={`font-black tracking-wide text-2xl sm:text-3xl ios-text-render ${
+                          progressPercent(selectedUser) >= 100
+                            ? "text-emerald-300"
+                            : "text-red-300"
+                        }`}
+                      >
                         {Math.round(progressPercent(selectedUser))}%
                       </span>
                     </div>
                   </div>
                   {(() => {
-                    const info = progressGainLoss(selectedUser); return info.text ? (
-                      <div className={`mt-3 text-center text-base ios-text-render ${info.classes}`}>{info.text}</div>
-                    ) : null
+                    const info = progressGainLoss(selectedUser);
+                    return info.text ? (
+                      <div
+                        className={`mt-3 text-center text-base ios-text-render ${info.classes}`}
+                      >
+                        {info.text}
+                      </div>
+                    ) : null;
                   })()}
                   {/* Heading + Dual Cards (Remaining Steps + Completion %) */}
                   <div className="mt-4 max-w-5xl mx-auto">
                     <div className="text-center mb-5">
                       <div className="inline-block group relative rounded-2xl p-[2px] bg-[conic-gradient(at_50%_50%,#22d3ee66,#3b82f666,#a855f766,#22d3ee66)] shadow-sm">
                         <div className="relative rounded-2xl px-5 py-3 bg-slate-900/40 border border-white/10 ring-1 ring-white/10 backdrop-blur-sm">
-                          <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background:"linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.08) 45%, transparent 65%)"}} />
+                          <div
+                            className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            style={{
+                              background:
+                                "linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.08) 45%, transparent 65%)",
+                            }}
+                          />
                           <span className="relative bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 font-extrabold tracking-wider text-xl sm:text-2xl md:text-3xl">
-                            Kursning tugatilganlik foizi va daromadgacha qolgan qadamlar:
+                            Kursning tugatilganlik foizi va daromadgacha qolgan
+                            qadamlar:
                           </span>
                         </div>
                       </div>
-                      
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
                       {/* Remaining Steps Card */}
                       <div className="group relative rounded-3xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-indigo-400/25 hover:shadow-2xl hover:-translate-y-0.5 h-full">
                         <div className="absolute inset-0 bg-[conic-gradient(at_50%_50%,#6366f140,#8b5cf640,#a855f740,#06b6d440)]" />
                         <div className="relative m-[2px] rounded-3xl bg-slate-900/50 backdrop-blur-md border border-white/10 text-center py-4 px-5 ring-1 ring-white/10 transition-all duration-300 group-hover:bg-slate-900/60 group-hover:border-white/15 flex flex-col h-full">
-                          <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background:"linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.08) 40%, transparent 60%)"}} />
+                          <div
+                            className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            style={{
+                              background:
+                                "linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.08) 40%, transparent 60%)",
+                            }}
+                          />
                           <div className="flex flex-col items-center justify-center gap-2 relative z-10">
                             <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/35 via-violet-500/30 to-cyan-500/30 ring-2 ring-indigo-300/30 flex items-center justify-center shadow-lg shadow-indigo-900/20 transition-transform duration-300 group-hover:rotate-1 group-hover:scale-105">
                               <div className="absolute inset-0 rounded-xl bg-cyan-400/10 blur-[6px]" />
                               <DollarSign className="relative w-6 h-6 text-white drop-shadow-[0_1px_6px_rgba(99,102,241,0.45)]" />
                             </div>
                             <div className="min-w-0">
-                              <div className="text-sm sm:text-base font-semibold uppercase tracking-wide text-white/90">Daromadgacha qolgan qadamlar</div>
+                              <div className="text-sm sm:text-base font-semibold uppercase tracking-wide text-white/90">
+                                Daromadgacha qolgan qadamlar
+                              </div>
                               <div className="text-white font-extrabold text-3xl md:text-4xl mt-1 leading-tight ios-text-render">
-                                {Math.max(0, 600 - Number(selectedUser?.step || 0))}
+                                {Math.max(
+                                  0,
+                                  600 - Number(selectedUser?.step || 0),
+                                )}
                               </div>
                             </div>
                           </div>
@@ -4733,24 +4939,45 @@ function ProxOffline() {
                       <div className="group relative rounded-3xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-amber-400/25 hover:shadow-2xl hover:-translate-y-0.5 h-full">
                         <div className="absolute inset-0 bg-[conic-gradient(at_50%_50%,#f59e0b40,#f9731640,#ef444440,#eab30840)]" />
                         <div className="relative m-[2px] rounded-3xl bg-slate-900/50 backdrop-blur-md border border-white/10 text-center py-4 px-5 ring-1 ring-white/10 transition-all duration-300 group-hover:bg-slate-900/60 group-hover:border-white/15 flex flex-col h-full">
-                          <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background:"linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.08) 40%, transparent 60%)"}} />
+                          <div
+                            className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            style={{
+                              background:
+                                "linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.08) 40%, transparent 60%)",
+                            }}
+                          />
                           <div className="flex flex-col items-center justify-center gap-2 relative z-10">
                             <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/35 via-orange-500/30 to-rose-500/30 ring-2 ring-amber-300/30 flex items-center justify-center shadow-lg shadow-amber-900/20 transition-transform duration-300 group-hover:-rotate-1 group-hover:scale-105">
                               <TrendingUp className="relative w-6 h-6 text-white drop-shadow-[0_1px_6px_rgba(245,158,11,0.45)]" />
                             </div>
                             <div className="min-w-0">
-                              <div className="text-sm sm:text-base font-semibold uppercase tracking-wide text-white/90">Daromadgacha tugatilgan foiz</div>
+                              <div className="text-sm sm:text-base font-semibold uppercase tracking-wide text-white/90">
+                                Daromadgacha tugatilgan foiz
+                              </div>
                             </div>
                             {/* mini progress percent */}
                             <div className="w-full mt-2">
                               <div className="h-2 md:h-2.5 rounded-full bg-white/10 overflow-hidden ring-1 ring-white/10">
                                 <div
                                   className="h-full rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 transition-all duration-500 shadow-[inset_0_0_6px_rgba(0,0,0,0.3)]"
-                                  style={{ width: `${Math.min(100, Math.max(0, Math.round(((Number(selectedUser?.step || 0))/600)*100)))}%` }}
+                                  style={{
+                                    width: `${Math.min(100, Math.max(0, Math.round((Number(selectedUser?.step || 0) / 600) * 100)))}%`,
+                                  }}
                                 />
                               </div>
                               <div className="mt-1 text-sm sm:text-base text-white/80">
-                                Maqsadga {Math.min(100, Math.max(0, Math.round(((Number(selectedUser?.step || 0))/600)*100)))}% yetdi
+                                Maqsadga{" "}
+                                {Math.min(
+                                  100,
+                                  Math.max(
+                                    0,
+                                    Math.round(
+                                      (Number(selectedUser?.step || 0) / 600) *
+                                        100,
+                                    ),
+                                  ),
+                                )}
+                                % yetdi
                               </div>
                             </div>
                           </div>
@@ -4771,8 +4998,22 @@ function ProxOffline() {
                         <Calendar className="w-[clamp(18px,3vw,20px)] h-[clamp(18px,3vw,20px)] text-amber-100 relative z-10 drop-shadow-lg" />
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(12px,2vw,16px)]" style={{fontSize:'clamp(12px,2vw,16px)', lineHeight:'clamp(16px,2.4vw,20px)'}}>{isRuLang ? 'Дата начала' : 'Kelgan sana'}</div>
-                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-date-fix ios-text-render text-[clamp(22px,3.6vw,30px)]" style={{fontSize:'clamp(22px,3.6vw,30px)', lineHeight:'clamp(26px,4vw,34px)'}}>
+                        <div
+                          className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(12px,2vw,16px)]"
+                          style={{
+                            fontSize: "clamp(12px,2vw,16px)",
+                            lineHeight: "clamp(16px,2.4vw,20px)",
+                          }}
+                        >
+                          {isRuLang ? "Дата начала" : "Kelgan sana"}
+                        </div>
+                        <div
+                          className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-date-fix ios-text-render text-[clamp(22px,3.6vw,30px)]"
+                          style={{
+                            fontSize: "clamp(22px,3.6vw,30px)",
+                            lineHeight: "clamp(26px,4vw,34px)",
+                          }}
+                        >
                           {formatDateDDMMYY(selectedUser.arrivalDate)}
                         </div>
                       </div>
@@ -4788,8 +5029,22 @@ function ProxOffline() {
                         <Target className="w-[clamp(18px,3vw,20px)] h-[clamp(18px,3vw,20px)] text-emerald-100 relative z-10 drop-shadow-lg" />
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(12px,2vw,16px)]" style={{fontSize:'clamp(12px,2vw,16px)', lineHeight:'clamp(16px,2.4vw,20px)'}}>{isRuLang ? 'Сегодня' : 'Bugungi sana'}</div>
-                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-date-fix ios-text-render text-[clamp(22px,3.6vw,30px)]" style={{fontSize:'clamp(22px,3.6vw,30px)', lineHeight:'clamp(26px,4vw,34px)'}}>
+                        <div
+                          className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(12px,2vw,16px)]"
+                          style={{
+                            fontSize: "clamp(12px,2vw,16px)",
+                            lineHeight: "clamp(16px,2.4vw,20px)",
+                          }}
+                        >
+                          {isRuLang ? "Сегодня" : "Bugungi sana"}
+                        </div>
+                        <div
+                          className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-date-fix ios-text-render text-[clamp(22px,3.6vw,30px)]"
+                          style={{
+                            fontSize: "clamp(22px,3.6vw,30px)",
+                            lineHeight: "clamp(26px,4vw,34px)",
+                          }}
+                        >
                           {formatDateDDMMYY(new Date().toISOString())}
                         </div>
                       </div>
@@ -4804,8 +5059,22 @@ function ProxOffline() {
                         <Zap className="w-[clamp(18px,3vw,20px)] h-[clamp(18px,3vw,20px)] text-violet-100 relative z-10 drop-shadow-lg -translate-x-0.5" />
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(12px,2vw,16px)]" style={{fontSize:'clamp(12px,2vw,16px)', lineHeight:'clamp(16px,2.4vw,20px)'}}>{isRuLang ? 'Всего дней' : 'Jami kunlar'}</div>
-                        <div className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-text-render text-[clamp(22px,3.6vw,30px)]" style={{fontSize:'clamp(22px,3.6vw,30px)', lineHeight:'clamp(26px,4vw,34px)'}}>
+                        <div
+                          className="font-semibold uppercase tracking-wide text-white/90 text-[clamp(12px,2vw,16px)]"
+                          style={{
+                            fontSize: "clamp(12px,2vw,16px)",
+                            lineHeight: "clamp(16px,2.4vw,20px)",
+                          }}
+                        >
+                          {isRuLang ? "Всего дней" : "Jami kunlar"}
+                        </div>
+                        <div
+                          className="text-white/95 font-extrabold mt-[clamp(2px,0.4vw,6px)] leading-tight ios-text-render text-[clamp(22px,3.6vw,30px)]"
+                          style={{
+                            fontSize: "clamp(22px,3.6vw,30px)",
+                            lineHeight: "clamp(26px,4vw,34px)",
+                          }}
+                        >
                           {daysSinceArrival(selectedUser.arrivalDate)}
                         </div>
                       </div>
@@ -4822,28 +5091,54 @@ function ProxOffline() {
                         type="button"
                         onClick={() => {
                           setWarningTarget(1);
-                          setWarningReason(currentUserId ? (warningsByUser[currentUserId]?.[0] || "") : "");
+                          setWarningReason(
+                            currentUserId
+                              ? warningsByUser[currentUserId]?.[0] || ""
+                              : "",
+                          );
                           setWarningModalOpen(true);
                         }}
                         className="relative rounded-3xl border-4 border-amber-500/80 bg-gradient-to-br from-amber-600/40 via-yellow-600/35 to-orange-600/40 p-6 text-center shadow-2xl"
                       >
                         <div className="relative z-10">
                           <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 border-amber-500/80 bg-gradient-to-br from-amber-500/40 to-yellow-500/40 flex items-center justify-center shadow-xl">
-                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? (
-                              <span className="icon-warning text-3xl animate-bounce">⚠️</span>
+                            {currentUserId &&
+                            warningsByUser[currentUserId]?.[0] ? (
+                              <span className="icon-warning text-3xl animate-bounce">
+                                ⚠️
+                              </span>
                             ) : (
-                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-400">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                              <svg
+                                width="28"
+                                height="28"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className="text-amber-400"
+                              >
+                                <rect
+                                  x="3"
+                                  y="11"
+                                  width="18"
+                                  height="11"
+                                  rx="2"
+                                  ry="2"
+                                />
                                 <circle cx="12" cy="16" r="1" />
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                               </svg>
                             )}
                           </div>
                           <div className="text-xl font-bold text-amber-100 mb-2 tracking-wide">
-                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "1-Ogohlantirish berildi!" : "1-Ogohlantirish"}
+                            {currentUserId && warningsByUser[currentUserId]?.[0]
+                              ? "1-Ogohlantirish berildi!"
+                              : "1-Ogohlantirish"}
                           </div>
                           <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
-                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "" : ""}
+                            {currentUserId && warningsByUser[currentUserId]?.[0]
+                              ? ""
+                              : ""}
                           </div>
                         </div>
                       </button>
@@ -4851,21 +5146,43 @@ function ProxOffline() {
                       <div className="relative rounded-3xl border-4 border-amber-500/80 bg-gradient-to-br from-amber-600/40 via-yellow-600/35 to-orange-600/40 p-6 text-center opacity-85 cursor-not-allowed shadow-2xl">
                         <div className="relative z-10">
                           <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 border-amber-500/80 bg-gradient-to-br from-amber-500/40 to-yellow-500/40 flex items-center justify-center shadow-xl">
-                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? (
-                              <span className="icon-warning text-3xl animate-bounce">⚠️</span>
+                            {currentUserId &&
+                            warningsByUser[currentUserId]?.[0] ? (
+                              <span className="icon-warning text-3xl animate-bounce">
+                                ⚠️
+                              </span>
                             ) : (
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-400">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className="text-amber-400"
+                              >
+                                <rect
+                                  x="3"
+                                  y="11"
+                                  width="18"
+                                  height="11"
+                                  rx="2"
+                                  ry="2"
+                                />
                                 <circle cx="12" cy="16" r="1" />
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                               </svg>
                             )}
                           </div>
                           <div className="text-xl font-bold text-amber-200 mb-2">
-                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "1-Ogohlantirish berildi" : "1-Ogohlantirish"}
+                            {currentUserId && warningsByUser[currentUserId]?.[0]
+                              ? "1-Ogohlantirish berildi"
+                              : "1-Ogohlantirish"}
                           </div>
                           <div className="text-sm text-white/90 min-h-[20px] font-medium">
-                            {currentUserId && (warningsByUser[currentUserId]?.[0]) ? "" : ""}
+                            {currentUserId && warningsByUser[currentUserId]?.[0]
+                              ? ""
+                              : ""}
                           </div>
                         </div>
                       </div>
@@ -4875,37 +5192,70 @@ function ProxOffline() {
                       <button
                         type="button"
                         onClick={() => {
-                          if (!currentUserId || !(warningsByUser[currentUserId]?.[0])) {
+                          if (
+                            !currentUserId ||
+                            !warningsByUser[currentUserId]?.[0]
+                          ) {
                             alert("Avval 1-ogohlantirishni bering.");
                             return;
                           }
                           setWarningTarget(2);
-                          setWarningReason(currentUserId ? (warningsByUser[currentUserId]?.[1] || "") : "");
+                          setWarningReason(
+                            currentUserId
+                              ? warningsByUser[currentUserId]?.[1] || ""
+                              : "",
+                          );
                           setWarningModalOpen(true);
                         }}
-                        disabled={!currentUserId || !(warningsByUser[currentUserId]?.[0])}
-                        className={`relative rounded-3xl border-4 border-rose-500/80 p-6 text-center shadow-2xl ${currentUserId && warningsByUser[currentUserId]?.[0]
-                          ? "bg-gradient-to-br from-rose-600/50 via-red-600/45 to-pink-600/50"
-                          : "opacity-75 cursor-not-allowed bg-rose-700/40 border-rose-400/70"}
+                        disabled={
+                          !currentUserId || !warningsByUser[currentUserId]?.[0]
+                        }
+                        className={`relative rounded-3xl border-4 border-rose-500/80 p-6 text-center shadow-2xl ${
+                          currentUserId && warningsByUser[currentUserId]?.[0]
+                            ? "bg-gradient-to-br from-rose-600/50 via-red-600/45 to-pink-600/50"
+                            : "opacity-75 cursor-not-allowed bg-rose-700/40 border-rose-400/70"
+                        }
                       `}
                       >
                         <div className="relative z-10">
                           <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center border-rose-500/80 from-rose-500/50 to-red-500/50 shadow-xl">
-                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? (
-                              <span className="icon-warning text-3xl animate-bounce">⚠️</span>
+                            {currentUserId &&
+                            warningsByUser[currentUserId]?.[1] ? (
+                              <span className="icon-warning text-3xl animate-bounce">
+                                ⚠️
+                              </span>
                             ) : (
-                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-rose-300">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                              <svg
+                                width="28"
+                                height="28"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className="text-rose-300"
+                              >
+                                <rect
+                                  x="3"
+                                  y="11"
+                                  width="18"
+                                  height="11"
+                                  rx="2"
+                                  ry="2"
+                                />
                                 <circle cx="12" cy="16" r="1" />
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                               </svg>
                             )}
                           </div>
                           <div className="text-xl font-bold mb-2 tracking-wide text-rose-200">
-                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "2-Ogohlantirish berildi" : "2-Ogohlantirish"}
+                            {currentUserId && warningsByUser[currentUserId]?.[1]
+                              ? "2-Ogohlantirish berildi"
+                              : "2-Ogohlantirish"}
                           </div>
                           <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
-                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "" : ""}
+                            {currentUserId && warningsByUser[currentUserId]?.[1]
+                              ? ""
+                              : ""}
                           </div>
                         </div>
                       </button>
@@ -4913,21 +5263,43 @@ function ProxOffline() {
                       <div className="relative rounded-3xl border-4 border-rose-500/80 bg-gradient-to-br from-rose-600/50 via-red-600/45 to-pink-600/50 p-6 text-center opacity-85 cursor-not-allowed shadow-2xl">
                         <div className="relative z-10">
                           <div className="w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center border-rose-500/80 from-rose-500/50 to-red-500/50 shadow-xl">
-                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? (
-                              <span className="icon-warning text-3xl animate-bounce">⚠️</span>
+                            {currentUserId &&
+                            warningsByUser[currentUserId]?.[1] ? (
+                              <span className="icon-warning text-3xl animate-bounce">
+                                ⚠️
+                              </span>
                             ) : (
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-rose-400">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className="text-rose-400"
+                              >
+                                <rect
+                                  x="3"
+                                  y="11"
+                                  width="18"
+                                  height="11"
+                                  rx="2"
+                                  ry="2"
+                                />
                                 <circle cx="12" cy="16" r="1" />
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                               </svg>
                             )}
                           </div>
                           <div className="text-xl font-bold mb-2 text-rose-300">
-                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "2-Ogohlantirish berildi" : "2-Ogohlantirish"}
+                            {currentUserId && warningsByUser[currentUserId]?.[1]
+                              ? "2-Ogohlantirish berildi"
+                              : "2-Ogohlantirish"}
                           </div>
                           <div className="text-sm text-white/90 min-h-[20px] font-medium">
-                            {currentUserId && (warningsByUser[currentUserId]?.[1]) ? "" : ""}
+                            {currentUserId && warningsByUser[currentUserId]?.[1]
+                              ? ""
+                              : ""}
                           </div>
                         </div>
                       </div>
@@ -4937,66 +5309,137 @@ function ProxOffline() {
                       <button
                         type="button"
                         onClick={() => {
-                          if (!currentUserId || !(warningsByUser[currentUserId]?.[1])) {
+                          if (
+                            !currentUserId ||
+                            !warningsByUser[currentUserId]?.[1]
+                          ) {
                             alert("Avval 2-ogohlantirishni bering.");
                             return;
                           }
                           setWarningTarget(3);
-                          setWarningReason(currentUserId ? (warningsByUser[currentUserId]?.[2] || "") : "");
+                          setWarningReason(
+                            currentUserId
+                              ? warningsByUser[currentUserId]?.[2] || ""
+                              : "",
+                          );
                           setWarningModalOpen(true);
                         }}
-                        disabled={!currentUserId || !(warningsByUser[currentUserId]?.[1])}
-                        className={`relative rounded-3xl border-4 border-slate-600/80 p-7 text-center sm:col-span-1 ${currentUserId && warningsByUser[currentUserId]?.[1]
-                          ? "bg-gradient-to-br from-slate-900/80 via-gray-900/70 to-black/60 shadow-2xl"
-                          : "opacity-75 cursor-not-allowed bg-slate-800/40 border-slate-500/60"}
+                        disabled={
+                          !currentUserId || !warningsByUser[currentUserId]?.[1]
+                        }
+                        className={`relative rounded-3xl border-4 border-slate-600/80 p-7 text-center sm:col-span-1 ${
+                          currentUserId && warningsByUser[currentUserId]?.[1]
+                            ? "bg-gradient-to-br from-slate-900/80 via-gray-900/70 to-black/60 shadow-2xl"
+                            : "opacity-75 cursor-not-allowed bg-slate-800/40 border-slate-500/60"
+                        }
                       `}
                       >
                         <div className="relative z-10">
-                          <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center ${currentUserId && warningsByUser[currentUserId]?.[1]
-                            ? "border-slate-500/80 from-slate-700/40 to-gray-700/40 shadow-xl"
-                            : "border-slate-400/70 bg-slate-600/30"}
-                        `}>
-                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? (
-                              <span className="icon-warning text-3xl animate-bounce">⚠️</span>
+                          <div
+                            className={`w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center ${
+                              currentUserId &&
+                              warningsByUser[currentUserId]?.[1]
+                                ? "border-slate-500/80 from-slate-700/40 to-gray-700/40 shadow-xl"
+                                : "border-slate-400/70 bg-slate-600/30"
+                            }
+                        `}
+                          >
+                            {currentUserId &&
+                            warningsByUser[currentUserId]?.[2] ? (
+                              <span className="icon-warning text-3xl animate-bounce">
+                                ⚠️
+                              </span>
                             ) : (
-                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-400' : 'text-slate-500'}`}>
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                              <svg
+                                width="28"
+                                height="28"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className={`${currentUserId && warningsByUser[currentUserId]?.[1] ? "text-slate-400" : "text-slate-500"}`}
+                              >
+                                <rect
+                                  x="3"
+                                  y="11"
+                                  width="18"
+                                  height="11"
+                                  rx="2"
+                                  ry="2"
+                                />
                                 <circle cx="12" cy="16" r="1" />
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                               </svg>
                             )}
                           </div>
-                          <div className={`text-xl font-bold mb-2 ${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-100' : 'text-slate-400'}`}>
-                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-Ogohlantirish berildi" : "3-Ogohlantirish"}
+                          <div
+                            className={`text-xl font-bold mb-2 ${currentUserId && warningsByUser[currentUserId]?.[1] ? "text-slate-100" : "text-slate-400"}`}
+                          >
+                            {currentUserId && warningsByUser[currentUserId]?.[2]
+                              ? "3-Ogohlantirish berildi"
+                              : "3-Ogohlantirish"}
                           </div>
                           <div className="text-sm text-white/90 min-h-[24px] font-medium leading-relaxed">
-                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-Ogohlantirish olindi" : ""}
+                            {currentUserId && warningsByUser[currentUserId]?.[2]
+                              ? "3-Ogohlantirish olindi"
+                              : ""}
                           </div>
                         </div>
                       </button>
                     ) : (
                       <div className="relative rounded-3xl border-4 border-slate-600/80 bg-gradient-to-br from-slate-900/80 via-gray-900/70 to-black/60 p-7 text-center backdrop-blur-sm opacity-85 cursor-not-allowed shadow-2xl sm:col-span-1">
-                        <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-35 ${currentUserId && warningsByUser[currentUserId]?.[1]
-                          ? "from-slate-600/15 via-gray-600/8 to-black/15"
-                          : "from-slate-400/8 via-slate-500/5 to-slate-600/8"}
-                        `} />
+                        <div
+                          className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-35 ${
+                            currentUserId && warningsByUser[currentUserId]?.[1]
+                              ? "from-slate-600/15 via-gray-600/8 to-black/15"
+                              : "from-slate-400/8 via-slate-500/5 to-slate-600/8"
+                          }
+                        `}
+                        />
                         <div className="relative z-10">
-                          <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center ${currentUserId && warningsByUser[currentUserId]?.[1]
-                            ? "border-slate-400/60 from-slate-600/20 to-gray-600/20 shadow-xl"
-                            : "border-slate-300/60 bg-slate-500/15 shadow-lg"}
-                          `}>
-                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? (
-                              <span className="icon-warning text-2xl animate-bounce">⚠️</span>
+                          <div
+                            className={`w-20 h-20 mx-auto mb-4 rounded-2xl border-4 bg-gradient-to-br flex items-center justify-center ${
+                              currentUserId &&
+                              warningsByUser[currentUserId]?.[1]
+                                ? "border-slate-400/60 from-slate-600/20 to-gray-600/20 shadow-xl"
+                                : "border-slate-300/60 bg-slate-500/15 shadow-lg"
+                            }
+                          `}
+                          >
+                            {currentUserId &&
+                            warningsByUser[currentUserId]?.[2] ? (
+                              <span className="icon-warning text-2xl animate-bounce">
+                                ⚠️
+                              </span>
                             ) : (
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-400' : 'text-slate-500'}`}>
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className={`${currentUserId && warningsByUser[currentUserId]?.[1] ? "text-slate-400" : "text-slate-500"}`}
+                              >
+                                <rect
+                                  x="3"
+                                  y="11"
+                                  width="18"
+                                  height="11"
+                                  rx="2"
+                                  ry="2"
+                                />
                                 <circle cx="12" cy="16" r="1" />
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                               </svg>
                             )}
                           </div>
-                          <div className={`text-xl font-bold mb-2 ${currentUserId && warningsByUser[currentUserId]?.[1] ? 'text-slate-200' : 'text-slate-400'}`}>
-                            {currentUserId && (warningsByUser[currentUserId]?.[2]) ? "3-Ogohlantirish berildi" : "3-Ogohlantirish"}
+                          <div
+                            className={`text-xl font-bold mb-2 ${currentUserId && warningsByUser[currentUserId]?.[1] ? "text-slate-200" : "text-slate-400"}`}
+                          >
+                            {currentUserId && warningsByUser[currentUserId]?.[2]
+                              ? "3-Ogohlantirish berildi"
+                              : "3-Ogohlantirish"}
                           </div>
                         </div>
                       </div>
@@ -5005,83 +5448,117 @@ function ProxOffline() {
                   <div className="mt-4">
                     <div className="relative rounded-xl p-[2px] overflow-hidden">
                       <div className="relative z-10 flex items-center justify-center text-amber-400 bg-amber-900/20 border border-amber-500/40 rounded-xl px-3 py-2 text-base sm:text-lg">
-                        <span className="font-semibold text-center">Agar 3 ta ogohlantirish olsangiz ProX academiyasidan haydalasiz!</span>
+                        <span className="font-semibold text-center">
+                          Agar 3 ta ogohlantirish olsangiz ProX academiyasidan
+                          haydalasiz!
+                        </span>
                       </div>
                     </div>
                   </div>
                   {/* Reasons list */}
-                  {currentUserId && warningsByUser[currentUserId] && warningsByUser[currentUserId].some(Boolean) && (
-                    <div className="mt-4 space-y-3">
-                      {warningsByUser[currentUserId].map((r, idx) => (
-                        r ? (
-                          <div
-                            key={idx}
-                            className={`relative flex items-start justify-between gap-3 rounded-xl px-4 py-3 border backdrop-blur-sm shadow-sm
+                  {currentUserId &&
+                    warningsByUser[currentUserId] &&
+                    warningsByUser[currentUserId].some(Boolean) && (
+                      <div className="mt-4 space-y-3">
+                        {warningsByUser[currentUserId].map((r, idx) =>
+                          r ? (
+                            <div
+                              key={idx}
+                              className={`relative flex items-start justify-between gap-3 rounded-xl px-4 py-3 border backdrop-blur-sm shadow-sm
                               ${idx === 0 ? "bg-gradient-to-br from-amber-500/10 via-yellow-400/5 to-amber-300/10 border-amber-300/30" : ""}
                               ${idx === 1 ? "bg-gradient-to-br from-rose-500/10 via-red-500/5 to-rose-300/10 border-rose-300/30" : ""}
                               ${idx === 2 ? "bg-gradient-to-br from-slate-500/10 via-slate-400/5 to-slate-300/10 border-slate-300/30" : ""}
                             `}
-                          >
-                            <div className={`mt-0.5 flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center
+                            >
+                              <div
+                                className={`mt-0.5 flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center
                               ${idx === 0 ? "bg-amber-400/15 border border-amber-300/40" : ""}
                               ${idx === 1 ? "bg-rose-400/15 border border-rose-300/40" : ""}
                               ${idx === 2 ? "bg-slate-400/15 border border-slate-300/40" : ""}
-                            `}>
-                              <AlertTriangle className={`w-4 h-4
+                            `}
+                              >
+                                <AlertTriangle
+                                  className={`w-4 h-4
                                 ${idx === 0 ? "text-amber-300" : ""}
                                 ${idx === 1 ? "text-rose-300" : ""}
                                 ${idx === 2 ? "text-slate-200" : ""}
-                              `} />
+                              `}
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-base font-semibold text-white/90 mb-0.5">
+                                  {idx + 1}-Ogohlantirish sababi:
+                                </div>
+                                <div className="text-base text-white/80 break-words">
+                                  {r}
+                                </div>
+                              </div>
+                              {isAdmin && (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    className="px-2.5 py-1 text-xs rounded-md border border-red-400/40 text-red-300 hover:bg-red-400/10 transition-colors"
+                                    onClick={async () => {
+                                      if (!currentUserId) return;
+                                      const next = [
+                                        ...(warningsByUser[currentUserId] ||
+                                          []),
+                                      ];
+                                      next[idx] = "";
+                                      const ok = await updateWarnings(
+                                        currentUserId,
+                                        next,
+                                      );
+                                      if (ok) {
+                                        setWarningsByUser((prev) => ({
+                                          ...prev,
+                                          [currentUserId]: next,
+                                        }));
+                                      } else {
+                                        alert(
+                                          "Ogohlantirishni bekor qilishda xatolik",
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    Bekor qilish
+                                  </button>
+                                </div>
+                              )}
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="text-base font-semibold text-white/90 mb-0.5">
-                                {idx + 1}-Ogohlantirish sababi:
-                              </div>
-                              <div className="text-base text-white/80 break-words">
-                                {r}
-                              </div>
-                            </div>
-                            {isAdmin && (
-                              <div className="flex items-center gap-2">
-                                <button
-                                  className="px-2.5 py-1 text-xs rounded-md border border-red-400/40 text-red-300 hover:bg-red-400/10 transition-colors"
-                                  onClick={async () => {
-                                    if (!currentUserId) return;
-                                    const next = [...(warningsByUser[currentUserId] || [])];
-                                    next[idx] = "";
-                                    const ok = await updateWarnings(currentUserId, next);
-                                    if (ok) {
-                                      setWarningsByUser((prev) => ({ ...prev, [currentUserId]: next }));
-                                    } else {
-                                      alert("Ogohlantirishni bekor qilishda xatolik");
-                                    }
-                                  }}
-                                >
-                                  Bekor qilish
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        ) : null
-                      ))}
-                    </div>
-                  )}
+                          ) : null,
+                        )}
+                      </div>
+                    )}
                 </div>
 
                 {/* Certificates - Locked Card */}
                 <div className="mt-8 max-w-5xl mx-auto">
                   <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur-md p-6 shadow-2xl">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-xl font-bold text-white">Sertifikatlar</h3>
+                      <h3 className="text-xl font-bold text-white">
+                        Sertifikatlar
+                      </h3>
                     </div>
                     {/* Keys Section - Kalitlar */}
                     <div className="mb-3 flex items-center justify-center gap-3">
                       {certificateTitles.map((_, idx) => (
-                        <div key={idx} className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${currentUserId && certsByUser[currentUserId]?.[idx]
-                          ? 'bg-emerald-500 border-emerald-400 shadow-lg shadow-emerald-400/50'
-                          : 'bg-slate-600 border-slate-500'
-                          }`}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-white">
+                        <div
+                          key={idx}
+                          className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                            currentUserId && certsByUser[currentUserId]?.[idx]
+                              ? "bg-emerald-500 border-emerald-400 shadow-lg shadow-emerald-400/50"
+                              : "bg-slate-600 border-slate-500"
+                          }`}
+                        >
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            className="text-white"
+                          >
                             <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
                           </svg>
                         </div>
@@ -5089,7 +5566,9 @@ function ProxOffline() {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       {certificateTitles.map((title, idx) => {
-                        const unlocked = currentUserId ? !!certsByUser[currentUserId]?.[idx] : false;
+                        const unlocked = currentUserId
+                          ? !!certsByUser[currentUserId]?.[idx]
+                          : false;
                         const content = (
                           <div
                             className={`group relative rounded-3xl p-[2px] transition-all duration-300 hover:scale-[1.01] overflow-hidden`}
@@ -5100,11 +5579,17 @@ function ProxOffline() {
                               <div className="absolute inset-0 bg-gradient-to-br from-transparent via-cyan-500/5 to-transparent opacity-20"></div>
                             </div>
                             <div
-                              className={`relative z-10 flex items-center gap-4 rounded-3xl p-4 sm:p-5 min-h-[160px] sm:min-h-[180px] shadow-sm hover:shadow-md ${unlocked
-                                ? "border border-emerald-300/20"
-                                : "border border-white/10"
-                                }`}
-                              style={{ backgroundImage: `url('${getTechnologyIcon(title)}')`, backgroundRepeat: 'no-repeat', backgroundSize: '60%', backgroundPosition: 'center' }}
+                              className={`relative z-10 flex items-center gap-4 rounded-3xl p-4 sm:p-5 min-h-[160px] sm:min-h-[180px] shadow-sm hover:shadow-md ${
+                                unlocked
+                                  ? "border border-emerald-300/20"
+                                  : "border border-white/10"
+                              }`}
+                              style={{
+                                backgroundImage: `url('${getTechnologyIcon(title)}')`,
+                                backgroundRepeat: "no-repeat",
+                                backgroundSize: "60%",
+                                backgroundPosition: "center",
+                              }}
                             >
                               {/* Bottom gradient overlay for text readability */}
                               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 via-black/30 to-transparent" />
@@ -5126,9 +5611,7 @@ function ProxOffline() {
                         if (!isAdmin)
                           return (
                             <div key={idx} className="text-left">
-                              <div className="mb-3">
-                                {content}
-                              </div>
+                              <div className="mb-3">{content}</div>
                               <div className="text-center">
                                 <span className="text-white/80 text-sm font-medium">
                                   {title}
@@ -5146,9 +5629,7 @@ function ProxOffline() {
                             }}
                             className="text-left cursor-pointer"
                           >
-                            <div className="mb-3">
-                              {content}
-                            </div>
+                            <div className="mb-3">{content}</div>
                             <div className="text-center">
                               <span className="text-white/80 text-sm font-medium">
                                 {title}
@@ -5161,8 +5642,6 @@ function ProxOffline() {
                   </div>
                 </div>
 
-                
-
                 {/* Certificate Modal (admin) */}
                 {certModalOpen && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -5173,7 +5652,10 @@ function ProxOffline() {
                             ? "Rostan ham ushbu sertifikatni ochmoqchimisiz?"
                             : "Rostan ham sertifikatni yopmoqchimisiz?"}
                         </h3>
-                        <button className="p-2 rounded hover:bg-muted" onClick={() => setCertModalOpen(false)}>
+                        <button
+                          className="p-2 rounded hover:bg-muted"
+                          onClick={() => setCertModalOpen(false)}
+                        >
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -5181,20 +5663,29 @@ function ProxOffline() {
                         {certificateTitles[certTarget]}
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button variant="outline" onClick={() => setCertModalOpen(false)}>Yo'q</Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => setCertModalOpen(false)}
+                        >
+                          Yo'q
+                        </Button>
                         <Button
                           onClick={async () => {
                             if (!currentUserId) return;
 
                             // Sertifikat ochish tartibini tekshirish
-                            const currentCerts = certsByUser[currentUserId] || new Array(certificateTitles.length).fill(false);
+                            const currentCerts =
+                              certsByUser[currentUserId] ||
+                              new Array(certificateTitles.length).fill(false);
 
                             // Agar bu sertifikatdan avvalgi sertifikatlar ochilmagan bo'lsa, xabar berish
                             for (let i = 0; i < certTarget; i++) {
                               if (!currentCerts[i]) {
                                 // Toast notification yaratish
-                                const notification = document.createElement('div');
-                                notification.className = 'fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg border border-red-400 animate-in slide-in-from-top-2 duration-300';
+                                const notification =
+                                  document.createElement("div");
+                                notification.className =
+                                  "fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg border border-red-400 animate-in slide-in-from-top-2 duration-300";
                                 notification.innerHTML = `
                                   <div class="flex items-center gap-2">
                                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -5209,7 +5700,9 @@ function ProxOffline() {
                                 // 3 soniya keyin notification o'chirish
                                 setTimeout(() => {
                                   if (notification.parentNode) {
-                                    notification.parentNode.removeChild(notification);
+                                    notification.parentNode.removeChild(
+                                      notification,
+                                    );
                                   }
                                 }, 3000);
 
@@ -5217,12 +5710,20 @@ function ProxOffline() {
                               }
                             }
 
-                            const current = certsByUser[currentUserId] || new Array(certificateTitles.length).fill(false);
+                            const current =
+                              certsByUser[currentUserId] ||
+                              new Array(certificateTitles.length).fill(false);
                             const next = [...current];
                             next[certTarget] = certAction === "unlock";
-                            const ok = await updateCertificates(currentUserId, next);
+                            const ok = await updateCertificates(
+                              currentUserId,
+                              next,
+                            );
                             if (ok) {
-                              setCertsByUser((p) => ({ ...p, [currentUserId]: next }));
+                              setCertsByUser((p) => ({
+                                ...p,
+                                [currentUserId]: next,
+                              }));
                               setCertModalOpen(false);
                             } else {
                               alert("Sertifikat holatini saqlashda xatolik");
@@ -5259,7 +5760,9 @@ function ProxOffline() {
                             <h3 className="text-3xl font-bold text-white mb-2 bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
                               {certificateTitles[certInfo.index]} ma'lumotlari
                             </h3>
-                            <p className="text-white/70 text-lg">Batafsil ma'lumotlar va talablar</p>
+                            <p className="text-white/70 text-lg">
+                              Batafsil ma'lumotlar va talablar
+                            </p>
                           </div>
                         </div>
                         <button
@@ -5287,9 +5790,15 @@ function ProxOffline() {
                                 {certificateTitles[certInfo.index]}
                               </h4>
                               <div className="flex items-center gap-4">
-                                <div className={`w-5 h-5 rounded-full ${certsByUser[currentUserId]?.[certInfo.index] ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'} shadow-lg`}></div>
-                                <span className={`text-xl font-semibold ${certsByUser[currentUserId]?.[certInfo.index] ? 'text-emerald-300' : 'text-slate-300'}`}>
-                                  {certsByUser[currentUserId]?.[certInfo.index] ? '✅ Sertifikat ochilgan' : '🔒 Sertifikat qulf holatida'}
+                                <div
+                                  className={`w-5 h-5 rounded-full ${certsByUser[currentUserId]?.[certInfo.index] ? "bg-emerald-400 animate-pulse" : "bg-slate-500"} shadow-lg`}
+                                ></div>
+                                <span
+                                  className={`text-xl font-semibold ${certsByUser[currentUserId]?.[certInfo.index] ? "text-emerald-300" : "text-slate-300"}`}
+                                >
+                                  {certsByUser[currentUserId]?.[certInfo.index]
+                                    ? "✅ Sertifikat ochilgan"
+                                    : "🔒 Sertifikat qulf holatida"}
                                 </span>
                               </div>
                             </div>
@@ -5298,7 +5807,10 @@ function ProxOffline() {
                           {/* Certificate Description */}
                           <div className="bg-slate-800/60 rounded-2xl p-6 mb-6 border border-slate-700/50">
                             <p className="text-white/90 leading-relaxed text-lg">
-                              Bu sertifikat dasturlash sohasida {certificateTitles[certInfo.index].toLowerCase()} sohasida professional bilim va ko'nikmalarga ega ekanligingizni tasdiqlaydi.
+                              Bu sertifikat dasturlash sohasida{" "}
+                              {certificateTitles[certInfo.index].toLowerCase()}{" "}
+                              sohasida professional bilim va ko'nikmalarga ega
+                              ekanligingizni tasdiqlaydi.
                             </p>
                           </div>
 
@@ -5306,26 +5818,36 @@ function ProxOffline() {
                           <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-2xl p-6">
                             <h5 className="text-blue-300 font-bold mb-4 text-xl flex items-center gap-3">
                               <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                                <span className="text-blue-300 text-lg">📋</span>
+                                <span className="text-blue-300 text-lg">
+                                  📋
+                                </span>
                               </div>
                               Sertifikat talablari:
                             </h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div className="flex items-start gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
                                 <div className="w-3 h-3 rounded-full bg-blue-400 mt-1 flex-shrink-0"></div>
-                                <span className="text-white/90 text-base leading-relaxed">Mavzularni to'liq o'zlashtirish</span>
+                                <span className="text-white/90 text-base leading-relaxed">
+                                  Mavzularni to'liq o'zlashtirish
+                                </span>
                               </div>
                               <div className="flex items-start gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
                                 <div className="w-3 h-3 rounded-full bg-blue-400 mt-1 flex-shrink-0"></div>
-                                <span className="text-white/90 text-base leading-relaxed">Amaliy mashqlarni bajarish</span>
+                                <span className="text-white/90 text-base leading-relaxed">
+                                  Amaliy mashqlarni bajarish
+                                </span>
                               </div>
                               <div className="flex items-start gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
                                 <div className="w-3 h-3 rounded-full bg-blue-400 mt-1 flex-shrink-0"></div>
-                                <span className="text-white/90 text-base leading-relaxed">Loyihalarni yakunlash</span>
+                                <span className="text-white/90 text-base leading-relaxed">
+                                  Loyihalarni yakunlash
+                                </span>
                               </div>
                               <div className="flex items-start gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
                                 <div className="w-3 h-3 rounded-full bg-blue-400 mt-1 flex-shrink-0"></div>
-                                <span className="text-white/90 text-base leading-relaxed">Imtihondan muvaffaqiyatli o'tish</span>
+                                <span className="text-white/90 text-base leading-relaxed">
+                                  Imtihondan muvaffaqiyatli o'tish
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -5345,17 +5867,23 @@ function ProxOffline() {
                             <h4 className="text-2xl font-bold text-white mb-3">
                               {certificateTitles[certInfo.index]}
                             </h4>
-                            <p className={`text-lg ${certsByUser[currentUserId]?.[certInfo.index] ? 'text-emerald-300' : 'text-slate-400'}`}>
-                              {certsByUser[currentUserId]?.[certInfo.index] ? '🎉 Sertifikat muvaffaqiyatli ochilgan!' : '🔒 Sertifikat qulf holatida'}
+                            <p
+                              className={`text-lg ${certsByUser[currentUserId]?.[certInfo.index] ? "text-emerald-300" : "text-slate-400"}`}
+                            >
+                              {certsByUser[currentUserId]?.[certInfo.index]
+                                ? "🎉 Sertifikat muvaffaqiyatli ochilgan!"
+                                : "🔒 Sertifikat qulf holatida"}
                             </p>
                             <div className="mt-6">
                               <div className="w-full bg-slate-700/50 rounded-full h-5 mb-2">
                                 <div
-                                  className={`h-5 rounded-full transition-all duration-1000 ${certsByUser[currentUserId]?.[certInfo.index] ? 'bg-gradient-to-r from-emerald-400 to-green-400 w-full' : 'bg-slate-500 w-0'}`}
+                                  className={`h-5 rounded-full transition-all duration-1000 ${certsByUser[currentUserId]?.[certInfo.index] ? "bg-gradient-to-r from-emerald-400 to-green-400 w-full" : "bg-slate-500 w-0"}`}
                                 ></div>
                               </div>
                               <p className="text-sm text-white/60">
-                                {certsByUser[currentUserId]?.[certInfo.index] ? '100% to\'liq' : '0% to\'liq'}
+                                {certsByUser[currentUserId]?.[certInfo.index]
+                                  ? "100% to'liq"
+                                  : "0% to'liq"}
                               </p>
                             </div>
                           </div>
@@ -5364,7 +5892,9 @@ function ProxOffline() {
                           <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-3xl p-8">
                             <h5 className="text-indigo-300 font-bold mb-6 text-xl flex items-center gap-3">
                               <div className="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center">
-                                <span className="text-indigo-300 text-lg">ℹ️</span>
+                                <span className="text-indigo-300 text-lg">
+                                  ℹ️
+                                </span>
                               </div>
                               Sertifikat haqida:
                             </h5>
@@ -5372,31 +5902,49 @@ function ProxOffline() {
                             <div className="space-y-4">
                               <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10">
                                 <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                                  <span className="text-purple-300 text-lg">🏆</span>
+                                  <span className="text-purple-300 text-lg">
+                                    🏆
+                                  </span>
                                 </div>
                                 <div>
-                                  <p className="text-white/80 text-sm">Darajasi</p>
-                                  <p className="text-white font-semibold">Professional</p>
+                                  <p className="text-white/80 text-sm">
+                                    Darajasi
+                                  </p>
+                                  <p className="text-white font-semibold">
+                                    Professional
+                                  </p>
                                 </div>
                               </div>
 
                               <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10">
                                 <div className="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
-                                  <span className="text-cyan-300 text-lg">⏱️</span>
+                                  <span className="text-cyan-300 text-lg">
+                                    ⏱️
+                                  </span>
                                 </div>
                                 <div>
-                                  <p className="text-white/80 text-sm">Davomiyligi</p>
-                                  <p className="text-white font-semibold">3-6 oy</p>
+                                  <p className="text-white/80 text-sm">
+                                    Davomiyligi
+                                  </p>
+                                  <p className="text-white font-semibold">
+                                    3-6 oy
+                                  </p>
                                 </div>
                               </div>
 
                               <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10">
                                 <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                                  <span className="text-emerald-300 text-lg">🎯</span>
+                                  <span className="text-emerald-300 text-lg">
+                                    🎯
+                                  </span>
                                 </div>
                                 <div>
-                                  <p className="text-white/80 text-sm">Maqsadi</p>
-                                  <p className="text-white font-semibold">Kasbiy ko'nikmalar</p>
+                                  <p className="text-white/80 text-sm">
+                                    Maqsadi
+                                  </p>
+                                  <p className="text-white font-semibold">
+                                    Kasbiy ko'nikmalar
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -5413,9 +5961,7 @@ function ProxOffline() {
                             Modal oynani yopish
                           </Button>
                           {!certsByUser[currentUserId]?.[certInfo.index] && (
-                            <Button
-                              className="flex-1 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white text-lg py-4 rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
-                            >
+                            <Button className="flex-1 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white text-lg py-4 rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
                               Sertifikatni ochish
                             </Button>
                           )}
@@ -5433,12 +5979,17 @@ function ProxOffline() {
                         <h3 className="text-lg font-semibold text-foreground">
                           {warningTarget}-Ogohlantirish
                         </h3>
-                        <button className="p-2 rounded hover:bg-muted" onClick={() => setWarningModalOpen(false)}>
+                        <button
+                          className="p-2 rounded hover:bg-muted"
+                          onClick={() => setWarningModalOpen(false)}
+                        >
                           <X className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="space-y-3">
-                        <label className="block text-sm text-muted-foreground">Sababi</label>
+                        <label className="block text-sm text-muted-foreground">
+                          Sababi
+                        </label>
                         <textarea
                           rows={4}
                           value={warningReason}
@@ -5447,36 +5998,64 @@ function ProxOffline() {
                           placeholder="Sababni yozing..."
                         />
                         <div className="flex items-center justify-between pt-2 gap-2 flex-wrap">
-                          {currentUserId && warningsByUser[currentUserId]?.[warningTarget - 1] && (
-                            <Button
-                              variant="destructive"
-                              onClick={async () => {
-                                if (!currentUserId) return;
-                                const next = [...(warningsByUser[currentUserId] || [])];
-                                next[warningTarget - 1] = "";
-                                const ok = await updateWarnings(currentUserId, next);
-                                if (ok) {
-                                  setWarningsByUser((prev) => ({ ...prev, [currentUserId]: next }));
-                                  setWarningModalOpen(false);
-                                  setWarningReason("");
-                                } else {
-                                  alert("Ogohlantirishni bekor qilishda xatolik");
-                                }
-                              }}
-                            >
-                              Ogohlantirishni bekor qilish
-                            </Button>
-                          )}
+                          {currentUserId &&
+                            warningsByUser[currentUserId]?.[
+                              warningTarget - 1
+                            ] && (
+                              <Button
+                                variant="destructive"
+                                onClick={async () => {
+                                  if (!currentUserId) return;
+                                  const next = [
+                                    ...(warningsByUser[currentUserId] || []),
+                                  ];
+                                  next[warningTarget - 1] = "";
+                                  const ok = await updateWarnings(
+                                    currentUserId,
+                                    next,
+                                  );
+                                  if (ok) {
+                                    setWarningsByUser((prev) => ({
+                                      ...prev,
+                                      [currentUserId]: next,
+                                    }));
+                                    setWarningModalOpen(false);
+                                    setWarningReason("");
+                                  } else {
+                                    alert(
+                                      "Ogohlantirishni bekor qilishda xatolik",
+                                    );
+                                  }
+                                }}
+                              >
+                                Ogohlantirishni bekor qilish
+                              </Button>
+                            )}
                           <div className="ml-auto flex gap-2">
-                            <Button variant="outline" onClick={() => setWarningModalOpen(false)}>Yopish</Button>
+                            <Button
+                              variant="outline"
+                              onClick={() => setWarningModalOpen(false)}
+                            >
+                              Yopish
+                            </Button>
                             <Button
                               onClick={async () => {
                                 if (!selectedUser?.id) return;
-                                const next = [...(warningsByUser[selectedUser.id] || [])];
-                                next[warningTarget - 1] = (warningReason || "").trim();
-                                const ok = await updateWarnings(selectedUser.id, next);
+                                const next = [
+                                  ...(warningsByUser[selectedUser.id] || []),
+                                ];
+                                next[warningTarget - 1] = (
+                                  warningReason || ""
+                                ).trim();
+                                const ok = await updateWarnings(
+                                  selectedUser.id,
+                                  next,
+                                );
                                 if (ok) {
-                                  setWarningsByUser((prev) => ({ ...prev, [selectedUser.id]: next }));
+                                  setWarningsByUser((prev) => ({
+                                    ...prev,
+                                    [selectedUser.id]: next,
+                                  }));
                                   setWarningModalOpen(false);
                                   setWarningReason("");
                                 } else {
@@ -5497,7 +6076,6 @@ function ProxOffline() {
           </div>
 
           {/* Weekly Chart Section - REMOVED AS PER REQUEST */}
-
         </div>
       )}
     </div>
@@ -5571,10 +6149,11 @@ function CoursesPreview({ onShowAll, setActiveTab, navigate, setSkipScroll }) {
             onClick={() => navigate(`/courses/${course.id}`)}
           >
             <div
-              className={`rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 border-2 border-gray-600 ${course.imageUrl
-                ? "bg-gradient-to-br from-slate-700 to-slate-900"
-                : "bg-slate-800"
-                }`}
+              className={`rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 border-2 border-gray-600 ${
+                course.imageUrl
+                  ? "bg-gradient-to-br from-slate-700 to-slate-900"
+                  : "bg-slate-800"
+              }`}
             >
               {course.imageUrl ? (
                 <img
@@ -5710,6 +6289,10 @@ export default function Index() {
         setActiveTab("proX offline");
         setActiveProject("");
         break;
+      case "debtors":
+        setActiveTab("Qarzdorlar");
+        setActiveProject("");
+        break;
       default:
         break;
     }
@@ -5719,7 +6302,7 @@ export default function Index() {
     try {
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
-    } catch { }
+    } catch {}
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   };
 
@@ -5732,6 +6315,7 @@ export default function Index() {
     else if (title === "Kurslar") navigate("/courses");
     else if (title === "Kurslarim") navigate("/my-courses");
     else if (title === "Loyihalarimiz") navigate("/projects");
+    else if (title === "Qarzdorlar") navigate("/debtors");
   };
 
   const handleProjectMenuClick = (project) => {
@@ -5785,10 +6369,11 @@ export default function Index() {
                   {menuItems.map((item) => (
                     <button
                       key={item.title}
-                      className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${activeTab === item.title && !activeProject
-                        ? "bg-gradient-to-r from-slate-800 to-cyan-900 text-white"
-                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                        }`}
+                      className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
+                        activeTab === item.title && !activeProject
+                          ? "bg-gradient-to-r from-slate-800 to-cyan-900 text-white"
+                          : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                      }`}
                       onClick={() => handleSidebarMenuClick(item.title)}
                     >
                       <item.icon className="w-4 h-4" />
@@ -5816,10 +6401,11 @@ export default function Index() {
                     {userMenuItems.map((item) => (
                       <button
                         key={item.title}
-                        className={`w-full flex items-start gap-2 px-3 py-2 rounded-lg transition-all duration-200 justify-start ${activeTab === item.title && !activeProject
-                          ? "bg-gradient-to-r from-slate-800 to-cyan-900 text-white"
-                          : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                          }`}
+                        className={`w-full flex items-start gap-2 px-3 py-2 rounded-lg transition-all duration-200 justify-start ${
+                          activeTab === item.title && !activeProject
+                            ? "bg-gradient-to-r from-slate-800 to-cyan-900 text-white"
+                            : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                        }`}
                         onClick={() => handleSidebarMenuClick(item.title)}
                       >
                         <item.icon className="w-4 h-4" />
@@ -5842,10 +6428,11 @@ export default function Index() {
                 </div>
                 <div className="space-y-1">
                   <button
-                    className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${activeProject === "Blogs"
-                      ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
-                      : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                      }`}
+                    className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
+                      activeProject === "Blogs"
+                        ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
+                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                    }`}
                     onClick={() => handleProjectMenuClick("Blogs")}
                   >
                     <User className="w-4 h-4" />
@@ -5854,10 +6441,11 @@ export default function Index() {
                     </span>
                   </button>
                   <button
-                    className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${activeProject === "Resume Builder"
-                      ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
-                      : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                      }`}
+                    className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
+                      activeProject === "Resume Builder"
+                        ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
+                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                    }`}
                     onClick={() => handleProjectMenuClick("Resume Builder")}
                   >
                     <Settings className="w-4 h-4" />
@@ -5867,10 +6455,11 @@ export default function Index() {
                   </button>
                   {isLoggedIn && (
                     <button
-                      className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${activeProject === "Payments"
-                        ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
-                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                        }`}
+                      className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
+                        activeProject === "Payments"
+                          ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
+                          : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                      }`}
                       onClick={() => handleProjectMenuClick("Payments")}
                     >
                       <CreditCard className="w-4 h-4" />
@@ -5914,26 +6503,26 @@ export default function Index() {
 
         <SidebarInset id="main-scroll" className="flex-1 overflow-y-auto">
           <div className="p-4 sm:p-6 lg:p-8 md:pt-4 pt-20 pb-16">
-            {isLoading && location.pathname !== '/offline' && (
+            {isLoading && location.pathname !== "/offline" && (
               <div className="flex items-center justify-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
               </div>
             )}
-            {!isLoading && location.pathname === '/' && (
+            {!isLoading && location.pathname === "/" && (
               <HomeContent
                 setActiveTab={setActiveTab}
                 onProxOfflineClick={handleProxOfflineClick}
                 setSkipScroll={setSkipScroll}
               />
             )}
-            {!isLoading && location.pathname === '/home' && (
+            {!isLoading && location.pathname === "/home" && (
               <HomeContent
                 setActiveTab={setActiveTab}
                 onProxOfflineClick={handleProxOfflineClick}
                 setSkipScroll={setSkipScroll}
               />
             )}
-            {!isLoading && location.pathname === '/courses' && (
+            {!isLoading && location.pathname === "/courses" && (
               <CoursesList
                 setActiveTab={setActiveTab}
                 setActiveProject={setActiveProject}
@@ -5941,30 +6530,33 @@ export default function Index() {
                 setSkipScroll={setSkipScroll}
               />
             )}
-            {!isLoading && location.pathname === '/my-courses' && (
+            {!isLoading && location.pathname === "/my-courses" && (
               <MyCoursesContent navigate={navigate} />
             )}
             {/* ProxOffline handled in single routing block below to prevent duplicate loader */}
-            {!isLoading && activeTab === "Kurslarim" && location.pathname !== '/my-courses' && (
-              <MyCoursesContent navigate={navigate} />
-            )}
+            {!isLoading &&
+              activeTab === "Kurslarim" &&
+              location.pathname !== "/my-courses" && (
+                <MyCoursesContent navigate={navigate} />
+              )}
             {activeTab === "Loyihalarimiz" && !activeProject && (
               <ProjectsList />
             )}
+            {activeTab === "Loyihalarimiz" && activeProject === "Blogs" && (
+              <ProfileContent
+                setIsLoggedIn={setIsLoggedIn}
+                setActiveTab={setActiveTab}
+                setActiveProject={setActiveProject}
+                navigate={navigate}
+              />
+            )}
             {activeTab === "Loyihalarimiz" &&
-              activeProject === "Blogs" && (
-                <ProfileContent
-                  setIsLoggedIn={setIsLoggedIn}
-                  setActiveTab={setActiveTab}
-                  setActiveProject={setActiveProject}
-                  navigate={navigate}
-                />
-              )}
-{activeTab === "Loyihalarimiz" &&
               activeProject === "Resume Builder" && <SecurityContent />}
-            {activeTab === "Loyihalarimiz" &&
-              activeProject === "Payments" && <PaymentsContent />}
+            {activeTab === "Loyihalarimiz" && activeProject === "Payments" && (
+              <PaymentsContent />
+            )}
             {!isLoading && activeTab === "proX offline" && <ProxOffline />}
+            {!isLoading && location.pathname === "/debtors" && <Debtors />}
           </div>
         </SidebarInset>
       </div>
@@ -5987,7 +6579,7 @@ function AdminContactCard() {
       const sessionDismissed =
         sessionStorage.getItem("adminContactDismissedSession") === "1";
       if (sessionDismissed) setDismissed(true);
-    } catch { }
+    } catch {}
   }, []);
 
   useEffect(() => {
