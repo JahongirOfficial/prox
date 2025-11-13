@@ -152,10 +152,7 @@ function Index() {
         setActiveTab('Bosh sahifa');
         setActiveProject('');
         break;
-      case 'courses':
-        setActiveTab('Kurslar');
-        setActiveProject('');
-        break;
+      
       case 'projects':
         setActiveTab('O\'quvchilar loyihalari');
         if (sub === 'blogs') setActiveProject('Blogs');
@@ -163,10 +160,7 @@ function Index() {
         else if (sub === 'payments') setActiveProject('Payments');
         else setActiveProject('');
         break;
-      case 'my-courses':
-        setActiveTab('Kurslarim');
-        setActiveProject('');
-        break;
+      
       case 'offline':
         setActiveTab('proX offline');
         setActiveProject('');
@@ -182,9 +176,7 @@ function Index() {
     scrollToTop();
 
     if (title === 'Bosh sahifa') navigate('/home');
-    else if (title === 'Kurslar') navigate('/courses');
     else if (title === 'O\'quvchilar loyihalari') navigate('/projects');
-    else if (title === 'Kurslarim') navigate('/my-courses');
   };
 
   const handleProjectMenuClick = (project) => {
@@ -232,7 +224,7 @@ function Index() {
               <HomeContent onProxOfflineClick={handleProxOfflineClick} />
             )}
 
-            {!isLoading && location.pathname === '/courses' && <CoursesContent />}
+            
 
             {!isLoading && location.pathname === '/offline' && <ProxOffline />}
           </div>

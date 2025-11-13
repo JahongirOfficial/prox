@@ -152,6 +152,7 @@ export function createServer() {
         },
         warnings: { type: [String], default: [] },
         certificates: { type: [String], default: [] },
+        blocked: { type: Boolean, default: false },
       }),
     );
 
@@ -181,6 +182,10 @@ export function createServer() {
         }
         if ((user as any).certificates === undefined) {
           (user as any).certificates = [];
+          updated = true;
+        }
+        if ((user as any).blocked === undefined) {
+          (user as any).blocked = false;
           updated = true;
         }
         if (updated) {
@@ -912,24 +917,25 @@ export function createServer() {
               formattedArrival = arrival;
             }
           }
-          return {
-            id: user._id,
-            fullName: user.fullName,
-            phone: user.phone,
-            role: user.role,
-            balance: user.balance,
-            enrolledCourses: user.enrolledCourses,
-            completedCourses: user.completedCourses || [],
-            createdAt: user.createdAt,
-            step: user.step ?? 1,
-            attendanceDays: (user as any).attendanceDays ?? [],
-            todayScores: Array.isArray((user as any).todayScores)
-              ? (user as any).todayScores
-              : [],
-            arrivalDate: formattedArrival,
-            warnings: (user as any).warnings ?? [],
-            certificates: (user as any).certificates ?? [],
-          };
+      return {
+        id: user._id,
+        fullName: user.fullName,
+        phone: user.phone,
+        role: user.role,
+        balance: user.balance,
+        enrolledCourses: user.enrolledCourses,
+        completedCourses: user.completedCourses || [],
+        createdAt: user.createdAt,
+        step: user.step ?? 1,
+        attendanceDays: (user as any).attendanceDays ?? [],
+        todayScores: Array.isArray((user as any).todayScores)
+          ? (user as any).todayScores
+          : [],
+        arrivalDate: formattedArrival,
+        warnings: (user as any).warnings ?? [],
+        certificates: (user as any).certificates ?? [],
+        blocked: (user as any).blocked ?? false,
+      };
         }),
       });
     } catch (error) {
@@ -1021,6 +1027,7 @@ export function createServer() {
           // include warnings and certificates so clients can sync UI state
           warnings: (user as any).warnings ?? [],
           certificates: (user as any).certificates ?? [],
+          blocked: (user as any).blocked ?? false,
         })),
       });
     } catch (error) {
@@ -1048,6 +1055,7 @@ export function createServer() {
         totalScore,
         warnings,
         certificates,
+        blocked,
       } = req.body;
 
       const user = await User.findById(id);
@@ -1092,6 +1100,10 @@ export function createServer() {
         (user as any).certificates = certificates
           .map((c: any) => String(c || ""))
           .filter((c: string) => c.length > 0);
+      }
+
+      if (typeof blocked === "boolean") {
+        (user as any).blocked = !!blocked;
       }
 
       // Merge provided weekScores (array of {date, score, note}) into todayScores
@@ -1178,6 +1190,7 @@ export function createServer() {
           attendanceDays: (user as any).attendanceDays ?? [],
           arrivalDate: (user as any).arrivalDate ?? "",
           warnings: (user as any).warnings ?? [],
+          blocked: (user as any).blocked ?? false,
         },
       });
     } catch (error) {
@@ -1189,7 +1202,7 @@ export function createServer() {
   app.put("/api/admin/users/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const { fullName, phone, password, role, balance, step } = req.body;
+      const { fullName, phone, password, role, balance, step, blocked } = req.body;
 
       let formattedPhone = phone.replace(/\s/g, "");
       if (!formattedPhone.startsWith("+998")) {
@@ -1212,6 +1225,10 @@ export function createServer() {
       if (balance !== undefined) user.balance = balance;
       if (step !== undefined) user.step = step;
 
+      if (typeof blocked === "boolean") {
+        (user as any).blocked = !!blocked;
+      }
+
       await user.save();
 
       res.json({
@@ -1228,6 +1245,7 @@ export function createServer() {
           createdAt: user.createdAt,
           step: user.step ?? 1,
           todayScores: user.todayScores ?? {},
+          blocked: (user as any).blocked ?? false,
         },
       });
     } catch (error) {
@@ -1293,6 +1311,7 @@ export function createServer() {
           arrivalDate: (user as any).arrivalDate ?? "",
           warnings: (user as any).warnings ?? [],
           certificates: (user as any).certificates ?? [],
+          blocked: (user as any).blocked ?? false,
         },
       });
     } catch (error) {
@@ -3737,6 +3756,7 @@ export function createServer() {
           attendanceDays: user.attendanceDays ?? [],
           todayScores: user.todayScores ?? {},
           arrivalDate: formatDateForIOS(user.arrivalDate), // iOS Safari uchun optimizatsiya qilingan
+          blocked: (user as any).blocked ?? false,
         })),
       });
     } catch (error) {

@@ -1,22 +1,38 @@
-import React from 'react';
-import { useSidebar } from './Sidebar';
-import { Menu, X, Home, BookOpen, Users, Settings, User, CreditCard } from 'lucide-react';
+import {
+  BookOpen,
+  CreditCard,
+  Home,
+  Menu,
+  Settings,
+  User,
+  Users,
+  X,
+} from "lucide-react";
+import { useSidebar } from "./Sidebar";
 
 export function MobileNavbar() {
-  const { isOpen, setIsOpen, activeTab, setActiveTab, activeProject, setActiveProject, isLoggedIn } = useSidebar();
+  const {
+    isOpen,
+    setIsOpen,
+    activeTab,
+    setActiveTab,
+    activeProject,
+    setActiveProject,
+    isLoggedIn,
+  } = useSidebar();
 
   const handleMenuClick = (tab) => {
     setActiveTab(tab);
-    setActiveProject('');
+    setActiveProject("");
     setIsOpen(false);
-    console.log('Menu clicked:', tab);
+    console.log("Menu clicked:", tab);
   };
 
   const handleProjectClick = (project) => {
-    setActiveTab('O\'quvchilar loyihalari');
+    setActiveTab("O'quvchilar loyihalari");
     setActiveProject(project);
     setIsOpen(false);
-    console.log('Project clicked:', project);
+    console.log("Project clicked:", project);
   };
 
   return (
@@ -43,29 +59,33 @@ export function MobileNavbar() {
       )}
 
       {/* Mobile Sidebar */}
-      <div className={`md:hidden fixed top-0 left-0 h-full w-64 bg-slate-900 border-r border-slate-700 z-50 transform transition-transform duration-300 ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <div
+        className={`md:hidden fixed top-0 left-0 h-full w-64 bg-slate-900 border-r border-slate-700 z-50 transform transition-transform duration-300 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <div className="pt-16 p-4 h-full overflow-y-auto">
           <div className="space-y-6">
             {/* MENU Section */}
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-1 h-3 bg-cyan-400 rounded-full"></div>
-                <h3 className="text-white font-semibold text-xs uppercase tracking-wider">MENU</h3>
+                <h3 className="text-white font-semibold text-xs uppercase tracking-wider">
+                  MENU
+                </h3>
               </div>
               <div className="space-y-1">
                 {[
-                  { title: 'Bosh sahifa', icon: Home },
-                  { title: 'Kurslar', icon: BookOpen },
-                  { title: 'O\'quvchilar loyihalari', icon: Users },
+                  { title: "Bosh sahifa", icon: Home },
+                  { title: "Kurslar", icon: BookOpen },
+                  { title: "O'quvchilar loyihalari", icon: Users },
                 ].map((item) => (
                   <button
                     key={item.title}
                     className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
                       activeTab === item.title && !activeProject
-                        ? 'bg-gradient-to-r from-slate-800 to-cyan-900 text-white'
-                        : 'text-gray-300 hover:bg-slate-800 hover:text-white'
+                        ? "bg-gradient-to-r from-slate-800 to-cyan-900 text-white"
+                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
                     }`}
                     onClick={() => {
                       handleMenuClick(item.title);
@@ -84,17 +104,19 @@ export function MobileNavbar() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-1 h-3 bg-cyan-400 rounded-full"></div>
-                  <h3 className="text-white font-semibold text-xs uppercase tracking-wider">Mening kurslarim</h3>
+                  <h3 className="text-white font-semibold text-xs uppercase tracking-wider">
+                    Mening kurslarim
+                  </h3>
                 </div>
                 <div className="space-y-1">
                   <button
                     className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
-                      activeTab === 'Kurslarim'
-                        ? 'bg-gradient-to-r from-slate-800 to-cyan-900 text-white'
-                        : 'text-gray-300 hover:bg-slate-800 hover:text-white'
+                      activeTab === "Kurslarim"
+                        ? "bg-gradient-to-r from-slate-800 to-cyan-900 text-white"
+                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
                     }`}
                     onClick={() => {
-                      handleMenuClick('Kurslarim');
+                      handleMenuClick("Kurslarim");
                       setIsOpen(false);
                     }}
                   >
@@ -109,17 +131,19 @@ export function MobileNavbar() {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-1 h-3 bg-purple-400 rounded-full"></div>
-                <h3 className="text-white font-semibold text-xs uppercase tracking-wider">ADMIN PANEL</h3>
+                <h3 className="text-white font-semibold text-xs uppercase tracking-wider">
+                  ADMIN PANEL
+                </h3>
               </div>
               <div className="space-y-1">
                 <button
                   className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
-                    activeProject === 'Blogs'
-                      ? 'bg-gradient-to-r from-slate-800 to-purple-900 text-white'
-                      : 'text-gray-300 hover:bg-slate-800 hover:text-white'
+                    activeProject === "Blogs"
+                      ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
+                      : "text-gray-300 hover:bg-slate-800 hover:text-white"
                   }`}
                   onClick={() => {
-                    handleProjectClick('Blogs');
+                    handleProjectClick("Blogs");
                     setIsOpen(false);
                   }}
                 >
@@ -128,12 +152,12 @@ export function MobileNavbar() {
                 </button>
                 <button
                   className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
-                    activeProject === 'Resume Builder'
-                      ? 'bg-gradient-to-r from-slate-800 to-purple-900 text-white'
-                      : 'text-gray-300 hover:bg-slate-800 hover:text-white'
+                    activeProject === "Resume Builder"
+                      ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
+                      : "text-gray-300 hover:bg-slate-800 hover:text-white"
                   }`}
                   onClick={() => {
-                    handleProjectClick('Resume Builder');
+                    handleProjectClick("Resume Builder");
                     setIsOpen(false);
                   }}
                 >
@@ -143,12 +167,12 @@ export function MobileNavbar() {
                 {isLoggedIn && (
                   <button
                     className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 justify-start ${
-                      activeProject === 'Payments'
-                        ? 'bg-gradient-to-r from-slate-800 to-purple-900 text-white'
-                        : 'text-gray-300 hover:bg-slate-800 hover:text-white'
+                      activeProject === "Payments"
+                        ? "bg-gradient-to-r from-slate-800 to-purple-900 text-white"
+                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
                     }`}
                     onClick={() => {
-                      handleProjectClick('Payments');
+                      handleProjectClick("Payments");
                       setIsOpen(false);
                     }}
                   >

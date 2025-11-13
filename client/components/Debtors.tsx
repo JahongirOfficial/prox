@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-import { TrendingUp, Users } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { TrendingUp, Users, AlertTriangle, ChevronLeft } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -191,6 +192,27 @@ export default function Debtors() {
       return 0
     }
   })()
+
+  if (selectedUser && (selectedUser as any).blocked) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-700/80 backdrop-blur-sm">
+        <div className="max-w-2xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center justify-center mb-6 text-white">
+            <AlertTriangle className="w-10 h-10 mr-3" />
+            <span className="text-2xl sm:text-3xl font-bold">To'lov to'lamaganingiz sababli kira olmaysiz!</span>
+          </div>
+          <p className="text-white/90 text-lg sm:text-xl mb-8">To'lovni to'laganingizdan keyin kirishingiz mumkin.</p>
+          <Button
+            variant="outline"
+            onClick={() => setSelectedUser(null)}
+            className="bg-white/10 text-white border-white/40 hover:bg-white/20"
+          >
+            <ChevronLeft className="w-5 h-5 mr-2" /> Orqaga
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   if (selectedUser) {
     return (

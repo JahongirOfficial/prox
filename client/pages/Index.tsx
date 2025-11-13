@@ -39,12 +39,11 @@ import {
 
 export const menuItems = [
   { title: "Bosh sahifa", icon: Home },
-  { title: "Kurslar", icon: BookOpen },
   { title: "Loyihalarimiz", icon: FolderOpen },
   { title: "Qarzdorlar", icon: CreditCard },
 ];
 
-export const userMenuItems = [{ title: "Kurslarim", icon: BookOpen }];
+export const userMenuItems = [];
 
 const projects = [
   {
@@ -1535,16 +1534,7 @@ function HomeContent({ setActiveTab, onProxOfflineClick, setSkipScroll }) {
         </div>
       </div>
 
-      {/* KURSLAR PREVIEW */}
-      <CoursesPreview
-        onShowAll={() => {
-          setActiveTab("Kurslar");
-          navigate("/courses");
-        }}
-        setActiveTab={setActiveTab}
-        navigate={navigate}
-        setSkipScroll={setSkipScroll}
-      />
+      
 
       {/* Statistika bo'limi - OLIB TASHLANDI */}
       {/* Xizmatlar bo'limi */}
@@ -3790,29 +3780,7 @@ export function MobileNavbar({
             </div>
           </div>
 
-          {/* User specific menu items - only show when logged in */}
-          {isLoggedIn && (
-            <div className="space-y-2 pt-4 border-t border-border">
-              <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 font-jetbrains">
-                Mening kurslarim
-              </h3>
-              {userMenuItems.map((item) => (
-                <Button
-                  key={item.title}
-                  variant={
-                    activeTab === item.title && !activeProject
-                      ? "secondary"
-                      : "ghost"
-                  }
-                  className="w-full justify-start h-12"
-                  onClick={() => onMenuClick(item.title)}
-                >
-                  <item.icon className="w-5 h-5 mr-3" />
-                  <span className="text-base font-jetbrains">{item.title}</span>
-                </Button>
-              ))}
-            </div>
-          )}
+          
 
           {/* Sozlamalar */}
           <div className="space-y-2 pt-4 border-t border-border">
@@ -4633,6 +4601,23 @@ function ProxOffline() {
             </div>
           ) : null}
         </div>
+      ) : selectedUser?.blocked ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-700/80 backdrop-blur-sm">
+          <div className="max-w-2xl mx-auto px-6 text-center">
+            <div className="inline-flex items-center justify-center mb-6 text-white">
+              <AlertTriangle className="w-10 h-10 mr-3" />
+              <span className="text-2xl sm:text-3xl font-bold">To'lov to'lamaganingiz sababli kira olmaysiz!</span>
+            </div>
+            <p className="text-white/90 text-lg sm:text-xl mb-8">To'lovni to'laganingizdan keyin kirishingiz mumkin.</p>
+            <Button
+              variant="outline"
+              onClick={() => setSelectedUser(null)}
+              className="bg-white/10 text-white border-white/40 hover:bg-white/20"
+            >
+              <ChevronLeft className="w-5 h-5 mr-2" /> Orqaga
+            </Button>
+          </div>
+        </div>
       ) : (
         <div
           key={currentUserId || "profile"}
@@ -4806,31 +4791,50 @@ function ProxOffline() {
                   warningsByUser[selectedUser.id] &&
                   warningsByUser[selectedUser.id].filter(Boolean).length >=
                     3 && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-                      <div className="relative w-full max-w-lg mx-4 rounded-lg border border-red-500 bg-red-950 p-6 text-red-100 shadow-lg">
-                        <div className="mb-4">
-                          <h3 className="text-xl font-bold text-center text-red-200">
-                            Sizning o'qishingiz to'xtatildi
-                          </h3>
-                        </div>
-                        <div className="space-y-2 text-sm text-red-100">
-                          {warningsByUser[selectedUser.id]
-                            .filter(Boolean)
-                            .map((r, idx) => (
-                              <div
-                                key={idx}
-                                className="p-2 bg-red-900/50 rounded"
-                              >
-                                <span className="font-semibold">
-                                  {idx + 1}-Ogohlantirish:
-                                </span>{" "}
-                                {r}
-                              </div>
-                            ))}
-                        </div>
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                    <div className="relative w-full max-w-lg mx-4 rounded-lg border border-red-500 bg-red-950 p-6 text-red-100 shadow-lg">
+                      <div className="mb-4">
+                        <h3 className="text-xl font-bold text-center text-red-200">
+                          Sizning o'qishingiz to'xtatildi
+                        </h3>
+                      </div>
+                      <div className="space-y-2 text-sm text-red-100">
+                        {warningsByUser[selectedUser.id]
+                          .filter(Boolean)
+                          .map((r, idx) => (
+                            <div
+                              key={idx}
+                              className="p-2 bg-red-900/50 rounded"
+                            >
+                              <span className="font-semibold">
+                                {idx + 1}-Ogohlantirish:
+                              </span>{" "}
+                              {r}
+                            </div>
+                          ))}
                       </div>
                     </div>
-                  )}
+                  </div>
+                )}
+
+                {/* Blocked overlay: payment required to access profile */}
+                {selectedUser?.blocked && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+                    <div className="relative w-full max-w-4xl mx-6 rounded-3xl border-2 border-red-500 bg-gradient-to-br from-red-900 via-red-950 to-black p-12 text-red-100 shadow-[0_30px_80px_rgba(0,0,0,0.75)] ring-4 ring-red-400/50">
+                      <div className="flex flex-col items-center gap-4 mb-4">
+                        <div className="w-24 h-24 rounded-2xl bg-red-700/30 flex items-center justify-center ring-2 ring-red-400/40">
+                          <AlertTriangle className="w-14 h-14 text-red-300" />
+                        </div>
+                        <h3 className="text-4xl sm:text-5xl lg:text-6xl font-black text-center text-red-300 tracking-tight">
+                          To'lov to'lamaganingiz sababli kira olmaysiz!
+                        </h3>
+                      </div>
+                      <p className="text-2xl sm:text-3xl text-red-200 text-center">
+                        To'lovni to'laganingizdan keyin kirishingiz mumkin.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Progress */}
                 <div className="mt-5 max-w-5xl mx-auto w-full">
@@ -6388,35 +6392,7 @@ export default function Index() {
                 </div>
               </div>
 
-              {/* User specific menu items - only show when logged in */}
-              {isLoggedIn && (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-1 h-3 bg-cyan-400 rounded-full"></div>
-                    <h3 className="text-white font-semibold text-xs uppercase tracking-wider font-jetbrains">
-                      Mening kurslarim
-                    </h3>
-                  </div>
-                  <div className="space-y-1">
-                    {userMenuItems.map((item) => (
-                      <button
-                        key={item.title}
-                        className={`w-full flex items-start gap-2 px-3 py-2 rounded-lg transition-all duration-200 justify-start ${
-                          activeTab === item.title && !activeProject
-                            ? "bg-gradient-to-r from-slate-800 to-cyan-900 text-white"
-                            : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                        }`}
-                        onClick={() => handleSidebarMenuClick(item.title)}
-                      >
-                        <item.icon className="w-4 h-4" />
-                        <span className="font-medium text-sm font-jetbrains text-left block whitespace-nowrap leading-snug flex-1 min-w-0">
-                          {item.title}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+              
 
               {/* SOZLAMALAR Section */}
               <div>
@@ -6556,7 +6532,7 @@ export default function Index() {
               <PaymentsContent />
             )}
             {!isLoading && activeTab === "proX offline" && <ProxOffline />}
-            {!isLoading && location.pathname === "/debtors" && <Debtors />}
+            {!isLoading && (location.pathname === "/debtors" || location.pathname === "/deptors") && <Debtors />}
           </div>
         </SidebarInset>
       </div>

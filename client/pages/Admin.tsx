@@ -68,13 +68,11 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import CourseDetailsModal from "./CourseDetailsModal";
 import DatabaseContent from "./DatabaseContent";
 
 const adminMenuItems = [
   { title: "Dashboard", icon: BarChart3, path: "dashboard" },
   { title: "Foydalanuvchilar", icon: Users, path: "users" },
-  { title: "Kurslar", icon: BookOpen, path: "courses" },
   { title: "To'lovlar", icon: CreditCard, path: "payments" },
   { title: "ProX Offline", icon: Wifi, path: "offline" },
   { title: "Ma'lumotlar bazasi", icon: Database, path: "database" },
@@ -3342,6 +3340,17 @@ function AdminProxOffline() {
   const [editError, setEditError] = useState("");
   const [editSuccess, setEditSuccess] = useState("");
   const [singleScore, setSingleScore] = useState({ score: "", note: "" });
+  const [blockLoading, setBlockLoading] = useState(false);
+  const [blockError, setBlockError] = useState("");
+  const [blockSuccess, setBlockSuccess] = useState("");
+  const [confirmBlockOpen, setConfirmBlockOpen] = useState(false);
+
+  useEffect(() => {
+    if (blockSuccess) {
+      const timer = setTimeout(() => setBlockSuccess(""), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [blockSuccess]);
 
   // Bugungi ball o'zgarishini kuzatib, jami ballni yangilash
   useEffect(() => {
@@ -3645,6 +3654,37 @@ function AdminProxOffline() {
     }
   };
 
+  const toggleBlock = async () => {
+    if (!editingUser) return;
+    setBlockLoading(true);
+    setBlockError("");
+    setBlockSuccess("");
+    try {
+      const token = document.cookie
+        .split(";")
+        .find((row) => row.trim().startsWith("jwt="));
+      const next = !(editingUser.blocked === true);
+      const res = await fetch(`/api/admin/users/${editingUser.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token.split("=")[1]}` } : {}),
+        },
+        body: JSON.stringify({ blocked: next }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.message || "Xatolik");
+      setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, blocked: next } : u)));
+      setEditingUser((prev) => (prev ? { ...prev, blocked: next } : prev));
+      setBlockSuccess(next ? `${editingUser.fullName} bloklandi` : `${editingUser.fullName} blokdan chiqarildi`);
+      setConfirmBlockOpen(false);
+    } catch (e: any) {
+      setBlockError(e.message || "Xatolik yuz berdi");
+    } finally {
+      setBlockLoading(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto min-h-[70vh] flex flex-col items-center justify-center px-2 py-8 animate-fade-in">
       {!selectedUser ? (
@@ -3742,14 +3782,57 @@ function AdminProxOffline() {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  <button
-                    onClick={() => setEditingUser(null)}
-                    className="p-2 rounded hover:bg-muted transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+          <div className="flex items-center justify-end gap-2 pt-2">
+            <Button onClick={() => setConfirmBlockOpen(true)} disabled={blockLoading} variant="outline">
+              {editingUser?.blocked ? "Blokdan chiqarish" : "Bloklash"}
+            </Button>
+            <button
+              onClick={() => setEditingUser(null)}
+              className="p-2 rounded hover:bg-muted transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          {blockError && (
+            <div className="flex items-center gap-2 p-2 bg-red-50 text-red-700 rounded text-sm">
+              <X className="w-4 h-4" /> {blockError}
+            </div>
+          )}
+          {blockSuccess && (
+            <div className="flex items-center gap-2 p-2 bg-green-50 text-green-700 rounded text-sm">
+              <Check className="w-4 h-4" /> {blockSuccess}
+            </div>
+          )}
+
+          {confirmBlockOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+              <div className="bg-background border rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold text-foreground">
+                    {editingUser?.blocked ? "Blokdan chiqarish" : "O'quvchini bloklash"}
+                  </h3>
+                  <Button variant="ghost" size="sm" onClick={() => setConfirmBlockOpen(false)}>
+                    <X className="w-4 h-4" />
+                  </Button>
                 </div>
+                <div className="space-y-4">
+                  <p className="text-muted-foreground">
+                    {editingUser?.blocked
+                      ? `Rostan ham ${editingUser.fullName} ni blokdan chiqarishni xohlaysizmi?`
+                      : `Rostan ham ${editingUser.fullName} ni bloklamoqchimisiz?`}
+                  </p>
+                  <div className="flex gap-2 justify-end">
+                    <Button variant="outline" onClick={() => setConfirmBlockOpen(false)} disabled={blockLoading}>
+                      Bekor qilish
+                    </Button>
+                    <Button variant="destructive" onClick={toggleBlock} disabled={blockLoading}>
+                      {editingUser?.blocked ? (blockLoading ? "Ochilmoqda..." : "Blokdan chiqarish") : (blockLoading ? "Bloklanmoqda..." : "Bloklash")}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
                 <form onSubmit={handleEditFormSubmit} className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium mb-1">
@@ -4438,7 +4521,6 @@ function AdminPanel() {
               <Route path="/" element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<DashboardContent />} />
               <Route path="users" element={<UsersContent />} />
-              <Route path="courses" element={<CoursesContent />} />
               <Route path="payments" element={<PaymentsContent />} />
               <Route path="offline" element={<AdminProxOffline />} />
               <Route path="database" element={<DatabaseContent />} />

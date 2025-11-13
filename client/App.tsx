@@ -80,12 +80,12 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/home" element={<Index />} />
-            <Route path="/courses" element={<Index />} />
-            <Route path="/my-courses" element={<Index />} />
+            
             <Route path="/projects" element={<Index />} />
             <Route path="/projects/:sub" element={<Index />} />
             <Route path="/offline" element={<Index />} />
             <Route path="/debtors" element={<Index />} />
+            <Route path="/deptors" element={<Index />} />
             {/* Wrap details page with layout to show sidebar + top navbar */}
             <Route element={<AppLayout />}>
               <Route path="courses/:courseId" element={<CourseDetails />} />
