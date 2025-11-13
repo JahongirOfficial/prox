@@ -199,6 +199,18 @@ export function createServer() {
     // migrateUsers(); // Faqat bir marta ishga tushiring!
   }
 
+  app.get("/api/health", async (_req, res) => {
+    try {
+      let userCount: number | null = null;
+      try {
+        userCount = await User.countDocuments({});
+      } catch {}
+      return res.json({ ok: true, mongoConnected: isMongoConnected, userCount });
+    } catch {
+      return res.json({ ok: true, mongoConnected: isMongoConnected });
+    }
+  });
+
   // Payment Schema - Check if model already exists
   let Payment;
   try {
@@ -1152,7 +1164,7 @@ export function createServer() {
             "iyun",
             "iyul",
             "avgust",
-            "sentabr",
+            "sentyabr",
             "oktabr",
             "noyabr",
             "dekabr",
@@ -1190,61 +1202,6 @@ export function createServer() {
           attendanceDays: (user as any).attendanceDays ?? [],
           arrivalDate: (user as any).arrivalDate ?? "",
           warnings: (user as any).warnings ?? [],
-          blocked: (user as any).blocked ?? false,
-        },
-      });
-    } catch (error) {
-      res.status(500).json({ success: false, message: "Server xatosi" });
-    }
-  });
-
-  // Admin: Update user
-  app.put("/api/admin/users/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { fullName, phone, password, role, balance, step, blocked } = req.body;
-
-      let formattedPhone = phone.replace(/\s/g, "");
-      if (!formattedPhone.startsWith("+998")) {
-        formattedPhone = "+998" + formattedPhone.replace(/^\+/, "");
-      }
-
-      const user = await User.findById(id);
-
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: "Foydalanuvchi topilmadi",
-        });
-      }
-
-      if (fullName) user.fullName = fullName;
-      if (formattedPhone) user.phone = formattedPhone;
-      if (password) user.password = await bcrypt.hash(password, 12);
-      if (role) user.role = role;
-      if (balance !== undefined) user.balance = balance;
-      if (step !== undefined) user.step = step;
-
-      if (typeof blocked === "boolean") {
-        (user as any).blocked = !!blocked;
-      }
-
-      await user.save();
-
-      res.json({
-        success: true,
-        message: "Foydalanuvchi ma'lumotlari yangilandi",
-        user: {
-          id: user._id,
-          fullName: user.fullName,
-          phone: user.phone,
-          role: user.role,
-          balance: user.balance,
-          enrolledCourses: user.enrolledCourses,
-          completedCourses: user.completedCourses || [],
-          createdAt: user.createdAt,
-          step: user.step ?? 1,
-          todayScores: user.todayScores ?? {},
           blocked: (user as any).blocked ?? false,
         },
       });
