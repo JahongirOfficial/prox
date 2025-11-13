@@ -605,6 +605,14 @@ export function createServer() {
         });
       }
 
+      // Check if user is blocked
+      if ((user as any).blocked === true) {
+        return res.status(403).json({
+          success: false,
+          message: "Sizning hisobingiz bloklangan. Administrator bilan bog'laning.",
+        });
+      }
+
       // Generate JWT token
       const token = jwt.sign(
         { userId: user._id, phone: user.phone, role: user.role },
@@ -657,6 +665,14 @@ export function createServer() {
         return res.status(404).json({
           success: false,
           message: "Foydalanuvchi topilmadi",
+        });
+      }
+
+      // Check if user is blocked
+      if ((user as any).blocked === true) {
+        return res.status(403).json({
+          success: false,
+          message: "Sizning hisobingiz bloklangan. Administrator bilan bog'laning.",
         });
       }
 
@@ -909,51 +925,7 @@ export function createServer() {
     }
   });
 
-  // Public: Get all offline students
-  app.get("/api/offline-students", async (req, res) => {
-    try {
-      const users = await User.find(
-        { role: "student_offline" },
-        { password: 0 },
-      ).sort({ createdAt: -1 });
-      res.json({
-        success: true,
-        users: users.map((user) => {
-          const arrival = (user as any).arrivalDate;
-          let formattedArrival = "";
-          if (arrival) {
-            // If it's a Date object, convert to ISO string
-            if (arrival instanceof Date) {
-              formattedArrival = arrival.toISOString().split("T")[0];
-            } else if (typeof arrival === "string") {
-              formattedArrival = arrival;
-            }
-          }
-      return {
-        id: user._id,
-        fullName: user.fullName,
-        phone: user.phone,
-        role: user.role,
-        balance: user.balance,
-        enrolledCourses: user.enrolledCourses,
-        completedCourses: user.completedCourses || [],
-        createdAt: user.createdAt,
-        step: user.step ?? 1,
-        attendanceDays: (user as any).attendanceDays ?? [],
-        todayScores: Array.isArray((user as any).todayScores)
-          ? (user as any).todayScores
-          : [],
-        arrivalDate: formattedArrival,
-        warnings: (user as any).warnings ?? [],
-        certificates: (user as any).certificates ?? [],
-        blocked: (user as any).blocked ?? false,
-      };
-        }),
-      });
-    } catch (error) {
-      res.status(500).json({ success: false, message: "Server xatosi" });
-    }
-  });
+  // NOTE: Duplicate endpoint removed - using iOS Safari compatible version below
 
   // Admin: Create new user
   app.post("/api/admin/users", async (req, res) => {
@@ -3717,8 +3689,12 @@ export function createServer() {
           createdAt: formatDateForIOS(user.createdAt),
           step: user.step ?? 1,
           attendanceDays: user.attendanceDays ?? [],
-          todayScores: user.todayScores ?? {},
+          todayScores: Array.isArray((user as any).todayScores)
+            ? (user as any).todayScores
+            : [],
           arrivalDate: formatDateForIOS(user.arrivalDate), // iOS Safari uchun optimizatsiya qilingan
+          warnings: (user as any).warnings ?? [],
+          certificates: (user as any).certificates ?? [],
           blocked: (user as any).blocked ?? false,
         })),
       });

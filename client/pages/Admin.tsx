@@ -69,6 +69,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import DatabaseContent from "./DatabaseContent";
+import CourseDetailsModal from "./CourseDetailsModal";
 
 const adminMenuItems = [
   { title: "Dashboard", icon: BarChart3, path: "dashboard" },
@@ -2884,7 +2885,7 @@ function PaymentsContent() {
                             payment.status === "pending"
                               ? "secondary"
                               : payment.status === "completed" ||
-                                  payment.status === "success"
+                                payment.status === "success"
                                 ? "outline"
                                 : payment.status === "rejected"
                                   ? "destructive"
@@ -2894,7 +2895,7 @@ function PaymentsContent() {
                           {payment.status === "pending"
                             ? "Kutilmoqda"
                             : payment.status === "completed" ||
-                                payment.status === "success"
+                              payment.status === "success"
                               ? "Tasdiqlangan"
                               : payment.status === "rejected"
                                 ? "Rad etilgan"
@@ -3549,9 +3550,9 @@ function AdminProxOffline() {
       ...prev,
       [name]:
         name === "balance" ||
-        name === "step" ||
-        name === "todayScore" ||
-        name === "totalScore"
+          name === "step" ||
+          name === "todayScore" ||
+          name === "totalScore"
           ? Number(value)
           : value,
     }));
@@ -3628,13 +3629,14 @@ function AdminProxOffline() {
         prev.map((u) =>
           u.id === editingUser.id
             ? {
-                ...u,
-                ...editForm,
-                todayScores: data.user?.todayScores ?? u.todayScores,
-                attendanceDays: Array.isArray(data.user?.attendanceDays)
-                  ? data.user.attendanceDays
-                  : u.attendanceDays,
-              }
+              ...u,
+              ...editForm,
+              todayScores: data.user?.todayScores ?? u.todayScores,
+              attendanceDays: Array.isArray(data.user?.attendanceDays)
+                ? data.user.attendanceDays
+                : u.attendanceDays,
+              blocked: u.blocked, // Blocked holatini saqlab qolish
+            }
             : u,
         ),
       );
@@ -3740,13 +3742,25 @@ function AdminProxOffline() {
               {filteredUsers.map((user) => (
                 <div
                   key={user.id}
-                  className={`flex items-center gap-4 p-4 border rounded-lg bg-muted/50 transition-colors hover:bg-primary/10 hover:border-primary/60`}
+                  className={`flex items-center gap-4 p-4 border rounded-lg transition-colors ${user.blocked
+                      ? "bg-red-50 border-red-200 opacity-60"
+                      : "bg-muted/50 hover:bg-primary/10 hover:border-primary/60"
+                    }`}
                 >
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover-bounce">
-                    <span className="text-lg animate-bounce-emoji">👨‍💻</span>
+                    <span className="text-lg animate-bounce-emoji">
+                      {user.blocked ? "🔒" : "👨‍💻"}
+                    </span>
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium">{user.fullName}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium">{user.fullName}</p>
+                      {user.blocked && (
+                        <Badge variant="destructive" className="text-xs">
+                          Bloklangan
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-xs mt-1">
                       <span className="text-muted-foreground">Jami ball:</span>{" "}
                       <span className="font-semibold">
@@ -3770,10 +3784,17 @@ function AdminProxOffline() {
           {editingUser && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all">
               <div className="bg-background border rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto animate-fade-in">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold text-foreground">
-                    O'quvchini tahrirlash
-                  </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-2xl font-bold text-foreground">
+                      O'quvchini tahrirlash
+                    </h3>
+                    {editingUser?.blocked && (
+                      <Badge variant="destructive" className="text-xs">
+                        🔒 Bloklangan
+                      </Badge>
+                    )}
+                  </div>
                   <div className="text-sm text-muted-foreground">
                     Jami ball:{" "}
                     <span className="font-semibold text-foreground">
@@ -3782,57 +3803,57 @@ function AdminProxOffline() {
                     </span>
                   </div>
                 </div>
-          <div className="flex items-center justify-end gap-2 pt-2">
-            <Button onClick={() => setConfirmBlockOpen(true)} disabled={blockLoading} variant="outline">
-              {editingUser?.blocked ? "Blokdan chiqarish" : "Bloklash"}
-            </Button>
-            <button
-              onClick={() => setEditingUser(null)}
-              className="p-2 rounded hover:bg-muted transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          {blockError && (
-            <div className="flex items-center gap-2 p-2 bg-red-50 text-red-700 rounded text-sm">
-              <X className="w-4 h-4" /> {blockError}
-            </div>
-          )}
-          {blockSuccess && (
-            <div className="flex items-center gap-2 p-2 bg-green-50 text-green-700 rounded text-sm">
-              <Check className="w-4 h-4" /> {blockSuccess}
-            </div>
-          )}
-
-          {confirmBlockOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-              <div className="bg-background border rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold text-foreground">
-                    {editingUser?.blocked ? "Blokdan chiqarish" : "O'quvchini bloklash"}
-                  </h3>
-                  <Button variant="ghost" size="sm" onClick={() => setConfirmBlockOpen(false)}>
-                    <X className="w-4 h-4" />
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <Button onClick={() => setConfirmBlockOpen(true)} disabled={blockLoading} variant="outline">
+                    {editingUser?.blocked ? "Blokdan chiqarish" : "Bloklash"}
                   </Button>
+                  <button
+                    onClick={() => setEditingUser(null)}
+                    className="p-2 rounded hover:bg-muted transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">
-                    {editingUser?.blocked
-                      ? `Rostan ham ${editingUser.fullName} ni blokdan chiqarishni xohlaysizmi?`
-                      : `Rostan ham ${editingUser.fullName} ni bloklamoqchimisiz?`}
-                  </p>
-                  <div className="flex gap-2 justify-end">
-                    <Button variant="outline" onClick={() => setConfirmBlockOpen(false)} disabled={blockLoading}>
-                      Bekor qilish
-                    </Button>
-                    <Button variant="destructive" onClick={toggleBlock} disabled={blockLoading}>
-                      {editingUser?.blocked ? (blockLoading ? "Ochilmoqda..." : "Blokdan chiqarish") : (blockLoading ? "Bloklanmoqda..." : "Bloklash")}
-                    </Button>
+                {blockError && (
+                  <div className="flex items-center gap-2 p-2 bg-red-50 text-red-700 rounded text-sm">
+                    <X className="w-4 h-4" /> {blockError}
                   </div>
-                </div>
-              </div>
-            </div>
-          )}
+                )}
+                {blockSuccess && (
+                  <div className="flex items-center gap-2 p-2 bg-green-50 text-green-700 rounded text-sm">
+                    <Check className="w-4 h-4" /> {blockSuccess}
+                  </div>
+                )}
+
+                {confirmBlockOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="bg-background border rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-semibold text-foreground">
+                          {editingUser?.blocked ? "Blokdan chiqarish" : "O'quvchini bloklash"}
+                        </h3>
+                        <Button variant="ghost" size="sm" onClick={() => setConfirmBlockOpen(false)}>
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="space-y-4">
+                        <p className="text-muted-foreground">
+                          {editingUser?.blocked
+                            ? `Rostan ham ${editingUser.fullName} ni blokdan chiqarishni xohlaysizmi?`
+                            : `Rostan ham ${editingUser.fullName} ni bloklamoqchimisiz?`}
+                        </p>
+                        <div className="flex gap-2 justify-end">
+                          <Button variant="outline" onClick={() => setConfirmBlockOpen(false)} disabled={blockLoading}>
+                            Bekor qilish
+                          </Button>
+                          <Button variant="destructive" onClick={toggleBlock} disabled={blockLoading}>
+                            {editingUser?.blocked ? (blockLoading ? "Ochilmoqda..." : "Blokdan chiqarish") : (blockLoading ? "Bloklanmoqda..." : "Bloklash")}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <form onSubmit={handleEditFormSubmit} className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium mb-1">
@@ -3986,11 +4007,10 @@ function AdminProxOffline() {
                                 return { ...f, attendanceDays: next };
                               })
                             }
-                            className={`px-3 py-1 text-sm rounded-md border transition-colors ${
-                              active
+                            className={`px-3 py-1 text-sm rounded-md border transition-colors ${active
                                 ? "bg-primary text-primary-foreground border-primary"
                                 : "bg-muted/30 text-muted-foreground border-border hover:bg-muted"
-                            }`}
+                              }`}
                           >
                             {code}
                           </button>
@@ -4308,7 +4328,7 @@ function AdminPanel() {
           setUserData(data.user);
         }
       }
-    } catch {}
+    } catch { }
   };
 
   // When switching to settings tab, reload user data
