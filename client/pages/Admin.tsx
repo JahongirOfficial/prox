@@ -3743,8 +3743,8 @@ function AdminProxOffline() {
                 <div
                   key={user.id}
                   className={`flex items-center gap-4 p-4 border rounded-lg transition-colors ${user.blocked
-                      ? "bg-red-50 border-red-200 opacity-60"
-                      : "bg-muted/50 hover:bg-primary/10 hover:border-primary/60"
+                    ? "bg-red-50 border-red-200 opacity-60"
+                    : "bg-muted/50 hover:bg-primary/10 hover:border-primary/60"
                     }`}
                 >
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover-bounce">
@@ -4008,8 +4008,8 @@ function AdminProxOffline() {
                               })
                             }
                             className={`px-3 py-1 text-sm rounded-md border transition-colors ${active
-                                ? "bg-primary text-primary-foreground border-primary"
-                                : "bg-muted/30 text-muted-foreground border-border hover:bg-muted"
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-muted/30 text-muted-foreground border-border hover:bg-muted"
                               }`}
                           >
                             {code}
