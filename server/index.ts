@@ -3429,6 +3429,12 @@ export function createServer() {
         (user as any).warnings = warnings.map((w) => String(w || ""));
       if (Array.isArray(certificates))
         (user as any).certificates = certificates.map((c) => String(c || ""));
+
+      // Blocked maydonini yangilash
+      if (req.body.blocked !== undefined) {
+        (user as any).blocked = Boolean(req.body.blocked);
+      }
+
       if (user.role === "student_offline") {
         if (step !== undefined) user.step = step;
         if (user.todayScores === undefined)
