@@ -3386,6 +3386,7 @@ export function createServer() {
       if (req.body.blocked !== undefined) {
         const newBlockedStatus = Boolean(req.body.blocked);
         (user as any).blocked = newBlockedStatus;
+        console.log(`🔒 Setting blocked status for user ${user.fullName} (${user._id}): ${newBlockedStatus}`);
         
         // WebSocket orqali boshqa adminlarga real-time yangilanish yuborish
         broadcastNotification({
@@ -3526,7 +3527,10 @@ export function createServer() {
 
       await user.save();
 
-      console.log(`✅ User saved to MongoDB. Blocked status: ${(user as any).blocked}`);
+      // MongoDB'dan qayta o'qib, blocked holatini tekshirish
+      const savedUser = await User.findById(user._id);
+      const actualBlockedStatus = savedUser ? (savedUser as any).blocked : (user as any).blocked;
+      console.log(`✅ User saved to MongoDB. Blocked status in DB: ${actualBlockedStatus} (user object: ${(user as any).blocked})`);
 
       const updatedUser = {
         id: user._id,
@@ -3722,25 +3726,33 @@ export function createServer() {
 
       res.json({
         success: true,
-        users: users.map((user) => ({
-          id: user._id,
-          fullName: user.fullName,
-          phone: user.phone,
-          role: user.role,
-          balance: user.balance,
-          enrolledCourses: user.enrolledCourses,
-          completedCourses: user.completedCourses || [],
-          createdAt: formatDateForIOS(user.createdAt),
-          step: user.step ?? 1,
-          attendanceDays: user.attendanceDays ?? [],
-          todayScores: Array.isArray((user as any).todayScores)
-            ? (user as any).todayScores
-            : [],
-          arrivalDate: formatDateForIOS(user.arrivalDate), // iOS Safari uchun optimizatsiya qilingan
-          warnings: (user as any).warnings ?? [],
-          certificates: (user as any).certificates ?? [],
-          blocked: (user as any).blocked ?? false,
-        })),
+        users: users.map((user) => {
+          // MongoDB'dan kelgan blocked holatini to'g'ri olish
+          // Agar blocked undefined bo'lsa, false bo'ladi, aks holda MongoDB'dagi qiymat ishlatiladi
+          const blockedStatus = (user as any).blocked !== undefined 
+            ? Boolean((user as any).blocked) 
+            : false;
+          
+          return {
+            id: user._id,
+            fullName: user.fullName,
+            phone: user.phone,
+            role: user.role,
+            balance: user.balance,
+            enrolledCourses: user.enrolledCourses,
+            completedCourses: user.completedCourses || [],
+            createdAt: formatDateForIOS(user.createdAt),
+            step: user.step ?? 1,
+            attendanceDays: user.attendanceDays ?? [],
+            todayScores: Array.isArray((user as any).todayScores)
+              ? (user as any).todayScores
+              : [],
+            arrivalDate: formatDateForIOS(user.arrivalDate), // iOS Safari uchun optimizatsiya qilingan
+            warnings: (user as any).warnings ?? [],
+            certificates: (user as any).certificates ?? [],
+            blocked: blockedStatus, // MongoDB'dan kelgan to'g'ri holat
+          };
+        }),
       });
     } catch (error) {
       res.status(500).json({ success: false, message: "Server xatosi" });

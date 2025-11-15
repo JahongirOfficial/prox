@@ -3384,12 +3384,25 @@ function AdminProxOffline() {
         if (res.ok) {
           const data = await res.json();
           // MongoDB'dan kelgan blocked holatini to'g'ri olish
-          const usersWithBlocked = (data.users || []).map((user: any) => ({
-            ...user,
-            blocked: user.blocked ?? false, // MongoDB'dan kelgan blocked holatini saqlash
-          }));
+          const usersWithBlocked = (data.users || []).map((user: any) => {
+            // MongoDB'dan kelgan blocked holatini to'g'ri olish
+            // Agar blocked undefined bo'lsa, false bo'ladi, aks holda server'dan kelgan qiymat ishlatiladi
+            const blockedStatus = user.blocked !== undefined 
+              ? Boolean(user.blocked) 
+              : false;
+            
+            return {
+              ...user,
+              blocked: blockedStatus, // MongoDB'dan kelgan to'g'ri holat
+            };
+          });
           setUsers(usersWithBlocked);
           console.log(`📥 Loaded ${usersWithBlocked.length} users from MongoDB with blocked status`);
+          // Debug: bloklangan o'quvchilarni ko'rsatish
+          const blockedUsers = usersWithBlocked.filter((u: any) => u.blocked === true);
+          if (blockedUsers.length > 0) {
+            console.log(`🔒 Found ${blockedUsers.length} blocked users:`, blockedUsers.map((u: any) => u.fullName));
+          }
         } else {
           setError("Foydalanuvchilarni yuklashda xatolik");
         }
@@ -3709,6 +3722,11 @@ function AdminProxOffline() {
         });
       }
 
+      // MongoDB'dan kelgan blocked holatini saqlash (o'zgartirmaslik)
+      const currentBlockedStatus = editingUser.blocked !== undefined 
+        ? Boolean(editingUser.blocked) 
+        : false;
+      
       const body = {
         fullName: editForm.fullName,
         phone: editForm.phone,
@@ -3722,8 +3740,10 @@ function AdminProxOffline() {
           typeof editForm.totalScore === "number"
             ? editForm.totalScore
             : Number(editForm.totalScore) || 0,
-        blocked: editingUser.blocked ?? false, // Blocked holatini yuborish
+        blocked: currentBlockedStatus, // MongoDB'dan kelgan blocked holatini yuborish (o'zgartirmaslik)
       };
+      
+      console.log(`📤 Sending edit request with blocked status: ${currentBlockedStatus}`);
 
       const res = await fetch(`/api/admin/users/${editingUser.id}`, {
         method: "PUT",
