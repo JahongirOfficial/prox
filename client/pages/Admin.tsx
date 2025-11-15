@@ -3422,11 +3422,14 @@ function AdminProxOffline() {
         if (data.type === 'user:blocked') {
           console.log(`🔔 WebSocket: User ${data.userId} blocked status changed to ${data.blocked}`);
           
+          // MongoDB'dan kelgan blocked holatini ishlatish (localStorage emas!)
+          const blockedStatus = Boolean(data.blocked);
+          
           // Local state'ni yangilash (MongoDB'dan kelgan ma'lumot bilan)
           setUsers((prev) =>
             prev.map((u) =>
               u.id === data.userId
-                ? { ...u, blocked: data.blocked }
+                ? { ...u, blocked: blockedStatus } // MongoDB'dan kelgan holat
                 : u
             )
           );
@@ -3434,9 +3437,38 @@ function AdminProxOffline() {
           // Agar hozir tahrirlanayotgan o'quvchi bo'lsa, uni ham yangilash
           setEditingUser((prev) =>
             prev && prev.id === data.userId
-              ? { ...prev, blocked: data.blocked }
+              ? { ...prev, blocked: blockedStatus } // MongoDB'dan kelgan holat
               : prev
           );
+        }
+        
+        // O'quvchi ma'lumotlari yangilangan bo'lsa (to'liq yangilanish)
+        if (data.type === 'user:updated') {
+          console.log(`🔔 WebSocket: User ${data.userId} updated, blocked status: ${data.user?.blocked}`);
+          
+          // MongoDB'dan kelgan to'liq user ma'lumotlarini ishlatish
+          if (data.user) {
+            const updatedUser = {
+              ...data.user,
+              blocked: Boolean(data.user.blocked ?? false), // MongoDB'dan kelgan holat
+            };
+            
+            // Local state'ni yangilash
+            setUsers((prev) =>
+              prev.map((u) =>
+                u.id === data.userId
+                  ? { ...u, ...updatedUser, blocked: updatedUser.blocked } // MongoDB'dan kelgan holat
+                  : u
+              )
+            );
+            
+            // Agar hozir tahrirlanayotgan o'quvchi bo'lsa, uni ham yangilash
+            setEditingUser((prev) =>
+              prev && prev.id === data.userId
+                ? { ...prev, ...updatedUser, blocked: updatedUser.blocked } // MongoDB'dan kelgan holat
+                : prev
+            );
+          }
         }
       } catch (error) {
         console.error("WebSocket message parsing error:", error);
@@ -3594,7 +3626,16 @@ function AdminProxOffline() {
       ? user.attendanceDays
       : [];
     const defaultAll = dayPresets.find((p) => p.value === "all")!.days;
-    setEditingUser(user);
+    
+    // MongoDB'dan kelgan blocked holatini to'g'ri olish
+    const blockedStatus = Boolean(user.blocked ?? false);
+    
+    // EditingUser state'ni MongoDB'dan kelgan blocked holati bilan o'rnatish
+    setEditingUser({
+      ...user,
+      blocked: blockedStatus, // MongoDB'dan kelgan holat
+    });
+    
     setEditForm({
       fullName: user.fullName || "",
       phone: user.phone || "",

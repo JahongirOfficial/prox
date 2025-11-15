@@ -1170,26 +1170,35 @@ export function createServer() {
       
       console.log(`✅ User saved to MongoDB. Blocked status: ${(user as any).blocked}`);
 
+      const updatedUser = {
+        id: user._id,
+        fullName: user.fullName,
+        phone: user.phone,
+        role: user.role,
+        balance: user.balance,
+        enrolledCourses: user.enrolledCourses,
+        completedCourses: user.completedCourses || [],
+        createdAt: user.createdAt,
+        step: user.step ?? 1,
+        todayScores: user.todayScores ?? {},
+        attendanceDays: (user as any).attendanceDays ?? [],
+        arrivalDate: (user as any).arrivalDate ?? "",
+        warnings: (user as any).warnings ?? [],
+        certificates: (user as any).certificates ?? [],
+        blocked: (user as any).blocked ?? false,
+      };
+
+      // WebSocket orqali to'liq user ma'lumotlarini yuborish (blocked holati bilan)
+      broadcastNotification({
+        type: 'user:updated',
+        userId: user._id.toString(),
+        user: updatedUser,
+      });
+
       res.json({
         success: true,
         message: "Foydalanuvchi ma'lumotlari muvaffaqiyatli yangilandi",
-        user: {
-          id: user._id,
-          fullName: user.fullName,
-          phone: user.phone,
-          role: user.role,
-          balance: user.balance,
-          enrolledCourses: user.enrolledCourses,
-          completedCourses: user.completedCourses || [],
-          createdAt: user.createdAt,
-          step: user.step ?? 1,
-          todayScores: user.todayScores ?? {},
-          attendanceDays: (user as any).attendanceDays ?? [],
-          arrivalDate: (user as any).arrivalDate ?? "",
-          warnings: (user as any).warnings ?? [],
-          certificates: (user as any).certificates ?? [],
-          blocked: (user as any).blocked ?? false,
-        },
+        user: updatedUser,
       });
     } catch (error) {
       res.status(500).json({ success: false, message: "Server xatosi" });
@@ -3519,25 +3528,34 @@ export function createServer() {
 
       console.log(`✅ User saved to MongoDB. Blocked status: ${(user as any).blocked}`);
 
+      const updatedUser = {
+        id: user._id,
+        fullName: user.fullName,
+        phone: user.phone,
+        role: user.role,
+        balance: user.balance,
+        step: user.step ?? 1,
+        attendanceDays: (user as any).attendanceDays ?? [],
+        todayScores: Array.isArray((user as any).todayScores)
+          ? (user as any).todayScores
+          : [],
+        arrivalDate: (user as any).arrivalDate ?? "",
+        warnings: (user as any).warnings ?? [],
+        certificates: (user as any).certificates ?? [],
+        blocked: (user as any).blocked ?? false, // Blocked holatini qaytarish
+      };
+
+      // WebSocket orqali to'liq user ma'lumotlarini yuborish (blocked holati bilan)
+      broadcastNotification({
+        type: 'user:updated',
+        userId: user._id.toString(),
+        user: updatedUser,
+      });
+
       res.json({
         success: true,
         message: "Foydalanuvchi ma'lumotlari yangilandi",
-        user: {
-          id: user._id,
-          fullName: user.fullName,
-          phone: user.phone,
-          role: user.role,
-          balance: user.balance,
-          step: user.step ?? 1,
-          attendanceDays: (user as any).attendanceDays ?? [],
-          todayScores: Array.isArray((user as any).todayScores)
-            ? (user as any).todayScores
-            : [],
-          arrivalDate: (user as any).arrivalDate ?? "",
-          warnings: (user as any).warnings ?? [],
-          certificates: (user as any).certificates ?? [],
-          blocked: (user as any).blocked ?? false, // Blocked holatini qaytarish
-        },
+        user: updatedUser,
       });
     } catch (error) {
       res.status(500).json({ success: false, message: "Server xatosi" });
