@@ -723,6 +723,7 @@ export function createServer() {
           arrivalDate: user.arrivalDate ?? "",
           warnings: user.warnings ?? [],
           certificates: user.certificates ?? [],
+          blocked: (user as any).blocked ?? false,
         })),
       });
     } catch (error) {
@@ -760,6 +761,7 @@ export function createServer() {
           arrivalDate: (user as any).arrivalDate ?? "",
           warnings: (user as any).warnings ?? [],
           certificates: (user as any).certificates ?? [],
+          blocked: (user as any).blocked ?? false,
         },
       });
     } catch (error) {
@@ -1087,6 +1089,7 @@ export function createServer() {
       }
 
       if (typeof blocked === "boolean") {
+        console.log(`🔒 Updating blocked status for user ${user.fullName}: ${blocked}`);
         (user as any).blocked = !!blocked;
       }
 
@@ -1156,6 +1159,8 @@ export function createServer() {
       }
 
       await user.save();
+      
+      console.log(`✅ User saved to MongoDB. Blocked status: ${(user as any).blocked}`);
 
       res.json({
         success: true,
@@ -1174,6 +1179,7 @@ export function createServer() {
           attendanceDays: (user as any).attendanceDays ?? [],
           arrivalDate: (user as any).arrivalDate ?? "",
           warnings: (user as any).warnings ?? [],
+          certificates: (user as any).certificates ?? [],
           blocked: (user as any).blocked ?? false,
         },
       });

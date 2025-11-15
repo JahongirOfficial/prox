@@ -3611,6 +3611,7 @@ function AdminProxOffline() {
           typeof editForm.totalScore === "number"
             ? editForm.totalScore
             : Number(editForm.totalScore) || 0,
+        blocked: editingUser.blocked ?? false, // Blocked holatini yuborish
       };
 
       const res = await fetch(`/api/admin/users/${editingUser.id}`, {
@@ -3635,7 +3636,7 @@ function AdminProxOffline() {
               attendanceDays: Array.isArray(data.user?.attendanceDays)
                 ? data.user.attendanceDays
                 : u.attendanceDays,
-              blocked: u.blocked, // Blocked holatini saqlab qolish
+              blocked: data.user?.blocked ?? editingUser.blocked ?? false, // Server'dan kelgan blocked holatini olish
             }
             : u,
         ),
@@ -3666,6 +3667,8 @@ function AdminProxOffline() {
         .split(";")
         .find((row) => row.trim().startsWith("jwt="));
       const next = !(editingUser.blocked === true);
+      console.log(`🔒 Toggling block for ${editingUser.fullName}: ${editingUser.blocked} → ${next}`);
+      
       const res = await fetch(`/api/admin/users/${editingUser.id}`, {
         method: "PUT",
         headers: {
@@ -3675,12 +3678,18 @@ function AdminProxOffline() {
         body: JSON.stringify({ blocked: next }),
       });
       const data = await res.json();
+      console.log(`📥 Server response:`, data);
+      
       if (!res.ok || !data.success) throw new Error(data.message || "Xatolik");
+      
+      console.log(`✅ Block status updated in MongoDB. New status: ${next}`);
+      
       setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, blocked: next } : u)));
       setEditingUser((prev) => (prev ? { ...prev, blocked: next } : prev));
       setBlockSuccess(next ? `${editingUser.fullName} bloklandi` : `${editingUser.fullName} blokdan chiqarildi`);
       setConfirmBlockOpen(false);
     } catch (e: any) {
+      console.error(`❌ Block toggle error:`, e);
       setBlockError(e.message || "Xatolik yuz berdi");
     } finally {
       setBlockLoading(false);
