@@ -47,4 +47,6 @@ export interface Lesson {
 export type NotificationEvent =
   | { type: 'notification:new'; notification: AdminNotification }
   | { type: 'notification:read'; id: string }
-  | { type: 'notification:delete'; id: string };
+  | { type: 'notification:delete'; id: string }
+  | { type: 'user:blocked'; userId: string; blocked: boolean; fullName: string }
+  | { type: 'user:updated'; userId: string; user: any };

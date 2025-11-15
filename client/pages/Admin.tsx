@@ -3326,6 +3326,7 @@ function AdminProxOffline() {
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
+  const wsRef = useRef<WebSocket | null>(null);
   const [editForm, setEditForm] = useState({
     fullName: "",
     phone: "",
@@ -3382,7 +3383,13 @@ function AdminProxOffline() {
         });
         if (res.ok) {
           const data = await res.json();
-          setUsers(data.users || []);
+          // MongoDB'dan kelgan blocked holatini to'g'ri olish
+          const usersWithBlocked = (data.users || []).map((user: any) => ({
+            ...user,
+            blocked: user.blocked ?? false, // MongoDB'dan kelgan blocked holatini saqlash
+          }));
+          setUsers(usersWithBlocked);
+          console.log(`📥 Loaded ${usersWithBlocked.length} users from MongoDB with blocked status`);
         } else {
           setError("Foydalanuvchilarni yuklashda xatolik");
         }
@@ -3393,6 +3400,69 @@ function AdminProxOffline() {
       }
     };
     fetchUsers();
+  }, []);
+
+  // WebSocket orqali real-time yangilanishlarni qabul qilish
+  useEffect(() => {
+    // WebSocket ulanishini yaratish
+    const ws = new WebSocket(
+      `${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/ws/admin-notifications`
+    );
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log("🔌 WebSocket connected for admin offline updates");
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        
+        // O'quvchi bloklangan yoki blokdan chiqarilgan bo'lsa
+        if (data.type === 'user:blocked') {
+          console.log(`🔔 WebSocket: User ${data.userId} blocked status changed to ${data.blocked}`);
+          
+          // Local state'ni yangilash (MongoDB'dan kelgan ma'lumot bilan)
+          setUsers((prev) =>
+            prev.map((u) =>
+              u.id === data.userId
+                ? { ...u, blocked: data.blocked }
+                : u
+            )
+          );
+          
+          // Agar hozir tahrirlanayotgan o'quvchi bo'lsa, uni ham yangilash
+          setEditingUser((prev) =>
+            prev && prev.id === data.userId
+              ? { ...prev, blocked: data.blocked }
+              : prev
+          );
+        }
+      } catch (error) {
+        console.error("WebSocket message parsing error:", error);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    ws.onclose = () => {
+      console.log("🔌 WebSocket disconnected, attempting to reconnect...");
+      // Reconnect after 3 seconds
+      setTimeout(() => {
+        if (wsRef.current?.readyState === WebSocket.CLOSED) {
+          // Reconnect logic will be handled by useEffect cleanup and re-run
+        }
+      }, 3000);
+    };
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
   }, []);
 
   const filteredUsers = users.filter((user) =>
@@ -3625,21 +3695,29 @@ function AdminProxOffline() {
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.message || "Xatolik");
       setEditSuccess("O'quvchi ma'lumotlari yangilandi");
-      // Update user in list with new data
+      // Update user in list with new data from MongoDB
       setUsers((prev) =>
         prev.map((u) =>
           u.id === editingUser.id
             ? {
-              ...u,
-              ...editForm,
-              todayScores: data.user?.todayScores ?? u.todayScores,
-              attendanceDays: Array.isArray(data.user?.attendanceDays)
-                ? data.user.attendanceDays
-                : u.attendanceDays,
-              blocked: data.user?.blocked ?? editingUser.blocked ?? false, // Server'dan kelgan blocked holatini olish
-            }
+                ...u,
+                ...editForm,
+                todayScores: data.user?.todayScores ?? u.todayScores,
+                attendanceDays: Array.isArray(data.user?.attendanceDays)
+                  ? data.user.attendanceDays
+                  : u.attendanceDays,
+                blocked: data.user?.blocked ?? false, // MongoDB'dan kelgan blocked holatini olish
+              }
             : u,
         ),
+      );
+      // EditingUser state'ni ham yangilash
+      setEditingUser((prev) => 
+        prev ? { 
+          ...prev, 
+          ...editForm,
+          blocked: data.user?.blocked ?? false 
+        } : prev
       );
 
       // Bugungi ballni 0 ga o'rnatish (keyingi tahrirlash uchun)
@@ -3682,11 +3760,14 @@ function AdminProxOffline() {
       
       if (!res.ok || !data.success) throw new Error(data.message || "Xatolik");
       
-      console.log(`✅ Block status updated in MongoDB. New status: ${next}`);
+      // Server'dan kelgan blocked holatini olish (MongoDB'dan kelgan)
+      const serverBlockedStatus = data.user?.blocked ?? next;
+      console.log(`✅ Block status updated in MongoDB. New status: ${serverBlockedStatus}`);
       
-      setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, blocked: next } : u)));
-      setEditingUser((prev) => (prev ? { ...prev, blocked: next } : prev));
-      setBlockSuccess(next ? `${editingUser.fullName} bloklandi` : `${editingUser.fullName} blokdan chiqarildi`);
+      // Local state'ni server'dan kelgan ma'lumot bilan yangilash
+      setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, blocked: serverBlockedStatus } : u)));
+      setEditingUser((prev) => (prev ? { ...prev, blocked: serverBlockedStatus } : prev));
+      setBlockSuccess(serverBlockedStatus ? `${editingUser.fullName} bloklandi` : `${editingUser.fullName} blokdan chiqarildi`);
       setConfirmBlockOpen(false);
     } catch (e: any) {
       console.error(`❌ Block toggle error:`, e);

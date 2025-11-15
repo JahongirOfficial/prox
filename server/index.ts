@@ -1091,6 +1091,14 @@ export function createServer() {
       if (typeof blocked === "boolean") {
         console.log(`🔒 Updating blocked status for user ${user.fullName}: ${blocked}`);
         (user as any).blocked = !!blocked;
+        
+        // WebSocket orqali boshqa adminlarga real-time yangilanish yuborish
+        broadcastNotification({
+          type: 'user:blocked',
+          userId: user._id.toString(),
+          blocked: !!blocked,
+          fullName: user.fullName,
+        });
       }
 
       // Merge provided weekScores (array of {date, score, note}) into todayScores
@@ -3367,7 +3375,16 @@ export function createServer() {
 
       // Blocked maydonini yangilash
       if (req.body.blocked !== undefined) {
-        (user as any).blocked = Boolean(req.body.blocked);
+        const newBlockedStatus = Boolean(req.body.blocked);
+        (user as any).blocked = newBlockedStatus;
+        
+        // WebSocket orqali boshqa adminlarga real-time yangilanish yuborish
+        broadcastNotification({
+          type: 'user:blocked',
+          userId: user._id.toString(),
+          blocked: newBlockedStatus,
+          fullName: user.fullName,
+        });
       }
 
       if (user.role === "student_offline") {
@@ -3500,6 +3517,8 @@ export function createServer() {
 
       await user.save();
 
+      console.log(`✅ User saved to MongoDB. Blocked status: ${(user as any).blocked}`);
+
       res.json({
         success: true,
         message: "Foydalanuvchi ma'lumotlari yangilandi",
@@ -3517,6 +3536,7 @@ export function createServer() {
           arrivalDate: (user as any).arrivalDate ?? "",
           warnings: (user as any).warnings ?? [],
           certificates: (user as any).certificates ?? [],
+          blocked: (user as any).blocked ?? false, // Blocked holatini qaytarish
         },
       });
     } catch (error) {
