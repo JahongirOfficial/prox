@@ -51,6 +51,7 @@ export default function Sidebar({ isLoggedIn, userRole = null, isMobileOpen = fa
     { path: '/tasks', label: 'Qadam topshirish', icon: 'assignment' },
     { path: '/students', label: "O'quvchilar", icon: 'school' },
     { path: '/debtors', label: "Qarzdor o'quvchilar", icon: 'account_balance_wallet' },
+    { path: '/projects', label: 'Loyihalarimiz', icon: 'folder' },
     { path: '/profile', label: 'Profilim', icon: 'person' },
   ]
 
@@ -88,7 +89,7 @@ export default function Sidebar({ isLoggedIn, userRole = null, isMobileOpen = fa
         </div>
 
         {/* Navigation */}
-        <nav className="p-3 sm:p-4 space-y-2 overflow-y-auto" style={{ height: isLoggedIn ? 'calc(100vh - 240px)' : 'calc(100vh - 100px)' }}>
+        <nav className="p-3 sm:p-4 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent hover:scrollbar-thumb-slate-600" style={{ height: isLoggedIn ? 'calc(100vh - 240px)' : 'calc(100vh - 100px)' }}>
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path
             return (

@@ -6,6 +6,28 @@ dotenv.config()
 
 const realProjects = [
   {
+    title: 'Bolajon',
+    description: 'Bolalar uchun rivojlantiruvchi o\'yinlar va ta\'lim platformasi. Ota-onalar va bolalar uchun interaktiv ta\'lim tizimi.',
+    technology: 'Next.js, MongoDB, Tailwind CSS',
+    students: 8,
+    status: 'completed',
+    progress: 100,
+    deadline: new Date('2024-01-20'),
+    url: 'https://bolajon.uz/',
+    logo: '/loyihalar/bolajon.png'
+  },
+  {
+    title: 'Alochi',
+    description: 'Zamonaviy restoran va ovqatlanish xizmatlari platformasi. Onlayn buyurtma va yetkazib berish tizimi.',
+    technology: 'React, TypeScript, Node.js, PostgreSQL',
+    students: 10,
+    status: 'completed',
+    progress: 100,
+    deadline: new Date('2024-02-15'),
+    url: 'https://alochi.uz/',
+    logo: '/loyihalar/alochi.jpg'
+  },
+  {
     title: 'MentalJon',
     description: 'Ruhiy salomatlik va psixologik yordam platformasi. Onlayn konsultatsiya va ruhiy salomatlik xizmatlari.',
     technology: 'React, Node.js, MongoDB, Express',
@@ -13,37 +35,41 @@ const realProjects = [
     status: 'completed',
     progress: 100,
     deadline: new Date('2024-01-15'),
-    url: 'https://mentaljon.uz/en/'
+    url: 'https://mentaljon.uz/',
+    logo: '/loyihalar/Mentaljon.png'
   },
   {
-    title: 'ProX Academy',
+    title: 'proX Academy',
     description: 'Zamonaviy o\'quv platformasi va dasturlash kurslari. O\'quvchilar uchun interaktiv ta\'lim tizimi.',
     technology: 'React, TypeScript, MongoDB, Express',
     students: 12,
     status: 'active',
     progress: 85,
     deadline: new Date('2024-03-01'),
-    url: 'https://prox.uz/'
+    url: 'https://prox.uz/',
+    logo: '/loyihalar/prox.jpg'
   },
   {
-    title: 'Alibobo Qurilish',
+    title: 'Mukammal Ota-Ona',
+    description: 'Ota-onalar uchun tarbiya va rivojlantirish bo\'yicha maslahat platformasi. Bolalar tarbiyasi bo\'yicha qo\'llanma.',
+    technology: 'Next.js, Strapi, PostgreSQL, Tailwind CSS',
+    students: 7,
+    status: 'completed',
+    progress: 100,
+    deadline: new Date('2024-03-10'),
+    url: 'https://mukammalotaona.uz/',
+    logo: '/loyihalar/mukammalotaona.png'
+  },
+  {
+    title: 'Aliboboqurilish',
     description: 'Qurilish kompaniyasi uchun korporativ veb-sayt. Loyihalar portfoliosi va xizmatlar taqdimoti.',
     technology: 'Vue.js, Laravel, MySQL, Bootstrap',
     students: 6,
     status: 'completed',
     progress: 100,
     deadline: new Date('2023-12-20'),
-    url: 'https://aliboboqurilish.uz/'
-  },
-  {
-    title: 'Alochi Bolajon',
-    description: 'Bolalar uchun o\'yinchoqlar va rivojlantiruvchi mahsulotlar onlayn do\'koni.',
-    technology: 'Next.js, Strapi, PostgreSQL, Tailwind CSS',
-    students: 7,
-    status: 'completed',
-    progress: 100,
-    deadline: new Date('2024-02-10'),
-    url: 'https://alochibolajon.uz/'
+    url: 'https://aliboboqurilish.uz/',
+    logo: '/loyihalar/alibobo.png'
   },
   {
     title: 'BiznesJon',
@@ -53,17 +79,41 @@ const realProjects = [
     status: 'active',
     progress: 75,
     deadline: new Date('2024-04-15'),
-    url: 'https://biznesjon.uz/'
+    url: 'https://biznesjon.uz/',
+    logo: '/loyihalar/biznesjon.png'
   },
   {
-    title: 'UstaJon',
-    description: 'Hunarmandlar va xizmat ko\'rsatuvchilar uchun platforma. Mijozlar bilan bog\'lanish tizimi.',
-    technology: 'React Native, Firebase, Redux, Expo',
-    students: 10,
+    title: 'Avtofix',
+    description: 'Avtomobil ta\'mirlash xizmatlari va ehtiyot qismlar platformasi. Onlayn qidiruv va buyurtma tizimi.',
+    technology: 'React, Node.js, MongoDB, Express',
+    students: 8,
     status: 'active',
-    progress: 60,
+    progress: 80,
     deadline: new Date('2024-05-01'),
-    url: 'https://ustajon.uz/'
+    url: 'https://avtofix.uz/',
+    logo: '/loyihalar/avtofix.webp'
+  },
+  {
+    title: 'UzKafe',
+    description: 'O\'zbekiston kafe va restoranlar uchun boshqaruv tizimi. Buyurtmalar va inventarizatsiya nazorati.',
+    technology: 'React, TypeScript, Node.js, MongoDB',
+    students: 9,
+    status: 'completed',
+    progress: 100,
+    deadline: new Date('2024-02-28'),
+    url: 'https://uzkafe.uz/',
+    logo: '/loyihalar/kafe.jpg'
+  },
+  {
+    title: 'Avtojon',
+    description: 'Avtomobil sotish va xarid qilish platformasi. Yangi va ishlatilgan avtomobillar bozori.',
+    technology: 'Next.js, PostgreSQL, Prisma, Tailwind CSS',
+    students: 11,
+    status: 'active',
+    progress: 70,
+    deadline: new Date('2024-06-01'),
+    url: 'https://avtojon.uz/',
+    logo: '/loyihalar/avtojon.png'
   }
 ]
 

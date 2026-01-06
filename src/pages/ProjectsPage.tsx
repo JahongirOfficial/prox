@@ -28,10 +28,17 @@ export default function ProjectsPage() {
     
     const title = project.title?.toLowerCase() || ''
     
+    // Exact matches
+    if (title.includes('bolajon')) return '/loyihalar/bolajon.png'
+    if (title.includes('alochi')) return '/loyihalar/alochi.jpg'
     if (title.includes('mental') || title.includes('mentaljon')) return '/loyihalar/Mentaljon.png'
-    if (title.includes('alibobo')) return '/loyihalar/alibobo.png'
-    if (title.includes('alochi') || title.includes('bolajon')) return '/loyihalar/alochi.jpg'
     if (title.includes('prox') || title.includes('academy')) return '/loyihalar/prox.jpg'
+    if (title.includes('mukammal') || title.includes('ota-ona')) return '/loyihalar/mukammalotaona.png'
+    if (title.includes('alibobo')) return '/loyihalar/alibobo.png'
+    if (title.includes('biznes')) return '/loyihalar/biznesjon.png'
+    if (title.includes('avtofix')) return '/loyihalar/avtofix.png'
+    if (title.includes('uzkafe')) return '/loyihalar/uzkafe.png'
+    if (title.includes('avtojon')) return '/loyihalar/avtojon.png'
     
     return null
   }

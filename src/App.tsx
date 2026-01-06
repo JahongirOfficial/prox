@@ -108,6 +108,16 @@ function App() {
                 <DebtorsPage />
               </Layout>
             } />
+            <Route path="/projects" element={
+              <Layout isLoggedIn={true} userRole={userRole}>
+                <ProjectsPage />
+              </Layout>
+            } />
+            <Route path="/project/:id" element={
+              <Layout isLoggedIn={true} userRole={userRole}>
+                <ProjectDetailPage />
+              </Layout>
+            } />
             <Route
               path="/profile"
               element={userId ? <Navigate to={`/student/${userId}`} replace /> : <Navigate to="/tasks" replace />}
