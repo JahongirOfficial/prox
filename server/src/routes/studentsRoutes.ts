@@ -8,8 +8,8 @@ import {
   getStudentsStats,
   getStudentDailyBalls,
   getStudentsWithSteps
-} from '../controllers/studentsController'
-import { authenticateToken } from '../middleware/auth'
+} from '../controllers/studentsController.js'
+import { authenticateToken } from '../middleware/auth.js'
 
 const router = express.Router()
 

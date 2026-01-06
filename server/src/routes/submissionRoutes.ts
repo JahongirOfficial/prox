@@ -7,8 +7,8 @@ import {
   getStudentSubmissions,
   updateTaskStatus,
   uploadFile
-} from '../controllers/submissionController'
-import { authenticateToken } from '../middleware/auth'
+} from '../controllers/submissionController.js'
+import { authenticateToken } from '../middleware/auth.js'
 
 const router = express.Router()
 

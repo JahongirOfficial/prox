@@ -3,8 +3,8 @@ import {
   getAllTasks, 
   getTasksStats,
   updateTaskStatus
-} from '../controllers/tasksController'
-import { authenticateToken } from '../middleware/auth'
+} from '../controllers/tasksController.js'
+import { authenticateToken } from '../middleware/auth.js'
 
 const router = express.Router()
 

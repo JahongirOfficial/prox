@@ -5,8 +5,8 @@ import {
   getProjectsStats,
   createProject,
   updateProject
-} from '../controllers/projectsController'
-import { authenticateToken } from '../middleware/auth'
+} from '../controllers/projectsController.js'
+import { authenticateToken } from '../middleware/auth.js'
 
 const router = express.Router()
 

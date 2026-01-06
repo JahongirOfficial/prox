@@ -3,8 +3,8 @@ import {
   getAllDebtors, 
   getDebtorsStats,
   updatePayment
-} from '../controllers/debtorsController'
-import { authenticateToken } from '../middleware/auth'
+} from '../controllers/debtorsController.js'
+import { authenticateToken } from '../middleware/auth.js'
 
 const router = express.Router()
 
