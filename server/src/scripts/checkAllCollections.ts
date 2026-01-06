@@ -8,11 +8,17 @@ const checkAllCollections = async () => {
     await mongoose.connect(process.env.MONGODB_URI as string)
     console.log('✅ MongoDB ulandi')
 
-    const collections = await mongoose.connection.db.listCollections().toArray()
+    const db = mongoose.connection.db
+    if (!db) {
+      console.error('❌ Database connection error')
+      process.exit(1)
+    }
+
+    const collections = await db.listCollections().toArray()
     
     for (const col of collections) {
       console.log(`\n📁 Collection: ${col.name}`)
-      const collection = mongoose.connection.db.collection(col.name)
+      const collection = db.collection(col.name)
       const count = await collection.countDocuments()
       console.log(`   Jami ma'lumotlar: ${count}`)
       

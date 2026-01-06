@@ -350,7 +350,6 @@ export default function TasksPage() {
             const locked = isStepLocked(stepNumber)
             const completed = isStepCompleted(stepNumber)
             const progress = stepTasks.length > 0 ? Math.round((stepTasks.filter(t => isTaskDoneForGating(t._id)).length / stepTasks.length) * 100) : 0
-            const completedTestsCount = testTasks.filter(t => isTaskDoneForGating(t._id)).length
 
             return (
               <div

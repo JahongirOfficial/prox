@@ -25,7 +25,7 @@ const addScoresToStudents = async () => {
         score: finalScore
       })
 
-      console.log(`✅ ${student.fullName}: ${finalScore} ball qo'shildi`)
+      console.log(`✅ ${student.fullName || student.name}: ${finalScore} ball qo'shildi`)
     }
 
     console.log('🎉 Barcha o\'quvchilarga ball qo\'shildi!')

@@ -8,7 +8,7 @@ export const getAllDebtors = async (req: Request, res: Response) => {
 
     // Calculate academic debt for each student
     const debtorsWithAcademicDebt = allStudents.map(student => {
-      const enrollmentDate = new Date(student.enrollmentDate)
+      const enrollmentDate = new Date(student.enrollmentDate || student.joinDate)
       const now = new Date()
       const daysSinceEnrollment = Math.floor((now.getTime() - enrollmentDate.getTime()) / (1000 * 60 * 60 * 24))
       
@@ -52,7 +52,7 @@ export const getDebtorsStats = async (req: Request, res: Response) => {
     const now = new Date()
     
     allStudents.forEach(student => {
-      const enrollmentDate = new Date(student.enrollmentDate)
+      const enrollmentDate = new Date(student.enrollmentDate || student.joinDate)
       const daysSinceEnrollment = Math.floor((now.getTime() - enrollmentDate.getTime()) / (1000 * 60 * 60 * 24))
       
       const expectedProgress = Math.min(100, daysSinceEnrollment * 1.5)
@@ -92,8 +92,8 @@ export const updatePayment = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'O\'quvchi topilmadi' })
     }
 
-    student.paidAmount += amount
-    student.remainingAmount = Math.max(0, student.totalPayment - student.paidAmount)
+    student.paidAmount = (student.paidAmount || 0) + amount
+    student.remainingAmount = Math.max(0, (student.totalPayment || 0) - (student.paidAmount || 0))
     
     await student.save()
     res.json(student)

@@ -34,10 +34,10 @@ async function checkCurrentProjects() {
       titleGroups.get(baseTitle).push(project)
     })
 
-    titleGroups.forEach((projectList, baseTitle) => {
+    titleGroups.forEach((projectList: any[], baseTitle) => {
       if (projectList.length > 1) {
         console.log(`\n"${baseTitle}" asosida ${projectList.length} ta loyiha:`)
-        projectList.forEach(p => {
+        projectList.forEach((p: any) => {
           console.log(`  - "${p.title}" - ${p.url || 'URL yo\'q'}`)
         })
       }

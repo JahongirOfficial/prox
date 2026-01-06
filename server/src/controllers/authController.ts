@@ -6,8 +6,8 @@ import { AuthRequest } from '../middleware/auth.js'
 
 // JWT token yaratish
 const generateToken = (id: string, role: string = 'student') => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET!, {
-    expiresIn: process.env.JWT_EXPIRE,
+  return jwt.sign({ id, role }, process.env.JWT_SECRET || 'default-secret', {
+    expiresIn: '30d',
   })
 }
 
@@ -52,7 +52,15 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // 2. Students collection'dan qidirish (prox.uz_crm dan kelgan o'quvchilar)
-    const studentsCollection = mongoose.connection.db.collection('students')
+    const db = mongoose.connection.db
+    if (!db) {
+      return res.status(500).json({
+        success: false,
+        message: 'Database connection error',
+      })
+    }
+    
+    const studentsCollection = db.collection('students')
     const student = await studentsCollection.findOne({ 
       username: lowercaseUsername 
     })
@@ -112,7 +120,15 @@ export const getMe = async (req: AuthRequest, res: Response) => {
     }
 
     // Student uchun
-    const studentsCollection = mongoose.connection.db.collection('students')
+    const db = mongoose.connection.db
+    if (!db) {
+      return res.status(404).json({
+        success: false,
+        message: 'Database connection error',
+      })
+    }
+    
+    const studentsCollection = db.collection('students')
     const student = await studentsCollection.findOne({ 
       _id: new mongoose.Types.ObjectId(id) 
     })

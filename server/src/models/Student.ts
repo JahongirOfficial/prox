@@ -28,6 +28,15 @@ export interface IStudent extends Document {
   blocked_at: Date
   created_at: Date
   updated_at: Date
+  // Additional fields for debtors
+  enrollmentDate?: Date
+  progress?: number
+  totalPayment?: number
+  paidAmount?: number
+  remainingAmount?: number
+  fullName?: string
+  course?: string
+  status?: string
 }
 
 const StudentSchema: Schema = new Schema({
@@ -56,7 +65,16 @@ const StudentSchema: Schema = new Schema({
   is_blocked: { type: Boolean, default: false },
   blocked_at: Date,
   created_at: { type: Date, default: Date.now },
-  updated_at: { type: Date, default: Date.now }
+  updated_at: { type: Date, default: Date.now },
+  // Additional fields
+  enrollmentDate: Date,
+  progress: { type: Number, default: 0 },
+  totalPayment: { type: Number, default: 0 },
+  paidAmount: { type: Number, default: 0 },
+  remainingAmount: { type: Number, default: 0 },
+  fullName: String,
+  course: String,
+  status: { type: String, default: 'active' }
 })
 
 StudentSchema.pre('save', function(next) {
