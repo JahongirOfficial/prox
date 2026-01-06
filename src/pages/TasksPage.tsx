@@ -76,7 +76,7 @@ export default function TasksPage() {
       })
       if (response.ok) {
         const data = await response.json()
-        setStudents(data)
+        console.log('Students loaded:', data)
       }
     } catch (err) {
       console.error('O\'quvchilarni yuklashda xatolik:', err)
@@ -349,8 +349,8 @@ export default function TasksPage() {
             const testTasks = stepTasks.filter(task => task.taskType === 'test')
             const locked = isStepLocked(stepNumber)
             const completed = isStepCompleted(stepNumber)
-            const completedTests = testTasks.filter(t => isTaskDoneForGating(t._id)).length
             const progress = stepTasks.length > 0 ? Math.round((stepTasks.filter(t => isTaskDoneForGating(t._id)).length / stepTasks.length) * 100) : 0
+            const completedTestsCount = testTasks.filter(t => isTaskDoneForGating(t._id)).length
 
             return (
               <div
@@ -415,7 +415,7 @@ export default function TasksPage() {
             const testTasks = stepTasks.filter(task => task.taskType === 'test')
             const locked = isStepLocked(stepNumber)
             const completed = isStepCompleted(stepNumber)
-            const completedTests = testTasks.filter(t => isTaskDoneForGating(t._id)).length
+            const completedTestsCount = testTasks.filter(t => isTaskDoneForGating(t._id)).length
             const progress = stepTasks.length > 0 ? Math.round((stepTasks.filter(t => isTaskDoneForGating(t._id)).length / stepTasks.length) * 100) : 0
 
             return (
@@ -450,7 +450,7 @@ export default function TasksPage() {
                       <p className="text-[10px] text-slate-400">Jarayon</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-white">{completedTests}/{testTasks.length}</p>
+                      <p className="text-sm font-bold text-white">{completedTestsCount}/{testTasks.length}</p>
                       <p className="text-[10px] text-slate-400">Testlar</p>
                     </div>
                   </div>
