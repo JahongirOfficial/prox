@@ -13,7 +13,7 @@ const realProjects = [
     status: 'completed',
     progress: 100,
     deadline: new Date('2024-01-20'),
-    url: 'https://bolajon.uz/',
+    url: 'https://bolajoon.uz/',
     logo: '/loyihalar/bolajon.png'
   },
   {
@@ -24,7 +24,7 @@ const realProjects = [
     status: 'completed',
     progress: 100,
     deadline: new Date('2024-02-15'),
-    url: 'https://alochi.uz/',
+    url: 'https://alochibolajon.uz/',
     logo: '/loyihalar/alochi.jpg'
   },
   {
@@ -79,8 +79,7 @@ const realProjects = [
     status: 'active',
     progress: 75,
     deadline: new Date('2024-04-15'),
-    url: 'https://biznesjon.uz/',
-    logo: '/loyihalar/biznesjon.png'
+    url: 'https://biznesjon.uz/'
   },
   {
     title: 'Avtofix',
@@ -92,17 +91,6 @@ const realProjects = [
     deadline: new Date('2024-05-01'),
     url: 'https://avtofix.uz/',
     logo: '/loyihalar/avtofix.webp'
-  },
-  {
-    title: 'UzKafe',
-    description: 'O\'zbekiston kafe va restoranlar uchun boshqaruv tizimi. Buyurtmalar va inventarizatsiya nazorati.',
-    technology: 'React, TypeScript, Node.js, MongoDB',
-    students: 9,
-    status: 'completed',
-    progress: 100,
-    deadline: new Date('2024-02-28'),
-    url: 'https://uzkafe.uz/',
-    logo: '/loyihalar/kafe.jpg'
   },
   {
     title: 'Avtojon',

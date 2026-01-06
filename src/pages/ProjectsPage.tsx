@@ -35,9 +35,7 @@ export default function ProjectsPage() {
     if (title.includes('prox') || title.includes('academy')) return '/loyihalar/prox.jpg'
     if (title.includes('mukammal') || title.includes('ota-ona')) return '/loyihalar/mukammalotaona.png'
     if (title.includes('alibobo')) return '/loyihalar/alibobo.png'
-    if (title.includes('biznes')) return '/loyihalar/biznesjon.png'
-    if (title.includes('avtofix')) return '/loyihalar/avtofix.png'
-    if (title.includes('uzkafe')) return '/loyihalar/uzkafe.png'
+    if (title.includes('avtofix')) return '/loyihalar/avtofix.webp'
     if (title.includes('avtojon')) return '/loyihalar/avtojon.png'
     
     return null
