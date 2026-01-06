@@ -1,139 +1,156 @@
-# Safety Notes - Boshqa Loyihalarga Ta'sir Qilmasligi
+# ⚠️ SAFETY NOTES - PROX.UZ DEPLOYMENT
 
-## Xavfsizlik Kafolatlari
+## CRITICAL RULES
 
-### 1. Papka Izolyatsiyasi
-Barcha scriptlar faqat `/opt/prox.uz` papkasida ishlaydi:
-```bash
-cd /opt/prox.uz  # Faqat shu papkada
-npm install      # Faqat prox.uz dependencies
-npm run build    # Faqat prox.uz build
+### ❌ NEVER DO THESE:
+1. **NEVER** use `pm2 delete all` - this will delete ALL projects
+2. **NEVER** use `pm2 restart all` - this will restart ALL projects
+3. **NEVER** modify files outside `/opt/prox.uz` directory
+4. **NEVER** change nginx configs for other sites
+
+### ✅ ALWAYS DO THESE:
+1. **ALWAYS** use `pm2 delete prox-uz-backend` (specific name)
+2. **ALWAYS** use `pm2 restart prox-uz-backend` (specific name)
+3. **ALWAYS** test changes in `/opt/prox.uz` only
+4. **ALWAYS** verify other projects are still running after changes
+
+## CURRENT CONFIGURATION
+
+### Ports:
+- **prox.uz backend**: Port 5004 (changed from 5003)
+- **avtojon-api**: Port 5003 (DO NOT TOUCH)
+- **Other projects**: Various ports (DO NOT TOUCH)
+
+### PM2 Processes:
+```
+prox-uz-backend  - Our project (safe to restart/delete)
+alibobo-backend  - DO NOT TOUCH
+alochi-backend   - DO NOT TOUCH
+avtojon-api      - DO NOT TOUCH
+debt-tracker     - DO NOT TOUCH
+... (all others) - DO NOT TOUCH
 ```
 
-### 2. PM2 Process Izolyatsiyasi
-PM2 process faqat `prox-uz-backend` nomli:
-```bash
-pm2 restart prox-uz-backend  # Faqat prox.uz backend
-pm2 delete prox-uz-backend   # Faqat prox.uz o'chiradi
-```
+## QUICK DEPLOYMENT STEPS
 
-Boshqa processlar:
-- `alibobo-backend` - tegmaydi ✅
-- `alochi-backend` - tegmaydi ✅
-- `avtojon-api` - tegmaydi ✅
-- `debt-tracker` - tegmaydi ✅
-- va boshqalar...
-
-### 3. Port Izolyatsiyasi
-Har bir loyiha o'z portida:
-- prox.uz backend: `5003` ✅
-- alochi backend: boshqa port ✅
-- alibobo backend: boshqa port ✅
-
-### 4. Nginx Izolyatsiyasi
-Har bir loyiha o'z nginx config fayliga ega:
-```
-/etc/nginx/sites-available/
-├── prox.uz              # Faqat prox.uz uchun
-├── alochi.uz            # Alochi uchun
-├── alibobo.uz           # Alibobo uchun
-└── ...
-```
-
-Nginx config faqat prox.uz uchun:
-```nginx
-server {
-    server_name prox.uz www.prox.uz;  # Faqat prox.uz
-    root /opt/prox.uz/dist;           # Faqat prox.uz files
-    
-    location /api {
-        proxy_pass http://localhost:5003;  # Faqat prox.uz backend
-    }
-}
-```
-
-### 5. Database Izolyatsiyasi
-Har bir loyiha o'z database'iga ulangan:
-- prox.uz: `prox_crm` database ✅
-- alochi: boshqa database ✅
-- alibobo: boshqa database ✅
-
-### 6. Logs Izolyatsiyasi
-Har bir loyiha o'z log papkasiga yozadi:
-```
-/opt/prox.uz/logs/        # Faqat prox.uz logs
-/opt/alochi/logs/         # Alochi logs
-/opt/alibobo/logs/        # Alibobo logs
-```
-
-## Xavfsiz Deployment Qoidalari
-
-### ✅ XAVFSIZ (Faqat prox.uz ga ta'sir qiladi)
+### Option 1: Use DEPLOY_NOW.sh (Recommended)
 ```bash
 cd /opt/prox.uz
-./full-deploy.sh              # ✅ Faqat prox.uz
-./quick-fix-deploy.sh         # ✅ Faqat prox.uz
-pm2 restart prox-uz-backend   # ✅ Faqat prox.uz
-npm run build                 # ✅ Faqat prox.uz
+chmod +x DEPLOY_NOW.sh
+./DEPLOY_NOW.sh
 ```
 
-### ⚠️ EHTIYOT (Barcha loyihalarga ta'sir qilishi mumkin)
+### Option 2: Manual Steps
 ```bash
-pm2 restart all               # ⚠️ BARCHA processlarni restart qiladi
-sudo systemctl restart nginx  # ⚠️ BARCHA saytlarni restart qiladi
-sudo reboot                   # ⚠️ BUTUN serverni restart qiladi
+cd /opt/prox.uz
+
+# Pull changes
+git stash
+git pull
+
+# Build
+npm install
+cd server && npm install && cd ..
+npm run build
+cd server && npm run build && cd ..
+
+# Update nginx
+sudo cp nginx-prox.uz.conf /etc/nginx/sites-available/prox.uz
+sudo nginx -t && sudo systemctl reload nginx
+
+# Restart backend (ONLY prox-uz-backend)
+pm2 delete prox-uz-backend
+pm2 start ecosystem.config.cjs
+pm2 save
 ```
 
-### ❌ ISHLATMANG (Xavfli)
+## FIXES APPLIED
+
+### 1. JWT_SECRET Issue - FIXED ✅
+- Added JWT_SECRET directly to `ecosystem.config.cjs`
+- Value: `prox-uz-super-secret-key-2024-production`
+- No longer depends on .env file loading
+
+### 2. Port Conflict - FIXED ✅
+- Changed backend from port 5003 to 5004
+- Updated nginx to proxy to 5004
+- Port 5003 remains free for avtojon-api
+
+### 3. Nginx Configuration - FIXED ✅
+- Updated proxy_pass to localhost:5004
+- Correct root path: `/opt/prox.uz/dist`
+- SSL configuration intact
+
+## VERIFICATION COMMANDS
+
 ```bash
-cd /opt && rm -rf *           # ❌ BARCHA loyihalarni o'chiradi
-pm2 delete all                # ❌ BARCHA processlarni o'chiradi
-sudo rm /etc/nginx/sites-*    # ❌ BARCHA nginx configlarni o'chiradi
+# Check PM2 status (should show all projects running)
+pm2 list
+
+# Check prox.uz backend logs
+pm2 logs prox-uz-backend --lines 20
+
+# Test backend API
+curl http://localhost:5004/api/health
+
+# Test frontend
+curl https://prox.uz
+
+# Check nginx
+sudo nginx -t
+sudo systemctl status nginx
+
+# Verify port 5004 is in use
+lsof -i :5004
 ```
 
-## Tekshirish
+## TROUBLESHOOTING
 
-### Faqat prox.uz ishlayotganini tekshirish:
+### If JWT still fails:
 ```bash
-# PM2 da faqat prox-uz-backend restart bo'lganini ko'rish
-pm2 status
-# Restart count faqat prox-uz-backend da oshgan bo'lishi kerak
-
-# Boshqa loyihalar ishlayotganini tekshirish
-curl http://localhost:5001/api/health  # Alochi
-curl http://localhost:5002/api/health  # Alibobo
-# Barchasi "ok" qaytarishi kerak
+pm2 delete prox-uz-backend
+pm2 start /opt/prox.uz/ecosystem.config.cjs
+pm2 logs prox-uz-backend
 ```
 
-### Nginx barcha saytlar uchun ishlayotganini tekshirish:
+### If port conflict:
 ```bash
-curl https://alochi.uz        # ✅ Ishlashi kerak
-curl https://alibobo.uz       # ✅ Ishlashi kerak
-curl https://prox.uz          # ✅ Ishlashi kerak
+# Check what's using the port
+lsof -i :5004
+
+# If needed, kill only that process
+lsof -ti:5004 | xargs kill -9
 ```
 
-## Muammo Bo'lsa
-
-Agar biror loyihaga ta'sir qilgan bo'lsa:
-
-### PM2 processni tiklash:
+### If nginx 500 error:
 ```bash
-cd /opt/[loyiha-nomi]
-pm2 restart [process-name]
+# Check nginx error logs
+sudo tail -f /var/log/nginx/prox.uz-error.log
+
+# Verify dist folder exists
+ls -la /opt/prox.uz/dist
+
+# Rebuild frontend if needed
+cd /opt/prox.uz && npm run build
 ```
 
-### Nginx tiklash:
+## EMERGENCY ROLLBACK
+
+If something breaks:
 ```bash
-sudo nginx -t                 # Config tekshirish
-sudo systemctl reload nginx   # Reload (restart emas!)
+# Stop prox-uz only
+pm2 delete prox-uz-backend
+
+# Verify other projects still running
+pm2 list
+
+# Check nginx for other sites
+curl https://alibobo.uz
+curl https://alochi.uz
 ```
 
-## Xulosa
+---
 
-✅ Barcha scriptlar **FAQAT** `/opt/prox.uz` papkasida ishlaydi
-✅ PM2 commands **FAQAT** `prox-uz-backend` processiga ta'sir qiladi
-✅ Nginx config **FAQAT** `prox.uz` domain uchun
-✅ Port **FAQAT** `5003` ishlatiladi
-✅ Database **FAQAT** `prox_crm` ishlatiladi
-
-**Boshqa loyihalarga HECH QANDAY ta'sir qilmaydi!** 🛡️
+**Last Updated**: January 6, 2026
+**Status**: Ready for deployment
+**Next Step**: Run `./DEPLOY_NOW.sh` on VPS

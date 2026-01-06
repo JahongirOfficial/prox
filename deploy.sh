@@ -41,16 +41,22 @@ cp server/.env.production server/.env
 # Step 6: Create logs directory
 mkdir -p logs
 
-# Step 7: Restart PM2 process
-echo -e "${YELLOW}🔄 Restarting PM2 process...${NC}"
-pm2 restart $PM2_APP_NAME || pm2 start ecosystem.config.cjs
+# Step 7: Update nginx configuration
+echo -e "${YELLOW}🔧 Updating nginx configuration...${NC}"
+sudo cp nginx-prox.uz.conf /etc/nginx/sites-available/prox.uz
+sudo nginx -t && sudo systemctl reload nginx
 
-# Step 8: Save PM2 configuration
+# Step 8: Restart PM2 process (delete and recreate to ensure env vars are loaded)
+echo -e "${YELLOW}🔄 Restarting PM2 process...${NC}"
+pm2 delete $PM2_APP_NAME 2>/dev/null || echo "Process not found, creating new one..."
+pm2 start ecosystem.config.cjs
+
+# Step 9: Save PM2 configuration
 pm2 save
 
 echo -e "${GREEN}✅ Deployment completed successfully!${NC}"
-echo -e "${GREEN}🌐 Application is running at: http://prox.uz${NC}"
-echo -e "${GREEN}🔌 Backend running on port: 5003${NC}"
+echo -e "${GREEN}🌐 Application is running at: https://prox.uz${NC}"
+echo -e "${GREEN}🔌 Backend running on port: 5004${NC}"
 
 # Show PM2 status
 pm2 status
