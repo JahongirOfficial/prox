@@ -16,20 +16,20 @@ const importAll14Students = async () => {
     console.log(`\n📊 HOZIRGI STUDENTS COLLECTION: ${currentStudents.length} ta o'quvchi`)
 
     if (currentStudents.length >= 14) {
-      console.log('\n✅ Students collection'da allaqachon 14+ ta o\'quvchi bor!')
-      console.log('Hech narsa qilish shart emas, barcha ma\'lumotlar tayyor.')
+      console.log('\n✅ Students collectionda allaqachon 14+ ta o`quvchi bor!')
+      console.log('Hech narsa qilish shart emas, barcha ma`lumotlar tayyor.')
       
       // Show all students
-      console.log('\n👥 BARCHA O\'QUVCHILAR:')
+      console.log('\n👥 BARCHA O`QUVCHILAR:')
       currentStudents.forEach((student, index) => {
-        console.log(`${index + 1}. ${student.fullName || student.name || 'Noma\'lum'} (${student.username || 'username yo\'q'}) - ${student.course || 'Kurs noma\'lum'}`)
+        console.log(`${index + 1}. ${student.fullName || student.name || 'Nomalum'} (${student.username || 'username yoq'}) - ${student.course || 'Kurs nomalum'}`)
       })
       
       process.exit(0)
     }
 
     // If we have less than 14, we need to get more data
-    console.log('\n🔍 14 ta o\'quvchi topish uchun boshqa collection\'larni tekshirish...')
+    console.log('\n🔍 14 ta o`quvchi topish uchun boshqa collectionlarni tekshirish...')
 
     // Clear current students
     await originalStudentsCol.deleteMany({})
@@ -68,7 +68,7 @@ const importAll14Students = async () => {
       allStudents.push(student)
     })
 
-    console.log(`📊 StudentProgresses'dan: ${uniqueFromProgresses.size} ta o'quvchi`)
+    console.log(`📊 StudentProgresses'dan: ${uniqueFromProgresses.size} ta o\`quvchi`)
 
     // Get from realprogresses
     const realProgressesCol = mongoose.connection.db.collection('realprogresses')
@@ -107,7 +107,7 @@ const importAll14Students = async () => {
       }
     })
 
-    console.log(`📈 RealProgresses'dan: ${uniqueFromReal.size} ta o'quvchi`)
+    console.log(`📈 RealProgresses'dan: ${uniqueFromReal.size} ta o\`quvchi`)
 
     // Add more students to reach 14 if needed
     const additionalStudents = [
@@ -233,7 +233,7 @@ const importAll14Students = async () => {
       }
     }
 
-    console.log(`➕ Qo'shimcha qo'shildi: ${addedCount} ta o'quvchi`)
+    console.log(`➕ Qo'shimcha qo'shildi: ${addedCount} ta o\`quvchi`)
 
     // Add timestamps
     const studentsToInsert = allStudents.slice(0, 14).map(student => ({
@@ -245,9 +245,9 @@ const importAll14Students = async () => {
     // Insert all 14 students
     if (studentsToInsert.length > 0) {
       await originalStudentsCol.insertMany(studentsToInsert)
-      console.log(`\n✅ ${studentsToInsert.length} ta o'quvchi qo'shildi`)
+      console.log(`\n✅ ${studentsToInsert.length} ta o\`quvchi qo'shildi`)
 
-      console.log('\n👥 BARCHA 14 TA O\'QUVCHI:')
+      console.log('\n👥 BARCHA 14 TA O`QUVCHI:')
       studentsToInsert.forEach((student, index) => {
         console.log(`${index + 1}. ${student.fullName} (${student.username}) - ${student.course} - ${student.progress}%`)
       })
@@ -269,7 +269,7 @@ const importAll14Students = async () => {
       console.log(`   O'rtacha progress: ${stats.avgProgress}%`)
     }
 
-    console.log('\n🎉 Barcha 14 ta o\'quvchi muvaffaqiyatli qo\'shildi!')
+    console.log('\n🎉 Barcha 14 ta o`quvchi muvaffaqiyatli qo`shildi!')
     process.exit(0)
   } catch (error) {
     console.error('❌ Xatolik:', error)

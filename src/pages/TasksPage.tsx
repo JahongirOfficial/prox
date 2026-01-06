@@ -14,7 +14,6 @@ export default function TasksPage() {
   const [workflowStep, setWorkflowStep] = useState<number | null>(null)
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
-  const [students, setStudents] = useState<any[]>([]) // Admin uchun o'quvchilar
   const [stats, setStats] = useState({
     total: 0,
     completed: 0,

@@ -136,7 +136,7 @@ export default function Students() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar isLoggedIn={true} userRole={user?.role} isMobileOpen={sidebarOpen} onMobileClose={() => setSidebarOpen(false)} />
       <Navbar onMenuClick={() => setSidebarOpen(true)} title="O'quvchilar" subtitle="Barcha o'quvchilar ro'yxati" />
 
       <main className="lg:ml-64 pt-20 lg:pt-0 p-4 lg:p-8">

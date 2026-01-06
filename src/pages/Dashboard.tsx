@@ -118,7 +118,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar isLoggedIn={true} userRole={user?.role} isMobileOpen={sidebarOpen} onMobileClose={() => setSidebarOpen(false)} />
       <Navbar onMenuClick={() => setSidebarOpen(true)} title="Dashboard" subtitle={`Xush kelibsiz, ${user?.fullName}`} />
 
       {/* Main Content */}

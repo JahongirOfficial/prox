@@ -19,18 +19,13 @@ export default function StudentProfile() {
   const [isVisible, setIsVisible] = useState<Record<string, boolean>>({})
 
   let viewerRole: string | null = null
-  let viewerId: string | null = null
   try {
     const raw = localStorage.getItem('user')
     const parsed = raw ? JSON.parse(raw) : null
     viewerRole = parsed?.role || null
-    viewerId = parsed?.id || null
   } catch {
     viewerRole = null
-    viewerId = null
   }
-
-  const isStudentViewer = viewerRole === 'student'
 
   const headerRef = useRef<HTMLDivElement>(null)
   const mainStatsRef = useRef<HTMLDivElement>(null)
