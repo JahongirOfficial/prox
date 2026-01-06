@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Public Payment Status Ledger - proX Academy</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0f1729",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#0f1729", /* Matching the requested dark navy */
+                        "surface-dark": "#1e293b", /* Slightly lighter for cards/tables */
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.375rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f1729; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased min-h-screen flex flex-col">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-primary/95 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
+<!-- Logo -->
+<div class="flex items-center gap-3 text-primary dark:text-white">
+<div class="size-8 flex items-center justify-center text-blue-500">
+<svg class="w-full h-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" fill="currentColor"></path>
+</svg>
+</div>
+<span class="text-xl font-bold tracking-tight">proX Academy</span>
+</div>
+<!-- Navigation Links -->
+<div class="hidden md:flex items-center gap-8">
+<a class="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-white text-sm font-medium transition-colors" href="#">Home</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-white text-sm font-medium transition-colors" href="#">Courses</a>
+<a class="text-blue-600 dark:text-white text-sm font-medium" href="#">Public Ledger</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-white text-sm font-medium transition-colors" href="#">Contact</a>
+</div>
+<!-- Mobile Menu Button (Icon only for visual) -->
+<div class="md:hidden text-slate-400">
+<span class="material-symbols-outlined">menu</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+<!-- Breadcrumbs -->
+<nav aria-label="Breadcrumb" class="flex">
+<ol class="flex items-center space-x-2">
+<li>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm font-medium" href="#">Home</a>
+</li>
+<li class="flex items-center">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-600 text-sm">chevron_right</span>
+<a aria-current="page" class="ml-2 text-slate-900 dark:text-white text-sm font-medium" href="#">Public Ledger</a>
+</li>
+</ol>
+</nav>
+<!-- Page Header -->
+<div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+<div class="space-y-2">
+<h1 class="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+                        Outstanding Fee Ledger
+                    </h1>
+<p class="text-slate-600 dark:text-slate-400 max-w-2xl text-lg">
+                        Public transparency record for proX Academy student fees.
+                    </p>
+</div>
+<div class="hidden md:block">
+<span class="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-500/20">
+                        Last Updated: Oct 24, 2023
+                     </span>
+</div>
+</div>
+<!-- Disclaimer Banner -->
+<div class="rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 p-4 md:p-6">
+<div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+<div class="flex-shrink-0">
+<div class="p-2 bg-amber-100 dark:bg-amber-900/40 rounded-full text-amber-600 dark:text-amber-500">
+<span class="material-symbols-outlined">info</span>
+</div>
+</div>
+<div class="flex-1">
+<h3 class="text-sm font-bold text-amber-800 dark:text-amber-500">Important Notice</h3>
+<p class="mt-1 text-sm text-amber-700 dark:text-amber-400/80 leading-relaxed">
+                            This list reflects current records for informational purposes only. If your name appears here in error, or if payment has recently been made, please contact our finance department immediately to rectify the record.
+                        </p>
+</div>
+<div class="flex-shrink-0 mt-3 md:mt-0">
+<a class="inline-flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-500 hover:text-amber-900 dark:hover:text-amber-400 transition-colors" href="#">
+                            Contact Finance
+                            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Search and Filter -->
+<div class="flex flex-col sm:flex-row gap-4">
+<div class="relative flex-1">
+<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="block w-full rounded-lg border-0 py-3 pl-10 pr-4 text-slate-900 dark:text-white bg-white dark:bg-surface-dark ring-1 ring-inset ring-slate-200 dark:ring-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 shadow-sm" placeholder="Search by student name..." type="text"/>
+</div>
+<div class="w-full sm:w-48">
+<div class="relative">
+<select class="block w-full appearance-none rounded-lg border-0 py-3 pl-4 pr-10 text-slate-900 dark:text-white bg-white dark:bg-surface-dark ring-1 ring-inset ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 shadow-sm cursor-pointer">
+<option>All Cohorts</option>
+<option>Fall 2023</option>
+<option>Summer 2023</option>
+<option>Spring 2023</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+<span class="material-symbols-outlined text-lg">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Ledger Table -->
+<div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-surface-dark shadow-sm">
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+<thead class="bg-slate-50 dark:bg-primary">
+<tr>
+<th class="py-4 pl-4 pr-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 sm:pl-6" scope="col">
+                                    Student Name
+                                </th>
+<th class="px-3 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400" scope="col">
+                                    Cohort
+                                </th>
+<th class="px-3 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400" scope="col">
+                                    Last Activity
+                                </th>
+<th class="px-3 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 sm:pr-6" scope="col">
+                                    Status
+                                </th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-surface-dark">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-slate-900 dark:text-white sm:pl-6">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
+                                            AD
+                                        </div>
+<span>Alex D.</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    FS - Fall 2023
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    3 days ago
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-right text-sm sm:pr-6">
+<span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-500/10 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/10 dark:ring-red-500/20">
+<span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-red-600 dark:bg-red-400"></span>
+                                        Overdue
+                                    </span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-slate-900 dark:text-white sm:pl-6">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
+                                            JS
+                                        </div>
+<span>Jordan S.</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    BE - Summer 2023
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    1 week ago
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-right text-sm sm:pr-6">
+<span class="inline-flex items-center rounded-md bg-orange-50 dark:bg-orange-500/10 px-2 py-1 text-xs font-medium text-orange-700 dark:text-orange-400 ring-1 ring-inset ring-orange-600/10 dark:ring-orange-500/20">
+<span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-orange-500 dark:bg-orange-400"></span>
+                                        Pending Payment
+                                    </span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-slate-900 dark:text-white sm:pl-6">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
+                                            MK
+                                        </div>
+<span>Michael K.</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    FS - Fall 2023
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    Yesterday
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-right text-sm sm:pr-6">
+<span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-500/10 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/10 dark:ring-red-500/20">
+<span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-red-600 dark:bg-red-400"></span>
+                                        Overdue
+                                    </span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-slate-900 dark:text-white sm:pl-6">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
+                                            EL
+                                        </div>
+<span>Emma L.</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    UI/UX - Spring 2023
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    2 weeks ago
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-right text-sm sm:pr-6">
+<span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-500/10 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/10 dark:ring-red-500/20">
+<span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-red-600 dark:bg-red-400"></span>
+                                        Action Required
+                                    </span>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-slate-900 dark:text-white sm:pl-6">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
+                                            RP
+                                        </div>
+<span>Ravi P.</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    BE - Fall 2023
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    Today
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-right text-sm sm:pr-6">
+<span class="inline-flex items-center rounded-md bg-orange-50 dark:bg-orange-500/10 px-2 py-1 text-xs font-medium text-orange-700 dark:text-orange-400 ring-1 ring-inset ring-orange-600/10 dark:ring-orange-500/20">
+<span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-orange-500 dark:bg-orange-400"></span>
+                                        Pending Payment
+                                    </span>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-slate-900 dark:text-white sm:pl-6">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
+                                            SW
+                                        </div>
+<span>Sarah W.</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    FS - Summer 2023
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                    1 month ago
+                                </td>
+<td class="whitespace-nowrap px-3 py-4 text-right text-sm sm:pr-6">
+<span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-500/10 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/10 dark:ring-red-500/20">
+<span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-red-600 dark:bg-red-400"></span>
+                                        Account Frozen
+                                    </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Pagination / Info -->
+<div class="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-4">
+<div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+<div>
+<p class="text-sm text-slate-500 dark:text-slate-400">
+                            Showing <span class="font-medium text-slate-900 dark:text-white">1</span> to <span class="font-medium text-slate-900 dark:text-white">6</span> of <span class="font-medium text-slate-900 dark:text-white">42</span> results
+                        </p>
+</div>
+<div>
+<nav aria-label="Pagination" class="isolate inline-flex -space-x-px rounded-md shadow-sm">
+<a class="relative inline-flex items-center rounded-l-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-200 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:z-20 focus:outline-offset-0" href="#">
+<span class="sr-only">Previous</span>
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</a>
+<a aria-current="page" class="relative z-10 inline-flex items-center bg-blue-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" href="#">1</a>
+<a class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white ring-1 ring-inset ring-slate-200 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:z-20 focus:outline-offset-0" href="#">2</a>
+<a class="relative hidden items-center px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white ring-1 ring-inset ring-slate-200 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:z-20 focus:outline-offset-0 md:inline-flex" href="#">3</a>
+<a class="relative inline-flex items-center rounded-r-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-200 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:z-20 focus:outline-offset-0" href="#">
+<span class="sr-only">Next</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-primary py-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-3 text-slate-500 dark:text-slate-400">
+<div class="size-6 text-slate-400 dark:text-slate-500">
+<svg class="w-full h-full grayscale opacity-50" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" fill="currentColor"></path>
+</svg>
+</div>
+<span class="text-sm">© 2023 proX Academy. All rights reserved.</span>
+</div>
+<div class="flex items-center gap-6">
+<a class="text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" href="#">Privacy Policy</a>
+<a class="text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" href="#">Terms of Service</a>
+<a class="text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" href="#">Finance Support</a>
+</div>
+</div>
+</footer>
+</body></html>
