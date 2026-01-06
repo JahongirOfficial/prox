@@ -1,5 +1,5 @@
-import Task from '../models/Task'
-import Submission from '../models/Submission'
+import Task from '../models/Task.js'
+import Submission from '../models/Submission.js'
 
 // Groq API integration
 const GROQ_API_KEY = process.env.GROQ_API_KEY

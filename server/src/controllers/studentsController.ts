@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
-import Student from '../models/Student'
-import User from '../models/User'
-import Submission from '../models/Submission'
-import Task from '../models/Task'
+import Student from '../models/Student.js'
+import User from '../models/User.js'
+import Submission from '../models/Submission.js'
+import Task from '../models/Task.js'
 
 // Get all students
 export const getAllStudents = async (req: Request, res: Response) => {

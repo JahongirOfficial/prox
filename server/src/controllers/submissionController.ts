@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import Submission from '../models/Submission'
-import Task from '../models/Task'
-import { AIReviewService } from '../services/aiReviewService'
+import Submission from '../models/Submission.js'
+import Task from '../models/Task.js'
+import { AIReviewService } from '../services/aiReviewService.js'
 
 // Vazifa topshirish
 export const submitTask = async (req: Request, res: Response) => {

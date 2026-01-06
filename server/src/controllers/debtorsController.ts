@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import Student from '../models/Student'
+import Student from '../models/Student.js'
 
 // Get all academic debtors (students behind in their studies)
 export const getAllDebtors = async (req: Request, res: Response) => {
