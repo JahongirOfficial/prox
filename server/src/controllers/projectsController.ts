@@ -4,7 +4,7 @@ import Project from '../models/Project.js'
 // Get all projects
 export const getAllProjects = async (req: Request, res: Response) => {
   try {
-    const projects = await Project.find().sort({ createdAt: 1 })
+    const projects = await Project.find().sort({ _id: 1 })
     res.json(projects)
   } catch (error) {
     console.error('Get projects error:', error)
