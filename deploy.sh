@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 # Configuration
 PROJECT_NAME="prox.uz"
 DEPLOY_PATH="/opt/prox.uz"
-PM2_APP_NAME="prox-uz"
+PM2_APP_NAME="prox-uz-backend"
 
 # Step 1: Pull latest changes
 echo -e "${YELLOW}📥 Pulling latest changes from Git...${NC}"
@@ -33,15 +33,24 @@ npm run build
 echo -e "${YELLOW}🔨 Building backend...${NC}"
 cd server && npm run build && cd ..
 
-# Step 5: Restart PM2 process
+# Step 5: Copy production environment files
+echo -e "${YELLOW}📝 Setting up production environment...${NC}"
+cp .env.production .env
+cp server/.env.production server/.env
+
+# Step 6: Create logs directory
+mkdir -p logs
+
+# Step 7: Restart PM2 process
 echo -e "${YELLOW}🔄 Restarting PM2 process...${NC}"
 pm2 restart $PM2_APP_NAME || pm2 start ecosystem.config.cjs
 
-# Step 6: Save PM2 configuration
+# Step 8: Save PM2 configuration
 pm2 save
 
 echo -e "${GREEN}✅ Deployment completed successfully!${NC}"
 echo -e "${GREEN}🌐 Application is running at: http://prox.uz${NC}"
+echo -e "${GREEN}🔌 Backend running on port: 5003${NC}"
 
 # Show PM2 status
 pm2 status

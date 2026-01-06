@@ -1,13 +1,13 @@
 module.exports = {
   apps: [
     {
-      name: 'prox-uz',
+      name: 'prox-uz-backend',
       script: './server/dist/server.js',
       instances: 1,
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 5000
+        PORT: 5003
       },
       error_file: './logs/err.log',
       out_file: './logs/out.log',
