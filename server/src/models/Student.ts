@@ -26,6 +26,11 @@ export interface IStudent extends Document {
   }>
   is_blocked: boolean
   blocked_at: Date
+  // To'lov tizimi uchun yangi maydonlar
+  current_month_payment?: 'paid' | 'unpaid'
+  last_payment_date?: Date
+  payment_deadline?: Date
+  payment_warning_shown?: boolean
   created_at: Date
   updated_at: Date
   // Additional fields for debtors
@@ -64,6 +69,11 @@ const StudentSchema: Schema = new Schema({
   }],
   is_blocked: { type: Boolean, default: false },
   blocked_at: Date,
+  // To'lov tizimi uchun yangi maydonlar
+  current_month_payment: { type: String, enum: ['paid', 'unpaid'], default: 'unpaid' },
+  last_payment_date: Date,
+  payment_deadline: Date,
+  payment_warning_shown: { type: Boolean, default: false },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
   // Additional fields

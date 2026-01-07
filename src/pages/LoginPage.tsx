@@ -20,6 +20,11 @@ export default function LoginPage() {
     try {
       const response = await authService.login(formData)
       if (response.success && response.token) {
+        // PaymentStatus'ni localStorage'ga saqlash
+        if (response.paymentStatus) {
+          localStorage.setItem('paymentStatus', JSON.stringify(response.paymentStatus))
+        }
+        
         const role = response.user?.role
         window.location.href = role === 'student' ? '/' : '/dashboard'
       } else {

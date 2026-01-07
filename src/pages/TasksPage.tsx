@@ -14,6 +14,7 @@ export default function TasksPage() {
   const [workflowStep, setWorkflowStep] = useState<number | null>(null)
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
+  const [paymentBlocked, setPaymentBlocked] = useState(false)
   const [stats, setStats] = useState({
     total: 0,
     completed: 0,
@@ -33,6 +34,21 @@ export default function TasksPage() {
   }
   const isStudentViewer = viewerRole === 'student'
   const isAdmin = viewerRole === 'admin'
+
+  // To'lov holatini tekshirish
+  useEffect(() => {
+    if (isStudentViewer) {
+      try {
+        const paymentStatusRaw = localStorage.getItem('paymentStatus')
+        if (paymentStatusRaw) {
+          const paymentStatus = JSON.parse(paymentStatusRaw)
+          setPaymentBlocked(paymentStatus.status === 'blocked' || !paymentStatus.canAccess)
+        }
+      } catch {
+        setPaymentBlocked(false)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     fetchTasks()
@@ -334,7 +350,9 @@ export default function TasksPage() {
             <Star className="w-4 h-4 text-purple-400" />
           </div>
           <div>
-            <p className="text-lg font-bold text-white">{stats.totalPoints}</p>
+            <p className="text-lg font-bold text-white">
+              {paymentBlocked && isStudentViewer ? '***' : stats.totalPoints}
+            </p>
             <p className="text-[10px] text-slate-400">Ball</p>
           </div>
         </div>
@@ -374,7 +392,9 @@ export default function TasksPage() {
 
                 {/* Title */}
                 <h3 className="text-sm font-semibold text-white mb-1 truncate">{mainTask?.title || `${stepNumber}-qadam`}</h3>
-                <p className="text-xs text-slate-400 mb-3">{testTasks.length} ta test • {mainTask?.points || 0} ball</p>
+                <p className="text-xs text-slate-400 mb-3">
+                  {testTasks.length} ta test • {paymentBlocked && isStudentViewer ? '***' : (mainTask?.points || 0)} ball
+                </p>
 
                 {/* Progress bar */}
                 <div className="w-full h-1.5 bg-slate-700/50 rounded-full mb-3">
@@ -439,13 +459,17 @@ export default function TasksPage() {
                   {/* Title & info */}
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm sm:text-base font-semibold text-white truncate">{mainTask?.title || `${stepNumber}-qadam`}</h3>
-                    <p className="text-[10px] sm:text-xs text-slate-400">{testTasks.length} ta test • {mainTask?.points || 0} ball</p>
+                    <p className="text-[10px] sm:text-xs text-slate-400">
+                      {testTasks.length} ta test • {paymentBlocked && isStudentViewer ? '***' : (mainTask?.points || 0)} ball
+                    </p>
                   </div>
 
                   {/* Progress - desktop only */}
                   <div className="hidden sm:flex items-center gap-4">
                     <div className="text-center">
-                      <p className="text-sm font-bold text-white">{progress}%</p>
+                      <p className="text-sm font-bold text-white">
+                        {paymentBlocked && isStudentViewer ? '***' : `${progress}%`}
+                      </p>
                       <p className="text-[10px] text-slate-400">Jarayon</p>
                     </div>
                     <div className="text-center">

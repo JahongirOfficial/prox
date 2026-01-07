@@ -4,6 +4,39 @@ import mongoose from 'mongoose'
 import User from '../models/User.js'
 import { AuthRequest } from '../middleware/auth.js'
 
+// To'lov holatini tekshirish funksiyasi
+const checkStudentPaymentStatus = (student: any) => {
+  const today = new Date();
+  const currentDay = today.getDate();
+  
+  // Agar to'lagan bo'lsa
+  if (student.current_month_payment === 'paid') {
+    return {
+      canAccess: true,
+      message: 'To\'lov qilingan',
+      status: 'paid'
+    };
+  }
+  
+  // Agar 1-10 sanalar orasida bo'lsa va to'lamagan bo'lsa
+  if (currentDay >= 1 && currentDay <= 10) {
+    return {
+      canAccess: true,
+      message: `To'lov davri! ${10 - currentDay + 1} kun qoldi. 10-sanagacha to'lov qiling!`,
+      status: 'warning',
+      daysLeft: 10 - currentDay + 1
+    };
+  }
+  
+  // Agar 10-sanadan keyin bo'lsa va to'lamagan bo'lsa
+  return {
+    canAccess: false,
+    message: 'To\'lov muddati o\'tdi! To\'lov qilmaguningizcha foizlaringizni ko\'ra olmaysiz. CRM admin bilan bog\'laning.',
+    status: 'blocked',
+    blocked: true
+  };
+};
+
 // JWT token yaratish
 const generateToken = (id: string, role: string = 'student') => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET || 'default-secret', {
@@ -82,6 +115,9 @@ export const login = async (req: Request, res: Response) => {
       });
       
       if (studentPassword === password) {
+        // To'lov holatini tekshirish
+        const paymentStatus = checkStudentPaymentStatus(student);
+        
         const token = generateToken(student._id.toString(), 'student')
 
         return res.status(200).json({
@@ -96,6 +132,7 @@ export const login = async (req: Request, res: Response) => {
             totalBall: student.totalBall,
             step: student.step,
           },
+          paymentStatus, // To'lov holati haqida ma'lumot
         })
       } else {
         console.log('❌ Student parol noto\'g\'ri');

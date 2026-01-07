@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import Layout from './components/Layout'
+import PaymentWarning from './components/PaymentWarning'
 import LoginPage from './pages/LoginPage'
 import HomePage from './pages/HomePage'
 import DashboardPage from './pages/DashboardPage'
@@ -25,6 +26,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'))
   const [userRole, setUserRole] = useState<string | null>(initialUser?.role || null)
   const [userId, setUserId] = useState<string | null>(initialUser?.id || null)
+  const [paymentStatus, setPaymentStatus] = useState<any>(null)
 
   useEffect(() => {
     // Check if user is logged in from localStorage
@@ -35,14 +37,29 @@ function App() {
       const parsed = raw ? JSON.parse(raw) : null
       setUserRole(parsed?.role || null)
       setUserId(parsed?.id || null)
+      
+      // To'lov holatini localStorage'dan olish
+      const paymentStatusRaw = localStorage.getItem('paymentStatus')
+      if (paymentStatusRaw) {
+        setPaymentStatus(JSON.parse(paymentStatusRaw))
+      }
     } catch {
       setUserRole(null)
       setUserId(null)
+      setPaymentStatus(null)
     }
   }, [])
 
   return (
     <Router>
+      {/* To'lov ogohlantirish - faqat student uchun */}
+      {isLoggedIn && userRole === 'student' && paymentStatus && (
+        <PaymentWarning 
+          paymentStatus={paymentStatus} 
+          onClose={() => setPaymentStatus(null)}
+        />
+      )}
+      
       <Routes>
         {/* Login page - faqat login bo'lmagan holat uchun */}
         <Route 
@@ -57,7 +74,7 @@ function App() {
         {/* Public routes - login bo'lmagan holat uchun */}
         {!isLoggedIn ? (
           <>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<AcademyPage />} />
             <Route path="/students" element={
               <Layout isLoggedIn={false}>
                 <StudentsPage />
