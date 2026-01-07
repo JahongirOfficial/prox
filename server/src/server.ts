@@ -38,6 +38,18 @@ app.use((req, res, next) => {
   next();
 });
 
+// JSON parsing debug middleware
+app.use((req, res, next) => {
+  if (req.method === 'POST' && req.headers['content-type']?.includes('application/json')) {
+    console.log('🔍 JSON request detected:', {
+      contentType: req.headers['content-type'],
+      contentLength: req.headers['content-length'],
+      hasBody: !!req.body
+    });
+  }
+  next();
+});
+
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/students', studentsRoutes)
