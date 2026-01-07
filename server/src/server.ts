@@ -56,7 +56,7 @@ app.use('/api/students', studentsRoutes)
 app.use('/api/debtors', debtorsRoutes)
 app.use('/api/projects', projectsRoutes)
 app.use('/api/tasks', tasksRoutes)
-app.use('/api', submissionRoutes)
+app.use('/api/submissions', submissionRoutes)
 
 // Test route
 app.get('/', (req, res) => {
