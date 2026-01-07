@@ -19,6 +19,7 @@ export const login = async (req: Request, res: Response) => {
     const { username, password } = req.body
 
     console.log('🔐 Login urinishi:', { username, password: '***' });
+    console.log('🔍 MongoDB connection state:', mongoose.connection.readyState);
 
     // Validatsiya
     if (!username || !password) {
@@ -103,12 +104,20 @@ export const login = async (req: Request, res: Response) => {
 
     // 3. Branches collection'dan mentor qidirish
     const branchesCollection = db.collection('branches')
+    console.log('🔍 Branches collection:', branchesCollection.collectionName);
+    
     const mentorBranch = await branchesCollection.findOne({ 
       mentor_username: username // lowercaseUsername emas, username ishlatish
     })
 
     console.log('🔍 Mentor qidirilmoqda:', username);
     console.log('📋 Topilgan mentor:', mentorBranch ? 'Topildi' : 'Topilmadi');
+    if (mentorBranch) {
+      console.log('📋 Mentor ma\'lumotlari:', { 
+        username: mentorBranch.mentor_username, 
+        password: mentorBranch.mentor_password 
+      });
+    }
 
     if (mentorBranch && mentorBranch.mentor_password === password) {
       const token = generateToken(mentorBranch._id.toString(), 'mentor')
