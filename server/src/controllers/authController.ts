@@ -18,6 +18,8 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body
 
+    console.log('🔐 Login urinishi:', { username, password: '***' });
+
     // Validatsiya
     if (!username || !password) {
       return res.status(400).json({
@@ -62,12 +64,21 @@ export const login = async (req: Request, res: Response) => {
     
     const studentsCollection = db.collection('students')
     const student = await studentsCollection.findOne({ 
-      username: lowercaseUsername 
+      username: username // lowercaseUsername emas, username ishlatish
     })
+
+    console.log('🔍 Student qidirilmoqda:', username);
+    console.log('📋 Topilgan student:', student ? 'Topildi' : 'Topilmadi');
 
     if (student) {
       // O'quvchi paroli plain text yoki plainPassword fieldida (prox_crm shunday saqlaydi)
       const studentPassword = student.plainPassword || student.password
+      
+      console.log('🔐 Student parol tekshirilmoqda:', { 
+        username: student.username, 
+        hasPassword: !!studentPassword,
+        inputPassword: password 
+      });
       
       if (studentPassword === password) {
         const token = generateToken(student._id.toString(), 'student')
@@ -85,14 +96,19 @@ export const login = async (req: Request, res: Response) => {
             step: student.step,
           },
         })
+      } else {
+        console.log('❌ Student parol noto\'g\'ri');
       }
     }
 
     // 3. Branches collection'dan mentor qidirish
     const branchesCollection = db.collection('branches')
     const mentorBranch = await branchesCollection.findOne({ 
-      mentor_username: lowercaseUsername 
+      mentor_username: username // lowercaseUsername emas, username ishlatish
     })
+
+    console.log('🔍 Mentor qidirilmoqda:', username);
+    console.log('📋 Topilgan mentor:', mentorBranch ? 'Topildi' : 'Topilmadi');
 
     if (mentorBranch && mentorBranch.mentor_password === password) {
       const token = generateToken(mentorBranch._id.toString(), 'mentor')
@@ -113,8 +129,11 @@ export const login = async (req: Request, res: Response) => {
 
     // 4. Branches collection'dan manager qidirish
     const managerBranch = await branchesCollection.findOne({ 
-      manager_username: lowercaseUsername 
+      manager_username: username // lowercaseUsername emas, username ishlatish
     })
+
+    console.log('🔍 Manager qidirilmoqda:', username);
+    console.log('📋 Topilgan manager:', managerBranch ? 'Topildi' : 'Topilmadi');
 
     if (managerBranch && managerBranch.manager_user_password === password) {
       const token = generateToken(managerBranch._id.toString(), 'manager')

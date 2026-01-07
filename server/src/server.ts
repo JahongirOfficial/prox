@@ -32,6 +32,12 @@ import projectsRoutes from './routes/projectsRoutes.js'
 import tasksRoutes from './routes/tasksRoutes.js'
 import submissionRoutes from './routes/submissionRoutes.js'
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`📥 ${req.method} ${req.path}`, req.body);
+  next();
+});
+
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/students', studentsRoutes)
