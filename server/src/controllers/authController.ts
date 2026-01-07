@@ -51,7 +51,7 @@ export const login = async (req: Request, res: Response) => {
       }
     }
 
-    // 2. Students collection'dan qidirish (prox.uz_crm dan kelgan o'quvchilar)
+    // 2. Students collection'dan qidirish (prox_crm dan kelgan o'quvchilar)
     const db = mongoose.connection.db
     if (!db) {
       return res.status(500).json({
@@ -66,8 +66,10 @@ export const login = async (req: Request, res: Response) => {
     })
 
     if (student) {
-      // O'quvchi paroli plain text (prox.uz_crm shunday saqlaydi)
-      if (student.password === password) {
+      // O'quvchi paroli plain text yoki plainPassword fieldida (prox_crm shunday saqlaydi)
+      const studentPassword = student.plainPassword || student.password
+      
+      if (studentPassword === password) {
         const token = generateToken(student._id.toString(), 'student')
 
         return res.status(200).json({
@@ -75,7 +77,7 @@ export const login = async (req: Request, res: Response) => {
           token,
           user: {
             id: student._id,
-            fullName: student.name, // prox.uz_crm'da "name" field
+            fullName: student.name, // prox_crm'da "name" field
             username: student.username,
             role: 'student',
             phone: student.phone,
