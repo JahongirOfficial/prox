@@ -13,6 +13,7 @@ import ProjectDetailPage from './pages/ProjectDetailPage'
 import TasksPage from './pages/TasksPage'
 import StudentHomePage from './pages/StudentHomePage'
 import StudentStepsPage from './pages/StudentStepsPage'
+import AcademyPage from './pages/AcademyPage'
 
 function App() {
   let initialUser: any = null
@@ -74,7 +75,12 @@ function App() {
         {/* Public routes - login bo'lmagan holat uchun */}
         {!isLoggedIn ? (
           <>
-            <Route path="/" element={<AcademyPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/academy" element={
+              <Layout isLoggedIn={false}>
+                <AcademyPage />
+              </Layout>
+            } />
             <Route path="/students" element={
               <Layout isLoggedIn={false}>
                 <StudentsPage />

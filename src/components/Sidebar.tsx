@@ -22,7 +22,7 @@ export default function Sidebar({ isLoggedIn, userRole = null, isMobileOpen = fa
   const location = useLocation()
 
   const publicMenuItems = [
-    { path: '/', label: 'Bosh sahifa', icon: 'home' },
+    { path: '/academy', label: 'Akademiya', icon: 'school' },
     { path: '/students', label: "O'quvchilar", icon: 'school' },
     { path: '/debtors', label: "Qarzdor o'quvchilar", icon: 'account_balance_wallet' },
     { path: '/projects', label: 'Loyihalarimiz', icon: 'folder' },
@@ -107,7 +107,7 @@ export default function Sidebar({ isLoggedIn, userRole = null, isMobileOpen = fa
         </nav>
 
         {/* User Info */}
-        {isLoggedIn && (
+        {isLoggedIn ? (
           <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-slate-700/50 bg-slate-900/95">
             <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50">
               <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
@@ -122,6 +122,17 @@ export default function Sidebar({ isLoggedIn, userRole = null, isMobileOpen = fa
                 <LogOut className="w-5 h-5" />
               </button>
             </div>
+          </div>
+        ) : (
+          <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-slate-700/50 bg-slate-900/95">
+            <Link to="/" className="flex items-center justify-center p-3 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 transition-all duration-200 group">
+              <div className="flex items-center gap-3">
+                <span className="text-slate-400 group-hover:text-blue-400 transition-colors">
+                  {iconMap['home']}
+                </span>
+                <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Bosh sahifa</span>
+              </div>
+            </Link>
           </div>
         )}
       </aside>

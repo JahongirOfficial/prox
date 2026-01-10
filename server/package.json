@@ -33,7 +33,8 @@
     "check:submissions": "tsx src/scripts/checkSubmissions.ts",
     "add:scores": "tsx src/scripts/addScoresToStudents.ts",
     "restore:31": "tsx src/scripts/restoreOriginal31Students.ts",
-    "restore:real31": "tsx src/scripts/restoreFrom31RealProgresses.ts"
+    "restore:real31": "tsx src/scripts/restoreFrom31RealProgresses.ts",
+    "seed:new-html-steps": "tsx src/scripts/seedNewHtmlSteps.ts"
   },
   "dependencies": {
     "@types/multer": "^2.0.0",

@@ -173,6 +173,7 @@ export default function TasksPage() {
 
   const isStepLocked = (stepNumber: number) => {
     if (!isStudentViewer) return false
+    if (isAdmin) return false // Admin uchun hech qanday qadam bloklanmaydi
     if (firstIncompleteStep === null) return false
     return stepNumber > firstIncompleteStep
   }

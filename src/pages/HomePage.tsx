@@ -298,9 +298,9 @@ export default function HomePage() {
 
   const t = (key: string) => translations[language][key] || key
 
-  // Sticky CTA visibility
+  // Sticky CTA visibility - appears very quickly on scroll
   useEffect(() => {
-    const handleScroll = () => setStickyVisible(window.scrollY > 800)
+    const handleScroll = () => setStickyVisible(window.scrollY > 50)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -308,6 +308,28 @@ export default function HomePage() {
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
   const validatePhone = (phone: string) => /^(\+998|998|8)?[0-9]{9}$/.test(phone.replace(/[\s\-\(\)]/g, ''))
+
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, '')
+    
+    // If starts with 998, add +
+    if (digits.startsWith('998')) {
+      const formatted = '+' + digits
+      if (formatted.length <= 4) return formatted
+      if (formatted.length <= 6) return formatted.slice(0, 4) + ' ' + formatted.slice(4)
+      if (formatted.length <= 9) return formatted.slice(0, 6) + ' ' + formatted.slice(6)
+      if (formatted.length <= 12) return formatted.slice(0, 9) + ' ' + formatted.slice(9)
+      return formatted.slice(0, 13) + ' ' + formatted.slice(13, 15)
+    }
+    
+    // If doesn't start with +998, add it
+    if (digits.length === 0) return ''
+    if (digits.length <= 2) return '+998 ' + digits
+    if (digits.length <= 5) return '+998 ' + digits.slice(0, 2) + ' ' + digits.slice(2)
+    if (digits.length <= 8) return '+998 ' + digits.slice(0, 2) + ' ' + digits.slice(2, 5) + ' ' + digits.slice(5)
+    return '+998 ' + digits.slice(0, 2) + ' ' + digits.slice(2, 5) + ' ' + digits.slice(5, 7) + ' ' + digits.slice(7, 9)
+  }
 
   const showNotification = (type: string, msg: string) => {
     setNotification({ type, message: msg })
@@ -370,77 +392,103 @@ export default function HomePage() {
       )}
 
       {/* ============ STICKY CTA ============ */}
-      <div className={`fixed bottom-6 right-6 z-50 hidden sm:flex flex-col gap-3 transition-all duration-500 ${stickyVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}`}>
-        <button onClick={() => scrollTo('consultation')} className="group flex items-center gap-2 px-5 py-4 btn-primary text-white rounded-2xl font-semibold shadow-2xl">
-          {Icons.rocket} <span>{t('hero.order')}</span>
-        </button>
-        <button onClick={() => scrollTo('consultation')} className="group flex items-center gap-2 px-5 py-4 btn-success text-white rounded-2xl font-semibold shadow-2xl">
-          {Icons.message} <span>{t('consultation.badge')}</span>
-        </button>
+      <div className={`fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-50 transition-all duration-300 ${stickyVisible ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0 pointer-events-none'}`}>
+        {/* Mobile: Single Academy Button */}
+        <div className="sm:hidden">
+          <button onClick={() => { navigate('/academy'); window.scrollTo(0, 0); }} className="group flex items-center justify-center gap-2 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-full shadow-lg hover:scale-110 transition-all duration-200">
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+            </svg>
+          </button>
+        </div>
+        
+        {/* Desktop: Multiple Buttons */}
+        <div className="hidden sm:flex flex-col gap-2">
+          <button onClick={() => { navigate('/academy'); window.scrollTo(0, 0); }} className="group flex items-center gap-2 px-4 py-3 btn-primary text-white rounded-xl font-medium text-base shadow-2xl hover:scale-105 transition-all duration-200">
+            {Icons.rocket} <span>{t('hero.order')}</span>
+          </button>
+          <button onClick={() => { navigate('/academy'); window.scrollTo(0, 0); }} className="group flex items-center gap-2 px-4 py-3 btn-success text-white rounded-xl font-medium text-base shadow-2xl hover:scale-105 transition-all duration-200">
+            {Icons.message} <span>{t('consultation.badge')}</span>
+          </button>
+          <button onClick={() => { navigate('/academy'); window.scrollTo(0, 0); }} className="group flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl font-medium text-base shadow-2xl hover:scale-105 transition-all duration-200">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+            </svg>
+            <span>Akademiya</span>
+          </button>
+        </div>
       </div>
 
       {/* ============ HERO SECTION ============ */}
-      <section className="relative min-h-screen bg-white">
+      <section className="relative min-h-[75vh] sm:min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 overflow-hidden">
         {/* Background Shape */}
-        <div className="absolute inset-0 overflow-visible">
-          <svg viewBox="0 0 1440 1000" className="absolute w-full hidden sm:block" style={{ height: '118%' }} preserveAspectRatio="xMidYMin slice">
-            <defs>
-              <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#1e3a8a" />
-                <stop offset="50%" stopColor="#1e40af" />
-                <stop offset="100%" stopColor="#2563eb" />
-              </linearGradient>
-            </defs>
-            <path d="M0,0 L0,700 Q360,800 720,700 Q1080,600 1440,700 L1440,0 Z" fill="url(#heroGradient)" />
-          </svg>
-          <svg viewBox="0 0 400 1000" className="absolute w-full h-full sm:hidden" preserveAspectRatio="xMidYMin slice">
-            <defs>
-              <linearGradient id="heroGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#1e3a8a" />
-                <stop offset="50%" stopColor="#1e40af" />
-                <stop offset="100%" stopColor="#2563eb" />
-              </linearGradient>
-            </defs>
-            <path d="M0,0 L0,920 Q100,1000 200,920 Q300,840 400,920 L400,0 Z" fill="url(#heroGradientMobile)" />
-          </svg>
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Desktop Wave - pastroq va kattaroq */}
+          <div className="absolute bottom-0 left-0 w-full hidden sm:block" style={{ height: '120px' }}>
+            <svg viewBox="0 0 1440 120" className="w-full h-full" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="100%" stopColor="#ffffff" />
+                </linearGradient>
+              </defs>
+              <path d="M0,60 C240,20 480,100 720,60 C960,20 1200,100 1440,60 L1440,120 L0,120 Z" fill="url(#waveGradient)" />
+            </svg>
+          </div>
+          
+          {/* Mobile Wave - yaxshilangan va kattaroq */}
+          <div className="absolute bottom-0 left-0 w-full sm:hidden" style={{ height: '80px' }}>
+            <svg viewBox="0 0 400 80" className="w-full h-full" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="waveGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="100%" stopColor="#ffffff" />
+                </linearGradient>
+              </defs>
+              <path d="M0,40 C100,15 150,65 200,40 C250,15 300,65 400,40 L400,80 L0,80 Z" fill="url(#waveGradientMobile)" />
+              <path d="M0,50 C80,25 120,75 200,50 C280,25 320,75 400,50 L400,80 L0,80 Z" fill="url(#waveGradientMobile)" opacity="0.7" />
+            </svg>
+          </div>
+          
           {/* Decorative elements */}
           <div className="absolute top-20 left-4 sm:left-10 w-40 sm:w-72 h-40 sm:h-72 bg-white/5 rounded-full blur-3xl animate-float" />
           <div className="absolute bottom-40 right-4 sm:right-10 w-48 sm:w-96 h-48 sm:h-96 bg-blue-400/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-6 min-h-screen flex flex-col justify-center">
-          <div className="text-center w-full max-w-5xl mx-auto pt-24 pb-16">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 min-h-[70vh] sm:min-h-screen flex flex-col justify-center">
+          <div className="text-center w-full max-w-5xl mx-auto pt-6 sm:pt-24 pb-20 sm:pb-32">
             {/* Title */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-8 leading-[1.1] tracking-tight">
+            <h1 className="text-2xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-4 sm:mb-8 leading-[1.1] tracking-tight px-2 sm:px-0">
               {t('hero.title')}
             </h1>
 
             {/* Subtitle */}
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-blue-100 mb-6">
+            <h2 className="text-base sm:text-2xl md:text-3xl font-semibold text-blue-100 mb-3 sm:mb-6 px-2 sm:px-0">
               {t('hero.subtitle')}
             </h2>
 
             {/* Description */}
-            <p className="text-lg md:text-xl text-blue-200/80 mb-12 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-lg md:text-xl text-blue-200/80 mb-6 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4 sm:px-0">
               {t('hero.description')}
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button onClick={() => scrollTo('consultation')} className="group flex items-center justify-center gap-3 px-10 py-5 bg-white text-blue-900 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-white/25 hover:-translate-y-1 transition-all duration-300 min-w-[240px]">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0">
+              <button onClick={() => scrollTo('consultation')} className="group flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-5 bg-white text-blue-900 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-lg shadow-2xl hover:shadow-white/25 hover:-translate-y-1 transition-all duration-300 min-w-[180px] sm:min-w-[240px]">
                 {Icons.rocket} <span>{t('hero.order')}</span>
               </button>
-              <button onClick={() => scrollTo('consultation')} className="group flex items-center justify-center gap-3 px-10 py-5 btn-success text-white rounded-2xl font-bold text-lg min-w-[240px]">
+              <button onClick={() => scrollTo('consultation')} className="group flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-5 btn-success text-white rounded-xl sm:rounded-2xl font-bold text-sm sm:text-lg min-w-[180px] sm:min-w-[240px]">
                 {Icons.message} <span>{t('hero.consultation')}</span>
               </button>
+           
             </div>
           </div>
         </div>
       </section>
 
       {/* ============ PORTFOLIO SECTION ============ */}
-      <section id="portfolio" className="pt-12 sm:pt-20 pb-12 sm:pb-20 bg-transparent relative z-10">
+<section id="portfolio" className="pt-8 sm:pt-20 pb-12 sm:pb-20 bg-white relative z-10">
         <div className="container mx-auto px-4 sm:px-6">
           <ScrollReveal animation="fade-up">
             <div className="text-center mb-8 sm:mb-16">
@@ -543,10 +591,21 @@ export default function HomePage() {
                 </div>
               </div>
               <form onSubmit={handleConsultSubmit} className="space-y-3 sm:space-y-4">
-                <input type="tel" value={consultPhone} onChange={(e) => setConsultPhone(e.target.value)} placeholder={t('consultation.placeholder.phone')} required
-                  className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300 text-sm sm:text-base" />
-                <textarea value={consultMessage} onChange={(e) => setConsultMessage(e.target.value)} placeholder={t('consultation.placeholder.message')} rows={3}
-                  className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-gray-50 border border-gray-200 rounded-xl resize-none focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300 text-sm sm:text-base" />
+                <input 
+                  type="tel" 
+                  value={consultPhone} 
+                  onChange={(e) => setConsultPhone(formatPhoneNumber(e.target.value))} 
+                  placeholder="+998 90 123 45 67" 
+                  required
+                  className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300 text-sm sm:text-base text-gray-900 placeholder-gray-500" 
+                />
+                <textarea 
+                  value={consultMessage} 
+                  onChange={(e) => setConsultMessage(e.target.value)} 
+                  placeholder={t('consultation.placeholder.message')} 
+                  rows={3}
+                  className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-white border border-gray-300 rounded-xl resize-none focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300 text-sm sm:text-base text-gray-900 placeholder-gray-500" 
+                />
                 <button type="submit" disabled={consultLoading}
                   className="w-full flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold text-sm sm:text-base hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70">
                   {consultLoading ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>{Icons.message} {t('consultation.submit')}</>}
@@ -569,11 +628,21 @@ export default function HomePage() {
                 </div>
               </div>
               <form onSubmit={handleOrderSubmit} className="space-y-3 sm:space-y-4">
-                <input type="tel" value={orderPhone} onChange={(e) => setOrderPhone(e.target.value)} placeholder={t('consultation.placeholder.phone')} required
-                  className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-sm sm:text-base" />
-                <select value={projectType} onChange={(e) => setProjectType(e.target.value)} required
-                  className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 appearance-none cursor-pointer text-sm sm:text-base"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.25rem' }}>
+                <input 
+                  type="tel" 
+                  value={orderPhone} 
+                  onChange={(e) => setOrderPhone(formatPhoneNumber(e.target.value))} 
+                  placeholder="+998 90 123 45 67" 
+                  required
+                  className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-sm sm:text-base text-gray-900 placeholder-gray-500" 
+                />
+                <select 
+                  value={projectType} 
+                  onChange={(e) => setProjectType(e.target.value)} 
+                  required
+                  className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 appearance-none cursor-pointer text-sm sm:text-base text-gray-900"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.25rem' }}
+                >
                   <option value="">{t('order.select')}</option>
                   {projectTypes.map((type) => <option key={type} value={type}>{t(`services.${type}`)}</option>)}
                 </select>
