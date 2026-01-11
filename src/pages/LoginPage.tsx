@@ -1,18 +1,21 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { authService } from '../services/authService'
-import { ArrowLeft, ArrowRight, User, Lock, AlertCircle, Info, Loader2 } from 'lucide-react'
+import { Loader2, Code2, Sparkles } from 'lucide-react'
 
 export default function LoginPage() {
-  const navigate = useNavigate()
+  const location = useLocation()
+  const from = (location.state as any)?.from?.pathname || '/'
+  
   const [formData, setFormData] = useState({ username: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [focused, setFocused] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.username.trim()) { setError('Username kiritilishi shart'); return }
-    if (!formData.password) { setError('Parol kiritilishi shart'); return }
+    if (!formData.username.trim()) { setError('Username kiriting'); return }
+    if (!formData.password) { setError('Parol kiriting'); return }
 
     setLoading(true)
     setError('')
@@ -20,98 +23,139 @@ export default function LoginPage() {
     try {
       const response = await authService.login(formData)
       if (response.success && response.token) {
-        // PaymentStatus'ni localStorage'ga saqlash
-        if (response.paymentStatus) {
-          localStorage.setItem('paymentStatus', JSON.stringify(response.paymentStatus))
+        if ((response as any).paymentStatus) {
+          localStorage.setItem('paymentStatus', JSON.stringify((response as any).paymentStatus))
         }
-        
         const role = response.user?.role
-        window.location.href = role === 'student' ? '/' : '/dashboard'
+        // Redirect to original page or default
+        const redirectTo = role === 'student' ? (from !== '/login' ? from : '/tasks') : '/dashboard'
+        window.location.href = redirectTo
       } else {
-        setError('Username yoki parol noto\'g\'ri')
+        setError('Login yoki parol noto\'g\'ri')
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Username yoki parol noto\'g\'ri')
+      setError(err.response?.data?.message || 'Login yoki parol noto\'g\'ri')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Back Button */}
-      <button type="button" onClick={() => navigate('/')}
-        className="absolute top-6 left-6 z-20 flex items-center gap-2 px-4 py-2 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl text-slate-300 hover:text-white hover:bg-slate-700/50 transition">
-        <ArrowLeft className="w-5 h-5" />
-        <span>Bosh sahifaga qaytish</span>
-      </button>
-
-      {/* Background blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Gradient orbs */}
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[150px]" />
+        
+        {/* Grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        
+        {/* Floating code symbols */}
+        <div className="absolute top-20 left-[15%] text-white/5 text-6xl font-mono animate-float">&lt;/&gt;</div>
+        <div className="absolute bottom-32 right-[20%] text-white/5 text-5xl font-mono animate-float" style={{ animationDelay: '2s' }}>{ }</div>
+        <div className="absolute top-1/3 right-[10%] text-white/5 text-4xl font-mono animate-float" style={{ animationDelay: '1s' }}>#</div>
       </div>
 
-      {/* Login Card */}
-      <div className="relative z-10 w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl shadow-purple-500/30">
-            <span className="text-3xl font-black text-white">P</span>
-          </div>
-          <h1 className="text-3xl font-bold text-white">proX Academy</h1>
-          <p className="text-slate-400 mt-2">O'quv platformasiga xush kelibsiz</p>
-        </div>
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+      `}</style>
+      
+      {/* Main container */}
+      <div className="relative w-full max-w-md z-10">
 
-        {/* Form */}
-        <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-8 border border-slate-700/50 shadow-2xl">
+        {/* Glass card */}
+        <div className="backdrop-blur-xl bg-white/[0.03] border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/20">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-4 shadow-lg shadow-purple-500/20">
+              <Code2 className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">proX Academy</h1>
+            <p className="text-white/40 text-sm mt-1">Dasturlash platformasi</p>
+          </div>
+
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Username */}
+            <div className="relative group">
+              <div className={`absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl blur-xl transition-opacity ${focused === 'username' ? 'opacity-100' : 'opacity-0'}`} />
+              <input
+                type="text"
+                value={formData.username}
+                onChange={(e) => { setFormData({ ...formData, username: e.target.value }); setError('') }}
+                onFocus={() => setFocused('username')}
+                onBlur={() => setFocused(null)}
+                className="relative w-full px-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-transparent focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.07] transition-all peer"
+                placeholder="Username"
+                autoComplete="username"
+              />
+              <label className={`absolute left-4 transition-all pointer-events-none ${
+                formData.username || focused === 'username' 
+                  ? 'top-1.5 text-[10px] text-blue-400' 
+                  : 'top-4 text-sm text-white/30'
+              }`}>
+                Username
+              </label>
+            </div>
+
+            {/* Password */}
+            <div className="relative group">
+              <div className={`absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl blur-xl transition-opacity ${focused === 'password' ? 'opacity-100' : 'opacity-0'}`} />
+              <input
+                type="password"
+                value={formData.password}
+                onChange={(e) => { setFormData({ ...formData, password: e.target.value }); setError('') }}
+                onFocus={() => setFocused('password')}
+                onBlur={() => setFocused(null)}
+                className="relative w-full px-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-transparent focus:outline-none focus:border-purple-500/50 focus:bg-white/[0.07] transition-all peer"
+                placeholder="Parol"
+                autoComplete="current-password"
+              />
+              <label className={`absolute left-4 transition-all pointer-events-none ${
+                formData.password || focused === 'password' 
+                  ? 'top-1.5 text-[10px] text-purple-400' 
+                  : 'top-4 text-sm text-white/30'
+              }`}>
+                Parol
+              </label>
+            </div>
+
+            {/* Error */}
             {error && (
-              <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <span>{error}</span>
+              <div className="flex items-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <p className="text-red-400 text-sm">{error}</p>
               </div>
             )}
 
-            <div>
-              <label htmlFor="username" className="block text-sm font-semibold text-slate-300 mb-2">Foydalanuvchi nomi</label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input id="username" type="text" autoComplete="username" value={formData.username}
-                  onChange={(e) => { setFormData({ ...formData, username: e.target.value }); if (error) setError('') }}
-                  className="w-full pl-12 pr-4 py-4 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="username" />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-slate-300 mb-2">Parol</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input id="password" type="password" autoComplete="current-password" value={formData.password}
-                  onChange={(e) => { setFormData({ ...formData, password: e.target.value }); if (error) setError('') }}
-                  className="w-full pl-12 pr-4 py-4 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="••••••••" />
-              </div>
-            </div>
-
-            <button type="submit" disabled={loading}
-              className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold rounded-xl transition transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-blue-500/30 flex items-center justify-center gap-2">
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="relative w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold rounded-xl hover:from-blue-500 hover:to-purple-500 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 overflow-hidden group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 opacity-0 group-hover:opacity-20 transition-opacity" />
               {loading ? (
-                <><Loader2 className="w-5 h-5 animate-spin" /><span>Yuklanmoqda...</span></>
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Kirish...</span>
+                </>
               ) : (
-                <><span>Kirish</span><ArrowRight className="w-5 h-5" /></>
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  <span>Kirish</span>
+                </>
               )}
             </button>
           </form>
-
-          <div className="mt-6 pt-6 border-t border-slate-700/50">
-            <p className="text-center text-slate-400 text-sm flex items-center justify-center gap-2">
-              <Info className="w-5 h-5" />
-              <span>Login va parol admin tomonidan beriladi</span>
-            </p>
-          </div>
         </div>
+
       </div>
     </div>
   )

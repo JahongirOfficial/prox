@@ -131,8 +131,12 @@ export const login = async (req: Request, res: Response) => {
             phone: student.phone,
             totalBall: student.totalBall,
             step: student.step,
+            is_blocked: student.is_blocked || false, // Bloklangan holat
           },
-          paymentStatus, // To'lov holati haqida ma'lumot
+          paymentStatus: {
+            ...paymentStatus,
+            isBlocked: student.is_blocked || false, // Bloklangan holat
+          },
         })
       } else {
         console.log('❌ Student parol noto\'g\'ri');

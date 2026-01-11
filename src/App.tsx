@@ -1,9 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import Layout from './components/Layout'
-import PaymentWarning from './components/PaymentWarning'
 import LoginPage from './pages/LoginPage'
-import HomePage from './pages/HomePage'
 import DashboardPage from './pages/DashboardPage'
 import StudentsPage from './pages/StudentsPage'
 import StudentProfile from './pages/StudentProfile'
@@ -14,6 +12,18 @@ import TasksPage from './pages/TasksPage'
 import StudentHomePage from './pages/StudentHomePage'
 import StudentStepsPage from './pages/StudentStepsPage'
 import AcademyPage from './pages/AcademyPage'
+
+// Protected Route wrapper - login kerak bo'lgan sahifalar uchun
+function ProtectedRoute({ children, isLoggedIn }: { children: React.ReactNode; isLoggedIn: boolean }) {
+  const location = useLocation()
+  
+  if (!isLoggedIn) {
+    // Login sahifasiga yo'naltirish, qaytish uchun joriy sahifani saqlash
+    return <Navigate to="/login" state={{ from: location }} replace />
+  }
+  
+  return <>{children}</>
+}
 
 function App() {
   let initialUser: any = null
@@ -27,10 +37,8 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'))
   const [userRole, setUserRole] = useState<string | null>(initialUser?.role || null)
   const [userId, setUserId] = useState<string | null>(initialUser?.id || null)
-  const [paymentStatus, setPaymentStatus] = useState<any>(null)
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
     const token = localStorage.getItem('token')
     setIsLoggedIn(!!token)
     try {
@@ -38,31 +46,17 @@ function App() {
       const parsed = raw ? JSON.parse(raw) : null
       setUserRole(parsed?.role || null)
       setUserId(parsed?.id || null)
-      
-      // To'lov holatini localStorage'dan olish
-      const paymentStatusRaw = localStorage.getItem('paymentStatus')
-      if (paymentStatusRaw) {
-        setPaymentStatus(JSON.parse(paymentStatusRaw))
-      }
     } catch {
       setUserRole(null)
       setUserId(null)
-      setPaymentStatus(null)
     }
   }, [])
 
+
   return (
     <Router>
-      {/* To'lov ogohlantirish - faqat student uchun */}
-      {isLoggedIn && userRole === 'student' && paymentStatus && (
-        <PaymentWarning 
-          paymentStatus={paymentStatus} 
-          onClose={() => setPaymentStatus(null)}
-        />
-      )}
-      
       <Routes>
-        {/* Login page - faqat login bo'lmagan holat uchun */}
+        {/* Login page */}
         <Route 
           path="/login" 
           element={
@@ -72,133 +66,98 @@ function App() {
           } 
         />
         
-        {/* Public routes - login bo'lmagan holat uchun */}
-        {!isLoggedIn ? (
-          <>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/academy" element={
-              <Layout isLoggedIn={false}>
-                <AcademyPage />
-              </Layout>
-            } />
-            <Route path="/students" element={
-              <Layout isLoggedIn={false}>
-                <StudentsPage />
-              </Layout>
-            } />
-            <Route path="/student/:id" element={
-              <Layout isLoggedIn={false}>
-                <StudentProfile />
-              </Layout>
-            } />
-            <Route path="/debtors" element={
-              <Layout isLoggedIn={false}>
-                <DebtorsPage />
-              </Layout>
-            } />
-            <Route path="/projects" element={
-              <Layout isLoggedIn={false}>
-                <ProjectsPage />
-              </Layout>
-            } />
-            <Route path="/project/:id" element={
-              <Layout isLoggedIn={false}>
-                <ProjectDetailPage />
-              </Layout>
-            } />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </>
-        ) : userRole === 'student' ? (
-          // Student routes
-          <>
-            <Route path="/" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <StudentHomePage />
-              </Layout>
-            } />
-            <Route path="/tasks" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <TasksPage />
-              </Layout>
-            } />
-            <Route path="/students" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <StudentsPage />
-              </Layout>
-            } />
-            <Route path="/debtors" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <DebtorsPage />
-              </Layout>
-            } />
-            <Route path="/projects" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <ProjectsPage />
-              </Layout>
-            } />
-            <Route path="/project/:id" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <ProjectDetailPage />
-              </Layout>
-            } />
-            <Route
-              path="/profile"
-              element={userId ? <Navigate to={`/student/${userId}`} replace /> : <Navigate to="/tasks" replace />}
-            />
-            <Route path="/student/:id" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <StudentProfile />
-              </Layout>
-            } />
-            <Route path="*" element={<Navigate to="/tasks" replace />} />
-          </>
-        ) : (
-          // Admin/Teacher routes
-          <>
-            <Route path="/dashboard" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <DashboardPage />
-              </Layout>
-            } />
-            <Route path="/tasks" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <TasksPage />
-              </Layout>
-            } />
-            <Route path="/student-steps" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <StudentStepsPage />
-              </Layout>
-            } />
-            <Route path="/students" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <StudentsPage />
-              </Layout>
-            } />
-            <Route path="/student/:id" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <StudentProfile />
-              </Layout>
-            } />
-            <Route path="/debtors" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <DebtorsPage />
-              </Layout>
-            } />
-            <Route path="/projects" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <ProjectsPage />
-              </Layout>
-            } />
-            <Route path="/project/:id" element={
-              <Layout isLoggedIn={true} userRole={userRole}>
-                <ProjectDetailPage />
-              </Layout>
-            } />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </>
-        )}
+        {/* ===== PUBLIC ROUTES - Login kerak emas ===== */}
+        
+        {/* Bosh sahifa - StudentHomePage hamma uchun */}
+        <Route path="/" element={
+          <Layout isLoggedIn={isLoggedIn} userRole={userRole || undefined}>
+            <StudentHomePage />
+          </Layout>
+        } />
+        
+        {/* Dashboard - public (lekin admin funksiyalari login kerak) */}
+        <Route path="/dashboard" element={
+          <Layout isLoggedIn={isLoggedIn} userRole={userRole || undefined}>
+            <DashboardPage />
+          </Layout>
+        } />
+        
+        {/* Academy - public */}
+        <Route path="/academy" element={
+          <Layout isLoggedIn={isLoggedIn} userRole={userRole || undefined}>
+            <AcademyPage />
+          </Layout>
+        } />
+        
+        {/* Students - public */}
+        <Route path="/students" element={
+          <Layout isLoggedIn={isLoggedIn} userRole={userRole || undefined}>
+            <StudentsPage />
+          </Layout>
+        } />
+        
+        {/* Debtors - public */}
+        <Route path="/debtors" element={
+          <Layout isLoggedIn={isLoggedIn} userRole={userRole || undefined}>
+            <DebtorsPage />
+          </Layout>
+        } />
+        
+        {/* Projects - public */}
+        <Route path="/projects" element={
+          <Layout isLoggedIn={isLoggedIn} userRole={userRole || undefined}>
+            <ProjectsPage />
+          </Layout>
+        } />
+        
+        {/* Project detail - public */}
+        <Route path="/project/:id" element={
+          <Layout isLoggedIn={isLoggedIn} userRole={userRole || undefined}>
+            <ProjectDetailPage />
+          </Layout>
+        } />
+        
+        {/* ===== PROTECTED ROUTES - Login kerak ===== */}
+        
+        {/* Tasks - protected */}
+        <Route path="/tasks" element={
+          <ProtectedRoute isLoggedIn={isLoggedIn}>
+            <Layout isLoggedIn={true} userRole={userRole || undefined}>
+              <TasksPage />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        
+        {/* Profile redirect - protected */}
+        <Route path="/profile" element={
+          <ProtectedRoute isLoggedIn={isLoggedIn}>
+            {userId ? <Navigate to={`/student/${userId}`} replace /> : <Navigate to="/tasks" replace />}
+          </ProtectedRoute>
+        } />
+        
+        {/* Student profile - protected (o'z profilini ko'rish uchun) */}
+        <Route path="/student/:id" element={
+          <Layout isLoggedIn={isLoggedIn} userRole={userRole || undefined}>
+            <StudentProfile />
+          </Layout>
+        } />
+        
+        {/* Student steps - admin only, protected */}
+        <Route path="/student-steps" element={
+          <ProtectedRoute isLoggedIn={isLoggedIn}>
+            {userRole === 'student' 
+              ? <Navigate to="/tasks" replace />
+              : <Layout isLoggedIn={true} userRole={userRole || undefined}><StudentStepsPage /></Layout>
+            }
+          </ProtectedRoute>
+        } />
+        
+        {/* Catch all - redirect based on login status */}
+        <Route path="*" element={
+          isLoggedIn 
+            ? <Navigate to={userRole === 'student' ? '/tasks' : '/dashboard'} replace />
+            : <Navigate to="/" replace />
+        } />
       </Routes>
     </Router>
   )

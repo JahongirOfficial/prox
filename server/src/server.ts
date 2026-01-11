@@ -31,6 +31,7 @@ import debtorsRoutes from './routes/debtorsRoutes.js'
 import projectsRoutes from './routes/projectsRoutes.js'
 import tasksRoutes from './routes/tasksRoutes.js'
 import submissionRoutes from './routes/submissionRoutes.js'
+import stepsRoutes from './routes/stepsRoutes.js'
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -56,7 +57,8 @@ app.use('/api/students', studentsRoutes)
 app.use('/api/debtors', debtorsRoutes)
 app.use('/api/projects', projectsRoutes)
 app.use('/api/tasks', tasksRoutes)
-app.use('/api/submissions', submissionRoutes)
+app.use('/api', submissionRoutes) // submissions va tasks/submit uchun
+app.use('/api/steps', stepsRoutes) // JSON-based steps API
 
 // Test route
 app.get('/', (req, res) => {

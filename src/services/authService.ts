@@ -14,6 +14,7 @@ export interface AuthResponse {
     username: string
     role: string
   }
+  paymentStatus?: any
 }
 
 export const authService = {
