@@ -57,7 +57,9 @@ export const stepsService = {
   },
 
   getCategories(): string[] {
-    const categories = new Set(this.getAllSteps().map(s => s.category))
+    const allSteps = this.getAllSteps()
+    const categories = new Set<string>()
+    allSteps.forEach(s => categories.add(s.category))
     return Array.from(categories)
   }
 }
