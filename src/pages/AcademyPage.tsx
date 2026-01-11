@@ -1,11 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
-import { FileText, User, BadgeCheck, TrendingUp, Users, GraduationCap, FolderOpen, Brain, Sparkles, Target, Rocket, Globe, ArrowRight, Sun, Moon, Monitor } from 'lucide-react'
+import { BadgeCheck, TrendingUp, Users, GraduationCap, FolderOpen, Brain, Sparkles, Target, Rocket, Globe, ArrowRight } from 'lucide-react'
 
 export default function AcademyPage() {
   const navigate = useNavigate()
   const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({})
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('dark')
   
   const heroRef = useRef<HTMLDivElement>(null)
   const statsRef = useRef<HTMLDivElement>(null)
