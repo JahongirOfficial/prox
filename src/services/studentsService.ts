@@ -19,8 +19,15 @@ export interface Student {
   payment_date: string
   username: string
   is_blocked: boolean
+  warnings?: Warning[]
   created_at: string
   updated_at: string
+}
+
+export interface Warning {
+  reason: string
+  date: string
+  given_by: string
 }
 
 export const studentsService = {
@@ -59,6 +66,22 @@ export const studentsService = {
     todayBall: number
   }> => {
     const response = await api.get(`/students/${id}/daily-balls`)
+    return response.data
+  },
+
+  // Warning functions
+  getWarnings: async (id: string): Promise<{ warnings: Warning[] }> => {
+    const response = await api.get(`/students/${id}/warnings`)
+    return response.data
+  },
+
+  addWarning: async (id: string, reason: string): Promise<{ message: string; warnings: Warning[]; is_blocked: boolean }> => {
+    const response = await api.post(`/students/${id}/warnings`, { reason })
+    return response.data
+  },
+
+  removeWarning: async (id: string, warningIndex: number): Promise<{ message: string; warnings: Warning[]; is_blocked: boolean }> => {
+    const response = await api.delete(`/students/${id}/warnings/${warningIndex}`)
     return response.data
   }
 }

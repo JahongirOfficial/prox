@@ -366,3 +366,109 @@ export const getStudentsWithSteps = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server xatoligi' })
   }
 }
+
+// Get student warnings
+export const getStudentWarnings = async (req: Request, res: Response) => {
+  try {
+    const student = await Student.findById(req.params.id).select('warnings')
+    if (!student) {
+      return res.status(404).json({ message: 'O\'quvchi topilmadi' })
+    }
+    res.json({ warnings: student.warnings || [] })
+  } catch (error) {
+    console.error('Get warnings error:', error)
+    res.status(500).json({ message: 'Server xatoligi' })
+  }
+}
+
+// Add warning to student
+export const addWarning = async (req: Request, res: Response) => {
+  try {
+    const { reason } = req.body
+    const user = (req as any).user
+
+    if (!reason || !reason.trim()) {
+      return res.status(400).json({ message: 'Ogohlantirish sababi kiritilishi shart' })
+    }
+
+    const student = await Student.findById(req.params.id)
+    if (!student) {
+      return res.status(404).json({ message: 'O\'quvchi topilmadi' })
+    }
+
+    // Maksimal 3 ta ogohlantirish
+    if (student.warnings && student.warnings.length >= 3) {
+      return res.status(400).json({ message: 'Maksimal 3 ta ogohlantirish berish mumkin' })
+    }
+
+    // Yangi ogohlantirish qo'shish
+    const newWarning = {
+      reason: reason.trim(),
+      date: new Date(),
+      given_by: user.fullName || user.username || 'Mentor'
+    }
+
+    if (!student.warnings) {
+      student.warnings = []
+    }
+    student.warnings.push(newWarning)
+
+    // Agar 3 ta ogohlantirish bo'lsa, o'quvchini bloklash
+    if (student.warnings.length >= 3) {
+      student.is_blocked = true
+      student.blocked_at = new Date()
+    }
+
+    await student.save()
+
+    res.json({ 
+      message: 'Ogohlantirish qo\'shildi',
+      warnings: student.warnings,
+      is_blocked: student.is_blocked
+    })
+  } catch (error) {
+    console.error('Add warning error:', error)
+    res.status(500).json({ message: 'Server xatoligi' })
+  }
+}
+
+// Remove warning from student
+export const removeWarning = async (req: Request, res: Response) => {
+  try {
+    const { warningId } = req.params
+
+    const student = await Student.findById(req.params.id)
+    if (!student) {
+      return res.status(404).json({ message: 'O\'quvchi topilmadi' })
+    }
+
+    if (!student.warnings || student.warnings.length === 0) {
+      return res.status(404).json({ message: 'Ogohlantirish topilmadi' })
+    }
+
+    // Warning ni o'chirish (index bo'yicha)
+    const warningIndex = parseInt(warningId)
+    if (isNaN(warningIndex) || warningIndex < 0 || warningIndex >= student.warnings.length) {
+      return res.status(400).json({ message: 'Noto\'g\'ri ogohlantirish ID' })
+    }
+
+    student.warnings.splice(warningIndex, 1)
+
+    // Agar ogohlantirish qolmasa, blokni olib tashlash
+    if (student.warnings.length < 3 && student.is_blocked) {
+      student.is_blocked = false
+      student.blocked_at = undefined as any
+    }
+
+    await student.save()
+
+    res.json({ 
+      message: 'Ogohlantirish o\'chirildi',
+      warnings: student.warnings,
+      is_blocked: student.is_blocked
+    })
+  } catch (error) {
+    console.error('Remove warning error:', error)
+    res.status(500).json({ message: 'Server xatoligi' })
+  }
+}
