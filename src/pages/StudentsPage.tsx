@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { studentsService, Student, Warning } from '../services/studentsService'
-import { AlertCircle, Search, Users, TrendingUp, AlertTriangle, Plus, X, Trash2 } from 'lucide-react'
+import { studentsService, Student } from '../services/studentsService'
+import { AlertCircle, Search, Users, TrendingUp, AlertTriangle } from 'lucide-react'
 
 export default function StudentsPage() {
   const navigate = useNavigate()
@@ -9,22 +9,7 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
-  const [warnings, setWarnings] = useState<Warning[]>([])
-  const [showWarningModal, setShowWarningModal] = useState(false)
-  const [warningReason, setWarningReason] = useState('')
-  const [warningLoading, setWarningLoading] = useState(false)
 
-  // Current user role check
-  let currentUserRole: string | null = null
-  try {
-    const raw = localStorage.getItem('user')
-    const parsed = raw ? JSON.parse(raw) : null
-    currentUserRole = parsed?.role || null
-  } catch {
-    currentUserRole = null
-  }
-  const canManageWarnings = currentUserRole === 'admin' || currentUserRole === 'mentor'
 
   useEffect(() => {
     fetchStudents()
@@ -42,61 +27,11 @@ export default function StudentsPage() {
   }
 
   const handleStudentClick = async (student: Student) => {
-    if (!canManageWarnings) {
-      navigate(`/student/${student._id}`)
-      return
-    }
-
-    setSelectedStudent(student)
-    try {
-      const data = await studentsService.getWarnings(student._id)
-      setWarnings(data.warnings)
-    } catch (err) {
-      console.error('Warning yuklashda xatolik:', err)
-      setWarnings([])
-    }
+    // Har doim profil sahifasiga o'tkazish
+    navigate(`/student/${student._id}`)
   }
 
-  const handleAddWarning = async () => {
-    if (!selectedStudent || !warningReason.trim()) return
 
-    setWarningLoading(true)
-    try {
-      const data = await studentsService.addWarning(selectedStudent._id, warningReason)
-      setWarnings(data.warnings)
-      setWarningReason('')
-      setShowWarningModal(false)
-      
-      // Update student in list
-      setStudents(prev => prev.map(s => 
-        s._id === selectedStudent._id 
-          ? { ...s, warnings: data.warnings, is_blocked: data.is_blocked }
-          : s
-      ))
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Xatolik')
-    } finally {
-      setWarningLoading(false)
-    }
-  }
-
-  const handleRemoveWarning = async (warningIndex: number) => {
-    if (!selectedStudent) return
-
-    try {
-      const data = await studentsService.removeWarning(selectedStudent._id, warningIndex)
-      setWarnings(data.warnings)
-      
-      // Update student in list
-      setStudents(prev => prev.map(s => 
-        s._id === selectedStudent._id 
-          ? { ...s, warnings: data.warnings, is_blocked: data.is_blocked }
-          : s
-      ))
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Xatolik')
-    }
-  }
 
   const getDaysSinceJoin = (student: Student) => {
     const dateStr = student.joinDate || student.created_at
@@ -255,118 +190,6 @@ export default function StudentsPage() {
               </div>
             )
           })}
-        </div>
-      )}
-
-      {/* Warning Modal */}
-      {selectedStudent && canManageWarnings && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-800 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-white">Ogohlantirish</h2>
-              <button
-                onClick={() => setSelectedStudent(null)}
-                className="p-1 hover:bg-slate-700 rounded-lg transition"
-              >
-                <X className="w-5 h-5 text-slate-400" />
-              </button>
-            </div>
-
-            <div className="mb-4">
-              <h3 className="font-semibold text-white mb-1">{selectedStudent.name}</h3>
-              <p className="text-sm text-slate-400">@{selectedStudent.username}</p>
-            </div>
-
-            {/* Current warnings */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-white">Ogohlantirish ({warnings.length}/3)</span>
-                {warnings.length < 3 && (
-                  <button
-                    onClick={() => setShowWarningModal(true)}
-                    className="p-1 hover:bg-slate-700 rounded-lg transition"
-                  >
-                    <Plus className="w-4 h-4 text-blue-400" />
-                  </button>
-                )}
-              </div>
-
-              {warnings.length === 0 ? (
-                <p className="text-sm text-slate-500">Ogohlantirish yo'q</p>
-              ) : (
-                <div className="space-y-2">
-                  {warnings.map((warning, index) => (
-                    <div key={index} className="bg-slate-700/50 rounded-lg p-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm text-white">{warning.reason}</p>
-                          <p className="text-xs text-slate-400 mt-1">
-                            {new Date(warning.date).toLocaleDateString('uz-UZ')} - {warning.given_by}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => handleRemoveWarning(index)}
-                          className="p-1 hover:bg-slate-600 rounded transition ml-2"
-                        >
-                          <Trash2 className="w-4 h-4 text-red-400" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {selectedStudent.is_blocked && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
-                <p className="text-sm text-red-400 font-medium">Bu o'quvchi bloklangan</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Add Warning Modal */}
-      {showWarningModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-          <div className="bg-slate-800 rounded-2xl p-6 max-w-md w-full">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">Ogohlantirish qo'shish</h3>
-              <button
-                onClick={() => setShowWarningModal(false)}
-                className="p-1 hover:bg-slate-700 rounded-lg transition"
-              >
-                <X className="w-5 h-5 text-slate-400" />
-              </button>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-white mb-2">Sabab</label>
-              <textarea
-                value={warningReason}
-                onChange={(e) => setWarningReason(e.target.value)}
-                placeholder="Ogohlantirish sababi..."
-                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 resize-none"
-                rows={3}
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowWarningModal(false)}
-                className="flex-1 py-2 px-4 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition"
-              >
-                Bekor qilish
-              </button>
-              <button
-                onClick={handleAddWarning}
-                disabled={!warningReason.trim() || warningLoading}
-                className="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {warningLoading ? 'Qo\'shilmoqda...' : 'Qo\'shish'}
-              </button>
-            </div>
-          </div>
         </div>
       )}
     </div>

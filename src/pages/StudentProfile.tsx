@@ -31,13 +31,17 @@ export default function StudentProfile() {
       const data = await studentsService.getStudentById(id!)
       setStudent(data)
       
-      // Warnings ni ham yuklash
-      try {
-        const warningsData = await studentsService.getWarnings(id!)
-        setWarnings(warningsData.warnings)
-      } catch (err) {
-        console.error('Warnings yuklashda xatolik:', err)
-        setWarnings([])
+      // Warnings ni ham yuklash - faqat login bo'lgan holda
+      const token = localStorage.getItem('token')
+      if (token) {
+        try {
+          const warningsData = await studentsService.getWarnings(id!)
+          setWarnings(warningsData.warnings)
+        } catch (err) {
+          // Warnings yuklashda xatolik bo'lsa, ignore qilamiz
+          console.error('Warnings yuklashda xatolik:', err)
+          setWarnings([])
+        }
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'O\'quvchi ma\'lumotlarini yuklashda xatolik')

@@ -7,6 +7,14 @@ const api = axios.create({
   },
 })
 
+// Public API instance - token yubormaslik
+export const publicApi = axios.create({
+  baseURL: (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
 // Request interceptor - har bir request'ga token qo'shish
 api.interceptors.request.use(
   (config) => {
@@ -21,14 +29,13 @@ api.interceptors.request.use(
   }
 )
 
-// Response interceptor - 401 xatolikda logout qilish
+// Response interceptor - xatoliklarni qaytarish
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      window.location.href = '/login'
-    }
+    // 401 xatolikda avtomatik logout qilmaslik
+    // Chunki ba'zi public route'lar ham token yuborishi mumkin
+    // Lekin bu xatolik bo'lmasligi kerak
     return Promise.reject(error)
   }
 )

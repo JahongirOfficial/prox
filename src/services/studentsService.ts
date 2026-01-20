@@ -1,4 +1,4 @@
-import api from './api'
+import api, { publicApi } from './api'
 
 export interface Student {
   _id: string
@@ -32,12 +32,12 @@ export interface Warning {
 
 export const studentsService = {
   getAllStudents: async (): Promise<Student[]> => {
-    const response = await api.get('/students')
+    const response = await publicApi.get('/students')
     return response.data
   },
 
   getStudentById: async (id: string): Promise<Student> => {
-    const response = await api.get(`/students/${id}`)
+    const response = await publicApi.get(`/students/${id}`)
     return response.data
   },
 
@@ -56,7 +56,7 @@ export const studentsService = {
   },
 
   getStudentsStats: async () => {
-    const response = await api.get('/students/stats')
+    const response = await publicApi.get('/students/stats')
     return response.data
   },
 
@@ -65,11 +65,11 @@ export const studentsService = {
     totalBall: number
     todayBall: number
   }> => {
-    const response = await api.get(`/students/${id}/daily-balls`)
+    const response = await publicApi.get(`/students/${id}/daily-balls`)
     return response.data
   },
 
-  // Warning functions
+  // Warning functions - protected routes
   getWarnings: async (id: string): Promise<{ warnings: Warning[] }> => {
     const response = await api.get(`/students/${id}/warnings`)
     return response.data
